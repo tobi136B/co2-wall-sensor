@@ -1,0 +1,13 @@
+# ESPHome
+esphome/secrets.yaml
+esphome/.esphome/
+.esphome/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# System
+.DS_Store
+Thumbs.db

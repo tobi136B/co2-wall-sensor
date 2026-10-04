@@ -1,0 +1,30 @@
+# Dashboard-Karte (nur Bordmittel, keine Zusatz-Karten noetig).
+# Dashboard bearbeiten > Karte hinzufuegen > Manuell > diesen Inhalt einfuegen.
+type: vertical-stack
+cards:
+  - type: gauge
+    name: CO2
+    entity: sensor.co2_wandsensor_co2
+    unit: ppm
+    min: 400
+    max: 2000
+    needle: true
+    severity:
+      green: 400
+      yellow: 1000
+      red: 1400
+  - type: glance
+    show_name: true
+    entities:
+      - entity: sensor.co2_wandsensor_luftqualitat
+        name: Luft
+      - entity: sensor.co2_wandsensor_temperatur
+        name: Temperatur
+      - entity: sensor.co2_wandsensor_luftfeuchtigkeit
+        name: Feuchte
+  - type: history-graph
+    title: Verlauf 24 h
+    hours_to_show: 24
+    entities:
+      - entity: sensor.co2_wandsensor_co2
+        name: CO2

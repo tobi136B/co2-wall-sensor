@@ -1,0 +1,3 @@
+# nur fuer die Werkzeuge in tools/
+matplotlib>=3.8
+pyyaml>=6.0

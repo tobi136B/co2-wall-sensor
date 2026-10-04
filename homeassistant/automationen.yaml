@@ -1,0 +1,58 @@
+# Beispiel-Automationen fuer Home Assistant.
+# Einfuegen ueber: Einstellungen > Automatisierungen > neue Automatisierung > YAML bearbeiten
+# (jeweils einen Block) oder in automations.yaml uebernehmen.
+# Entity-IDs ggf. an deinen Geraetenamen anpassen (Standard: co2_wandsensor).
+
+- id: co2_wandsensor_lueften_hinweis
+  alias: "CO2 Wandsensor: Lüften-Hinweis aufs Handy"
+  description: "Benachrichtigt, wenn die Luft 10 Minuten lang schlecht ist."
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: sensor.co2_wandsensor_luftqualitat
+      to: "Lüften!"
+      for: "00:10:00"
+  conditions:
+    - condition: time
+      after: "07:00:00"
+      before: "22:00:00"
+  actions:
+    - action: notify.notify
+      data:
+        title: "Bitte lüften"
+        message: >-
+          CO2 liegt bei {{ states('sensor.co2_wandsensor_co2') | int }} ppm
+          ({{ states('sensor.co2_wandsensor_temperatur') }} °C,
+          {{ states('sensor.co2_wandsensor_luftfeuchtigkeit') }} %).
+
+- id: co2_wandsensor_display_aus_bei_abwesenheit
+  alias: "CO2 Wandsensor: Display aus, wenn niemand zuhause ist"
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: zone.home
+      to: "0"
+      for: "00:05:00"
+      id: weg
+    - trigger: numeric_state
+      entity_id: zone.home
+      above: 0
+      id: da
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: weg
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: light.co2_wandsensor_display_helligkeit
+        - conditions:
+            - condition: trigger
+              id: da
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.co2_wandsensor_display_helligkeit
+              data:
+                brightness_pct: 80
