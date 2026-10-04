@@ -1,0 +1,333 @@
+# =============================================================================
+#  CO2 Wall Sensor  |  shared firmware logic (language independent)
+# -----------------------------------------------------------------------------
+#  Do not flash this file directly. Use one of the device files:
+#    ../co2-wall-sensor.yaml     English user interface
+#    ../co2-wall-sensor-de.yaml  German user interface
+#  All user-visible texts come from substitutions defined in those files.
+#
+#  Hardware: ESP32-C3 SuperMini, Sensirion SCD41 (I2C), Waveshare 2inch LCD (ST7789V, SPI)
+#  Wiring:   docs/wiring.md
+# =============================================================================
+
+substitutions:
+  # Defaults, can be overridden in the device file
+  co2_yellow_default: "1000"
+  co2_red_default: "1400"
+  temperature_offset: "2.0"     # self-heating compensation, verify against a reference after 24 h
+  altitude: "300m"              # altitude above sea level for CO2 pressure compensation
+  night_dim_percent: "8%"
+  day_brightness_percent: "80%"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  project:
+    name: "tobi136b.co2-wall-sensor"
+    version: "1.1.0"
+  on_boot:
+    priority: 600
+    then:
+      - light.turn_on:
+          id: backlight
+          brightness: ${day_brightness_percent}
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "${friendly_name} Setup"
+    password: !secret ap_password
+
+captive_portal:
+
+time:
+  - platform: homeassistant
+    id: ha_time
+    on_time:
+      - hours: 22
+        minutes: 0
+        seconds: 0
+        then:
+          - if:
+              condition:
+                switch.is_on: night_mode
+              then:
+                - light.turn_on:
+                    id: backlight
+                    brightness: ${night_dim_percent}
+      - hours: 6
+        minutes: 0
+        seconds: 0
+        then:
+          - if:
+              condition:
+                switch.is_on: night_mode
+              then:
+                - light.turn_on:
+                    id: backlight
+                    brightness: ${day_brightness_percent}
+
+# ----------------------------------------------------------------------------- buses
+i2c:
+  id: i2c_bus
+  sda: GPIO0
+  scl: GPIO1
+  frequency: 100kHz
+
+spi:
+  id: spi_bus
+  clk_pin: GPIO4
+  mosi_pin: GPIO6
+
+# ----------------------------------------------------------------------------- sensors
+sensor:
+  - platform: scd4x
+    i2c_id: i2c_bus
+    id: scd41
+    update_interval: 30s
+    measurement_mode: periodic
+    automatic_self_calibration: true
+    altitude_compensation: ${altitude}
+    temperature_offset: ${temperature_offset}
+    co2:
+      id: co2
+      name: "CO2"
+      filters:
+        - sliding_window_moving_average:
+            window_size: 2
+            send_every: 1
+    temperature:
+      id: temperature
+      name: "${txt_temperature}"
+      accuracy_decimals: 1
+    humidity:
+      id: humidity
+      name: "${txt_humidity}"
+      accuracy_decimals: 0
+
+  - platform: wifi_signal
+    name: "${txt_wifi_signal}"
+    update_interval: 120s
+    entity_category: diagnostic
+
+  - platform: uptime
+    name: "${txt_uptime}"
+    entity_category: diagnostic
+
+text_sensor:
+  - platform: template
+    id: air_quality
+    name: "${txt_air_quality}"
+    icon: mdi:air-filter
+    update_interval: 30s
+    lambda: |-
+      if (!id(co2).has_state()) return {"${txt_status_starting}"};
+      const float c = id(co2).state;
+      if (c >= id(threshold_red).state) return {"${txt_status_ventilate}"};
+      if (c >= id(threshold_yellow).state) return {"${txt_status_moderate}"};
+      return {"${txt_status_good}"};
+
+# ----------------------------------------------------------------------------- controls in Home Assistant
+number:
+  - platform: template
+    id: threshold_yellow
+    name: "${txt_threshold_yellow}"
+    icon: mdi:molecule-co2
+    unit_of_measurement: ppm
+    min_value: 600
+    max_value: 2000
+    step: 50
+    initial_value: ${co2_yellow_default}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: threshold_red
+    name: "${txt_threshold_red}"
+    icon: mdi:molecule-co2
+    unit_of_measurement: ppm
+    min_value: 800
+    max_value: 3000
+    step: 50
+    initial_value: ${co2_red_default}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+switch:
+  - platform: template
+    id: night_mode
+    name: "${txt_night_mode}"
+    icon: mdi:weather-night
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+
+button:
+  - platform: restart
+    name: "${txt_restart}"
+    entity_category: diagnostic
+  - platform: template
+    name: "${txt_calibrate}"
+    icon: mdi:tune-vertical
+    entity_category: config
+    on_press:
+      - scd4x.perform_forced_calibration:
+          value: 420
+          id: scd41
+
+# ----------------------------------------------------------------------------- display
+output:
+  - platform: ledc
+    id: backlight_pwm
+    pin: GPIO10
+
+light:
+  - platform: monochromatic
+    id: backlight
+    name: "${txt_brightness}"
+    icon: mdi:brightness-6
+    output: backlight_pwm
+    restore_mode: RESTORE_DEFAULT_ON
+    default_transition_length: 1s
+
+color:
+  - id: col_green
+    hex: "2ECC71"
+  - id: col_yellow
+    hex: "F5B700"
+  - id: col_red
+    hex: "E74C3C"
+  - id: col_text
+    hex: "F2F2F2"
+  - id: col_muted
+    hex: "7A7F87"
+  - id: col_line
+    hex: "2A2E35"
+
+font:
+  - file: "gfonts://Inter@700"
+    id: font_big
+    size: 72
+    glyphs: "0123456789-"
+  - file: "gfonts://Inter@600"
+    id: font_medium
+    size: 24
+    glyphs: " %,-.0123456789:C°"
+  # Superset of all status texts in English and German
+  - file: "gfonts://Inter@400"
+    id: font_small
+    size: 15
+    glyphs: " !%,-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÖÜß°"
+  - file:
+      type: web
+      url: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/master/fonts/materialdesignicons-webfont.ttf"
+    id: icons
+    size: 22
+    glyphs:
+      - "\U000F050F" # mdi-thermometer
+      - "\U000F058E" # mdi-water-percent
+      - "\U000F05A9" # mdi-wifi
+      - "\U000F05AA" # mdi-wifi-off
+
+graph:
+  - id: co2_graph
+    duration: 3h
+    x_grid: 1h
+    width: 300
+    height: 64
+    border: false
+    min_range: 400
+    traces:
+      - sensor: co2
+        line_type: SOLID
+        line_thickness: 2
+        color: col_muted
+
+display:
+  - platform: mipi_spi
+    id: lcd
+    model: ST7789V
+    spi_id: spi_bus
+    cs_pin: GPIO7
+    dc_pin: GPIO5
+    reset_pin: GPIO3
+    invert_colors: true
+    rotation: 90
+    update_interval: 5s
+    lambda: |-
+      // ------------------------------------------------------------ layout 320 x 240
+      const int W = it.get_width();
+      auto fmt = [](float v, int decimals) {
+        char buf[16];
+        snprintf(buf, sizeof(buf), "%.*f", decimals, v);
+        for (char *p = buf; *p; p++) if (*p == '.') *p = "${decimal_separator}"[0];
+        return std::string(buf);
+      };
+
+      Color level = id(col_muted);
+      std::string status = "${txt_status_starting}";
+      if (id(co2).has_state()) {
+        const float c = id(co2).state;
+        if (c >= id(threshold_red).state)         { level = id(col_red);    status = "${txt_status_ventilate}"; }
+        else if (c >= id(threshold_yellow).state) { level = id(col_yellow); status = "${txt_status_moderate}"; }
+        else                                      { level = id(col_green);  status = "${txt_status_good}"; }
+      }
+
+      // header: time left, WiFi right
+      auto now = id(ha_time).now();
+      if (now.is_valid()) it.strftime(12, 8, id(font_medium), id(col_text), "%H:%M", now);
+      const bool online = wifi::global_wifi_component->is_connected();
+      it.print(W - 12, 10, id(icons), online ? id(col_muted) : id(col_red), TextAlign::TOP_RIGHT,
+               online ? "\U000F05A9" : "\U000F05AA");
+
+      // status pill
+      const int pw = 140, ph = 26, px = (W - pw) / 2, py = 9;
+      it.filled_rectangle(px + ph / 2, py, pw - ph, ph, level);
+      it.filled_circle(px + ph / 2, py + ph / 2, ph / 2, level);
+      it.filled_circle(px + pw - ph / 2, py + ph / 2, ph / 2, level);
+      it.print(W / 2, py + ph / 2 + 1, id(font_small), Color::BLACK, TextAlign::CENTER, status.c_str());
+
+      // CO2 value
+      if (id(co2).has_state()) {
+        it.printf(W / 2 - 18, 84, id(font_big), level, TextAlign::CENTER, "%.0f", id(co2).state);
+      } else {
+        it.print(W / 2 - 18, 84, id(font_big), id(col_muted), TextAlign::CENTER, "--");
+      }
+      it.print(W - 14, 74, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, "ppm");
+      it.print(W - 14, 94, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, "CO2");
+
+      // trend of the last 3 hours
+      it.line(10, 199, W - 10, 199, id(col_line));
+      it.graph(10, 132, id(co2_graph), level);
+      it.print(12, 132, id(font_small), id(col_muted), TextAlign::TOP_LEFT, "3h");
+
+      // footer: temperature and humidity
+      if (id(temperature).has_state()) {
+        it.print(14, 225, id(icons), id(col_muted), TextAlign::CENTER_LEFT, "\U000F050F");
+        it.print(42, 225, id(font_medium), id(col_text), TextAlign::CENTER_LEFT,
+                 (fmt(id(temperature).state, 1) + " °C").c_str());
+      }
+      if (id(humidity).has_state()) {
+        it.print(W - 14, 225, id(font_medium), id(col_text), TextAlign::CENTER_RIGHT,
+                 (fmt(id(humidity).state, 0) + " %").c_str());
+        it.print(W - 76, 225, id(icons), id(col_muted), TextAlign::CENTER_RIGHT, "\U000F058E");
+      }

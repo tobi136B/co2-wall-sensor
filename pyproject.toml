@@ -1,0 +1,8 @@
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+# The Fusion script runs inside Autodesk Fusion and imports adsk, which is not installable.
+extend-exclude = ["cad/fusion/generate_enclosure/generate_enclosure.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]

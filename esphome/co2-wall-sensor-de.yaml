@@ -1,0 +1,33 @@
+# CO2-Wandsensor, deutsche Bedienoberflaeche.
+# secrets.yaml.example nach secrets.yaml kopieren, ausfuellen und diese Datei flashen.
+# Englische Oberflaeche: co2-wall-sensor.yaml verwenden.
+
+substitutions:
+  name: co2-wandsensor
+  friendly_name: CO2 Wandsensor
+  decimal_separator: ","
+  # Namen der Entitaeten in Home Assistant
+  txt_temperature: "Temperatur"
+  txt_humidity: "Luftfeuchtigkeit"
+  txt_air_quality: "Luftqualität"
+  txt_wifi_signal: "WLAN Signal"
+  txt_uptime: "Laufzeit"
+  txt_threshold_yellow: "CO2 Schwelle Gelb"
+  txt_threshold_red: "CO2 Schwelle Rot"
+  txt_night_mode: "Nachtmodus (22 bis 6 Uhr dimmen)"
+  txt_restart: "Neustart"
+  txt_calibrate: "SCD41 kalibrieren (Frischluft 420 ppm)"
+  txt_brightness: "Display Helligkeit"
+  # Statustexte auf dem Display und in Home Assistant
+  txt_status_starting: "Messung startet"
+  txt_status_good: "Gut"
+  txt_status_moderate: "Mäßig"
+  txt_status_ventilate: "Lüften!"
+  # Optionale Anpassungen (Standardwerte in common/base.yaml)
+  # co2_yellow_default: "1000"
+  # co2_red_default: "1400"
+  # temperature_offset: "2.0"
+  # altitude: "300m"
+
+packages:
+  base: !include common/base.yaml

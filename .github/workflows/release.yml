@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    name: Publish release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: firmware-*
+          path: dist
+          merge-multiple: true
+      - name: Prepare assets
+        run: |
+          cp cad/stl/*.stl cad/step/*.step docs/drawing/*.pdf dist/
+          ls -l dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            **Print files:** housing, back cover, wall plate and desk stand (STL) plus the full assembly (STEP).
+            **Drawing:** technical drawing in English and German (PDF).
+            **Firmware:** `*.factory.bin` for the first flash via USB (e.g. https://web.esphome.io), `*.ota.bin` for updates.
+            The firmware binaries are CI test builds without real credentials (setup hotspot password `co2-sensor-setup`).
+            For daily use build the firmware yourself with your own `secrets.yaml`, see the README.
+
+            **Deutsch:** Druckdateien (STL/STEP), Zeichnung (PDF, EN und DE) und Test-Firmware für Englisch und Deutsch.
+            Für den Alltag die Firmware mit eigener `secrets.yaml` selbst bauen, siehe README.de.md.
+          files: dist/*

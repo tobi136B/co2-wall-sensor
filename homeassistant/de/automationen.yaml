@@ -1,7 +1,7 @@
 # Beispiel-Automationen fuer Home Assistant.
 # Einfuegen ueber: Einstellungen > Automatisierungen > neue Automatisierung > YAML bearbeiten
 # (jeweils einen Block) oder in automations.yaml uebernehmen.
-# Entity-IDs ggf. an deinen Geraetenamen anpassen (Standard: co2_wandsensor).
+# Entity-IDs ggf. an deinen Geraetenamen anpassen (Standard: co2_wandsensor, deutsche Firmware co2-wall-sensor-de.yaml).
 
 - id: co2_wandsensor_lueften_hinweis
   alias: "CO2 Wandsensor: Lüften-Hinweis aufs Handy"

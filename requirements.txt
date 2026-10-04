@@ -1,3 +1,4 @@
-# nur fuer die Werkzeuge in tools/
+# Python tools in tools/ (drawing, wiring diagram, display preview)
 matplotlib>=3.8
+pillow>=10.0
 pyyaml>=6.0

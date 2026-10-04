@@ -1,6 +1,8 @@
 # Verdrahtung
 
-![Verdrahtungsplan](bilder/verdrahtung.png)
+[English](../wiring.md) | **Deutsch**
+
+![Verdrahtungsplan](../images/wiring_de.png)
 
 Alle Module laufen mit 3,3 V direkt aus dem ESP32-C3 SuperMini. Strom kommt über die USB-C-Buchse des ESP.
 
@@ -13,29 +15,29 @@ Alle Module laufen mit 3,3 V direkt aus dem ESP32-C3 SuperMini. Strom kommt übe
 | DIN | GPIO6    | SPI MOSI |
 | CLK | GPIO4    | SPI Takt |
 | CS  | GPIO7    | Chip Select |
-| DC  | GPIO5    | Daten/Kommando |
+| DC  | GPIO5    | Daten / Kommando |
 | RST | GPIO3    | Reset |
 | BL  | GPIO10   | Hintergrundlicht (PWM, dimmbar) |
 
-## ESP32-C3 SuperMini zu SCD41 (I²C)
+## ESP32-C3 SuperMini zu SCD41 (I2C)
 
 | SCD41 | ESP32-C3 | Funktion |
 |-------|----------|----------|
 | VDD   | 3V3      | Versorgung 3,3 V |
 | GND   | GND      | Masse |
-| SDA   | GPIO0    | I²C Daten |
-| SCL   | GPIO1    | I²C Takt |
+| SDA   | GPIO0    | I2C Daten |
+| SCL   | GPIO1    | I2C Takt |
 
 ## Warum genau diese Pins?
 
 * **GPIO2, GPIO8 und GPIO9** sind Strapping-Pins des ESP32-C3 (GPIO8 hängt zusätzlich an der blauen LED, GPIO9 am BOOT-Taster). Sie bleiben frei, damit das Board immer sauber startet.
 * **GPIO18 und GPIO19** sind die USB-Datenleitungen und bleiben ebenfalls frei.
-* **GPIO10** ist PWM-fähig und steuert die Displayhelligkeit, damit der Nachtmodus funktioniert.
+* **GPIO10** ist PWM-fähig und dimmt das Hintergrundlicht, damit funktioniert der Nachtmodus.
 
-Der Verdrahtungsplan wird mit `python tools/verdrahtung.py` direkt aus `esphome/co2-wandsensor.yaml` erzeugt. Wer Pins in der YAML ändert, erzeugt den Plan einfach neu.
+Der Plan wird mit `python tools/wiring.py` direkt aus `esphome/common/base.yaml` erzeugt. Wer Pins in der YAML ändert, erzeugt den Plan einfach neu.
 
 ## Tipps
 
-* Kabellänge etwa 6 cm, dünne Litze (AWG 28 bis 30) passt gut durch die Kabeldurchführungen.
-* Die SCD41-Leitungen durch die Kerbe im Zwischenboden führen und die Kerbe danach mit etwas Heißkleber abdichten. So zieht keine warme Luft vom ESP in die Sensorkammer.
-* Vor dem Einbau einmal komplett auf dem Tisch testen.
+* Ca. 6 cm dünne Litze (AWG 28 bis 30) passt gut durch die Kabelkerben.
+* Der SCD41 zieht für wenige Millisekunden bis ca. 200 mA. Der 3,3-V-Regler des SuperMini schafft das, die Versorgungsleitungen trotzdem kurz halten.
+* Alles zuerst auf dem Tisch testen, dann einbauen.

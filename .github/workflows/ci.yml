@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  ESPHOME_VERSION: "2026.9.1"
+
+jobs:
+  tools:
+    name: Tools (drawing, wiring, preview)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r requirements.txt ruff
+      - name: Lint
+        run: ruff check tools
+      - name: Generate drawing, wiring diagram and display preview
+        run: |
+          python tools/drawing.py
+          python tools/wiring.py
+          python tools/display_preview.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: generated-docs
+          path: |
+            docs/drawing/
+            docs/images/wiring_*.png
+            docs/images/display_preview_*.png
+
+  firmware:
+    name: Firmware (${{ matrix.lang }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lang: en
+            config: co2-wall-sensor.yaml
+          - lang: de
+            config: co2-wall-sensor-de.yaml
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cache PlatformIO and ESPHome build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            esphome/.esphome
+          key: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.lang }}-${{ hashFiles('esphome/**/*.yaml') }}
+          restore-keys: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.lang }}-
+      - name: Install ESPHome
+        run: pip install "esphome==${ESPHOME_VERSION}"
+      - name: Create CI secrets (no real credentials)
+        run: |
+          python - <<'PY'
+          import base64, os
+          key = base64.b64encode(os.urandom(32)).decode()
+          with open("esphome/secrets.yaml", "w", encoding="utf-8") as f:
+              f.write('wifi_ssid: "not-configured"\n')
+              f.write('wifi_password: "not-configured"\n')
+              f.write('ap_password: "co2-sensor-setup"\n')
+              f.write(f'api_encryption_key: "{key}"\n')
+              f.write('ota_password: "ci-build"\n')
+          PY
+      - name: Validate configuration
+        working-directory: esphome
+        run: esphome config ${{ matrix.config }} > /dev/null
+      - name: Compile firmware
+        working-directory: esphome
+        run: esphome compile ${{ matrix.config }}
+      - name: Collect binaries
+        run: |
+          mkdir -p dist
+          for f in esphome/.esphome/build/*/.pioenvs/*/firmware.factory.bin esphome/.esphome/build/*/.pioenvs/*/firmware.ota.bin; do
+            [ -f "$f" ] && cp "$f" "dist/co2-wall-sensor-${{ matrix.lang }}.$(basename "$f" | sed 's/^firmware\.//')"
+          done
+          ls -l dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.lang }}
+          path: dist/*.bin
+          if-no-files-found: error

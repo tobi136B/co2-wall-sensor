@@ -1,0 +1,12 @@
+qty,part,specification,used_for,approx_price_eur
+1,Sensirion SCD41 breakout,"CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V",sensor chamber,20-35
+1,ESP32-C3 SuperMini,"USB-C, WiFi, 22.5 x 18 mm",controller,3
+1,Waveshare 2inch LCD Module,"ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm",display,10
+1,USB-C cable with right-angle plug,"90 degree plug, length to suit",power,5
+1,USB power supply 5 V / 1 A,"plug-in or flush mounted USB insert",power,5
+2,Heat-set insert M3,"e.g. Ruthex M3 x 5.7, hole 4.0 mm",back cover,
+2,Countersunk screw M3 x 6,ISO 10642,back cover,
+4,Self-tapping plastic screw M2 x 4,for plastics,display,
+1,Stranded wire,"AWG 28-30, about 1 m",wiring,
+1,Double-sided foam tape,small piece,SCD41 fixing,
+1,Filament PETG,about 120 g,all printed parts,3

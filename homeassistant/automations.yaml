@@ -1,0 +1,57 @@
+# Example automations for Home Assistant (English firmware: co2-wall-sensor.yaml).
+# Paste one block at a time via Settings > Automations > New automation > Edit in YAML,
+# or merge them into automations.yaml. Adjust entity IDs if you renamed the device.
+
+- id: co2_wall_sensor_ventilate_notification
+  alias: "CO2 Wall Sensor: ventilate reminder"
+  description: "Sends a phone notification when the air has been bad for 10 minutes."
+  mode: single
+  triggers:
+    - trigger: state
+      entity_id: sensor.co2_wall_sensor_air_quality
+      to: "Ventilate!"
+      for: "00:10:00"
+  conditions:
+    - condition: time
+      after: "07:00:00"
+      before: "22:00:00"
+  actions:
+    - action: notify.notify
+      data:
+        title: "Please open a window"
+        message: >-
+          CO2 is at {{ states('sensor.co2_wall_sensor_co2') | int }} ppm
+          ({{ states('sensor.co2_wall_sensor_temperature') }} °C,
+          {{ states('sensor.co2_wall_sensor_humidity') }} %).
+
+- id: co2_wall_sensor_display_off_when_away
+  alias: "CO2 Wall Sensor: display off when nobody is home"
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: zone.home
+      to: "0"
+      for: "00:05:00"
+      id: away
+    - trigger: numeric_state
+      entity_id: zone.home
+      above: 0
+      id: home
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: away
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: light.co2_wall_sensor_display_brightness
+        - conditions:
+            - condition: trigger
+              id: home
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: light.co2_wall_sensor_display_brightness
+              data:
+                brightness_pct: 80

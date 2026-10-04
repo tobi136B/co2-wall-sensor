@@ -3,7 +3,7 @@
   "type": "script",
   "author": "Tobias Schneider",
   "description": {
-    "": "CO2-Wandsensor: erzeugt Gehaeuse, Rueckdeckel, Wandplatte und Tischstaender"
+    "": "CO2 Wall Sensor: builds housing, back cover, wall plate and desk stand"
   },
   "supportedOS": "windows|mac",
   "editEnabled": true

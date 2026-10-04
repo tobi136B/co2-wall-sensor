@@ -1,0 +1,30 @@
+# Dashboard card using built-in cards only (English firmware).
+# Edit dashboard > Add card > Manual > paste this content.
+type: vertical-stack
+cards:
+  - type: gauge
+    name: CO2
+    entity: sensor.co2_wall_sensor_co2
+    unit: ppm
+    min: 400
+    max: 2000
+    needle: true
+    severity:
+      green: 400
+      yellow: 1000
+      red: 1400
+  - type: glance
+    show_name: true
+    entities:
+      - entity: sensor.co2_wall_sensor_air_quality
+        name: Air
+      - entity: sensor.co2_wall_sensor_temperature
+        name: Temperature
+      - entity: sensor.co2_wall_sensor_humidity
+        name: Humidity
+  - type: history-graph
+    title: Last 24 h
+    hours_to_show: 24
+    entities:
+      - entity: sensor.co2_wall_sensor_co2
+        name: CO2

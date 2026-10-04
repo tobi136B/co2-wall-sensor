@@ -1,0 +1,43 @@
+name: Bug report / Fehlerbericht
+description: Something does not work as expected. / Etwas funktioniert nicht wie erwartet.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! English or German is fine. / Danke für die Meldung! Englisch oder Deutsch ist ok.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area / Bereich
+      options:
+        - Firmware (ESPHome)
+        - Enclosure / Gehäuse (CAD, print)
+        - Home Assistant
+        - Documentation / Doku
+        - Tools (drawing, wiring, preview)
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened? / Was ist passiert?
+      description: What did you expect and what happened instead? / Was hast du erwartet, was ist passiert?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / Schritte zum Nachstellen
+      placeholder: "1. ...\n2. ...\n3. ..."
+  - type: input
+    id: versions
+    attributes:
+      label: Versions / Versionen
+      placeholder: "ESPHome 2026.9.1, Home Assistant 2026.10, project v1.1.0"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: ESPHome logs or screenshots. Remove passwords and keys! / ESPHome-Logs oder Screenshots. Passwörter und Schlüssel entfernen!
+      render: shell
