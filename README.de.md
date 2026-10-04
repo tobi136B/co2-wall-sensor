@@ -25,7 +25,9 @@ Sitzt unsichtbar auf einer Hohlwanddose oder steht auf dem Schreibtisch.**
 * **Echte CO2-Messung** mit dem Sensirion SCD41 (photoakustisch, NDIR), dazu Temperatur und Luftfeuchte.
 * **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Temperatur und Luftfeuchte. Kein Umschalten, keine Tasten.
 * **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene auf der Rückseite passt auf die **Wandplatte** (verdeckt eine Standard-Hohlwanddose Ø 68 mm, das Kabel kommt aus der Wand) oder auf den **Tischständer**.
-* **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer, durch Zwischenboden und Trennwand vom ESP32 getrennt. Frischluft kommt von unten, die Front bleibt geschlossen und staubunempfindlich.
+* **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer, durch einen verschraubten Sensorträger und eine Trennwand vom ESP32 getrennt. Frischluft kommt von unten, die Front bleibt geschlossen und staubunempfindlich.
+* **Eine Schraubensorte, überall Metallgewinde.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4 (ISO 7380) halten Display, Sensorträger und Rückdeckel. Keine Kunststoffgewinde, keine Clips, die ausleiern.
+* **Kabel von unten oder hinten, Entscheidung nach dem Druck.** Zwei unsichtbare Ausbrechfelder: hinten für einen Winkelstecker in die Dose oder den Tischständer, unten für einen geraden Stecker.
 * **Native Home-Assistant-Integration** über ESPHome: Schwellen, Nachtmodus, Helligkeit und Kalibrierung direkt aus HA bedienbar.
 * **Vollständig parametrisches CAD.** Das Gehäuse entsteht per Python-Skript in Autodesk Fusion. Wert ändern, Skript starten, fertig. Technische Zeichnung und Verdrahtungsplan werden aus denselben Quellen erzeugt.
 * **Zweisprachig.** Firmware, Doku und Zeichnungen auf Englisch und Deutsch.
@@ -51,13 +53,15 @@ Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisie
 
 | | |
 |---|---|
-| Gerät | 66,8 × 66,8 × 20 mm (+ 3 mm Schiene) |
+| Gerät | 69,8 × 69,8 × 22 mm (+ 3 mm Schiene) |
 | Wandplatte | 82 × 82 × 7 mm, passt auf Hohlwanddosen Ø 68 mm mit 60 mm Schraubabstand |
 | Displayfenster | 41,8 × 31,6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 bis 5000 ppm, ±(50 ppm + 5 % vom Messwert) |
 | Versorgung | 5 V über USB-C, ca. 0,5 W |
 | Neigung auf dem Tischständer | 12° nach hinten |
-| Druckmaterial | PETG (PLA möglich), ca. 120 g |
+| Verbindungselemente | 10 × Einschmelzmutter M2 × 3 (AD 3,2), 10 × M2 × 4 ISO 7380 |
+| Kabelaustritt | hinten (Winkelstecker) oder unten (gerader Stecker), Ausbrechfelder |
+| Druckmaterial | PETG (PLA möglich), ca. 100 g |
 
 Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_sensor_drawing_de.pdf) | [Englisch (PDF)](docs/drawing/co2_wall_sensor_drawing_en.pdf)
 
@@ -73,18 +77,17 @@ Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_
 | 1 | Sensirion **SCD41** Modul | CO2, Temperatur, Feuchte, I2C | 20 bis 35 € |
 | 1 | **ESP32-C3 SuperMini** | USB-C, WLAN | 3 € |
 | 1 | **Waveshare 2inch LCD Module** | ST7789V, 240 × 320, IPS, SPI | 10 € |
-| 1 | USB-C-Kabel mit **90°-Winkelstecker** | ein gerader Stecker passt nicht | 5 € |
+| 1 | USB-C-Kabel | **Winkelstecker** für Austritt hinten (Dose, Tischständer) oder **gerader Stecker** für Austritt unten | 5 € |
 | 1 | Netzteil 5 V / 1 A | oder Unterputz-USB-Einsatz in der Dose | 5 € |
-| 2 | Einschmelzmutter **M3** (z. B. Ruthex M3 × 5,7) | Rückdeckel | |
-| 2 | Senkkopfschraube **M3 × 6** (ISO 10642) | Rückdeckel | |
-| 4 | Kunststoffschraube **M2 × 4** | Display | |
-| | Litze AWG 28 bis 30, Schaumklebeband | Verdrahtung, SCD41 fixieren | |
+| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm | Display 4, Rückdeckel 4, Sensorträger 2 | 3 € je 100 |
+| 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 | gleiche Stellen, einzige Schraubensorte | 3 € je 100 |
+| | Litze AWG 28 bis 30, doppelseitiges Schaumklebeband | Verdrahtung, SCD41 und ESP32-C3 fixieren | |
 
 Maschinenlesbar: [`hardware/bom.csv`](hardware/bom.csv)
 
 ## Schnellstart
 
-1. **Drucken:** die vier Teile aus [`cad/stl`](cad/stl). Druckeinstellungen: [docs/de/aufbau.md](docs/de/aufbau.md).
+1. **Drucken:** die fünf Teile aus [`cad/stl`](cad/stl) (Gehäuse, Sensorträger, Rückdeckel, Wandplatte, Tischständer). Druckeinstellungen: [docs/de/aufbau.md](docs/de/aufbau.md).
 2. **Verdrahten:** nach [docs/de/verdrahtung.md](docs/de/verdrahtung.md).
 
    <img src="docs/images/wiring_de.png" width="80%" alt="Verdrahtungsplan">
@@ -94,7 +97,11 @@ Maschinenlesbar: [`hardware/bom.csv`](hardware/bom.csv)
 
 <div align="center">
 <img src="docs/images/exploded_view.png" width="80%" alt="Explosionsansicht">
-<br><sub>Explosionsansicht: Gehäuse, Display, SCD41, ESP32-C3, Rückdeckel mit Schiene, Wandplatte</sub>
+<br><sub>Explosionsansicht: Display, Gehäuse, SCD41, Sensorträger, ESP32-C3, Rückdeckel mit Schiene, Wandplatte</sub>
+<br><br>
+<img src="docs/images/interior.png" width="46%" alt="Innenansicht ohne Rückdeckel">
+<img src="docs/images/back_view.png" width="46%" alt="Rückansicht mit vier M2-Schrauben und Schiene">
+<br><sub>Links: Innenansicht, die USB-C-Buchse zeigt nach unten zu beiden Ausbrechfeldern. Rechts: Rückdeckel mit vier versenkten M2-Schrauben und der Schwalbenschwanzschiene.</sub>
 </div>
 
 ## Entitäten in Home Assistant
@@ -150,7 +157,7 @@ Mehr Hintergrund: [Designnotizen](docs/de/design.md) und [FAQ](docs/de/faq.md).
 
 ## Vor dem ersten Druck
 
-* **SCD41-Platine:** Im Modell steckt ein Platzhalter mit 24 × 22 × 7 mm. Eigene Platine nachmessen und `SCD_W/SCD_H/SCD_T` anpassen.
+* **SCD41-Platine:** Im Modell steckt ein Platzhalter mit 20 × 20 × 8,1 mm. Eigene Platine nachmessen und `SCD_W/SCD_H/SCD_T` anpassen.
 * **Displayglas:** Waveshare dokumentiert die Glasdicke nicht, angenommen sind 2,5 mm (`GLASS_T`).
 * **Firmware:** Die Konfiguration wird von der CI geprüft und kompiliert. Das Displaylayout ist noch nicht auf echter Hardware getestet, Rückmeldungen sind willkommen.
 

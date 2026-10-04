@@ -19,7 +19,7 @@ Günstige „CO2“-Sensoren wie SGP30 oder CCS811 schätzen nur einen CO2-Äqui
 
 Jedes elektronische Gerät heizt sich selbst auf. Ein ESP32 mit WLAN und ein Display-Hintergrundlicht heben einen eingebauten Sensor schnell um mehrere Kelvin an. Gegenmaßnahmen:
 
-* **Eigene Sensorkammer** im Kinn des Gehäuses, zum Display durch eine Trennwand und zum ESP durch einen Zwischenboden abgeschlossen.
+* **Eigene Sensorkammer** im Kinn des Gehäuses, zum Display durch eine Trennwand und zum ESP durch den verschraubten Sensorträger abgeschlossen. Der Träger ist ein eigenes Teil, dadurch lässt sich der SCD41 leicht einbauen und tauschen.
 * **Luft kommt von unten** durch 13 Schlitze im Boden und je 3 Schlitze an den Seiten. Warme Luft der Elektronik steigt hinter dem Display nach oben, weg vom Sensor.
 * **ESP32-C3 statt klassischem ESP32:** ein Kern, kein USB-UART-Chip, kein Laderegler. Weniger Abwärme.
 * **Kabelkerbe mit Heißkleber abgedichtet**, damit keine warme Luft vom ESP in die Kammer gezogen wird.
@@ -38,6 +38,24 @@ Eine kurze Schwalbenschwanzschiene am Rückdeckel passt in zwei Adapter:
 * **Tischständer.** Gleiche Schiene, das Gerät lehnt für bessere Lesbarkeit 12° nach hinten, mit 5 mm Luftspalt unten, damit die Lüftung frei bleibt.
 
 Das Einsetzfenster über der Nut liegt verdeckt hinter dem Gerät. Gerät von vorne einsetzen und 15 mm nach unten schieben. Von außen ist nichts zu sehen, abnehmen geht ohne Werkzeug.
+
+## Verschraubung: eine Schraubensorte, nur Metallgewinde
+
+Kunststoffgewinde nutzen sich nach wenigen Zyklen ab, und selbstschneidende Schrauben sprengen dünne Dome. Deshalb sitzt an jeder Schraubstelle eine Einschmelzmutter aus Messing, überall mit denselben Teilen:
+
+* **10 × Einschmelzmutter M2 × 3** (Außendurchmesser 3,2 mm, Bohrung Ø 3,0 × 3,4 mm): 4 für das Display, 4 für den Rückdeckel, 2 für den Sensorträger.
+* **10 × Linsenkopfschraube (Halbrundkopf) M2 × 4, ISO 7380.** Ein Innensechskantschlüssel für das ganze Gerät.
+
+Der Rückdeckel wird an vier Punkten gehalten: zwei Dome in den unteren Ecken und zwei Einschmelzmuttern in einem massiven 5 mm Band über dem Displayschacht. Die Linsenköpfe sitzen in 1,3 mm tiefen Senkungen, die Deckelfläche bleibt plan und gleitet sauber auf Wandplatte und Tischständer. Der Deckel hat innen weder Stifte noch Haken und druckt flach ohne Stützmaterial.
+
+## Kabelaustritt: Entscheidung nach dem Druck
+
+Der ESP32-C3 sitzt mit der USB-C-Buchse **nach unten**, darunter sind 13 mm frei. Zwei Ausbrechfelder mit 0,6 mm sind vorbereitet und bündig mit der Außenfläche, also unsichtbar:
+
+* **Rückdeckel:** für einen Winkelstecker. Das Kabel geht direkt in die Hohlwanddose oder durch den Tischständer.
+* **Unterseite:** für einen geraden Stecker, wenn das Kabel auf Putz läuft.
+
+Man druckt ein Gehäuse und entscheidet vor Ort, welche Membran herausgebrochen wird. Die andere bleibt zu.
 
 ## Stromversorgung
 

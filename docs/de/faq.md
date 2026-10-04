@@ -26,5 +26,11 @@ Die Wandplatte nutzt die beiden waagrechten Geräteschrauben. Die meisten Hohlwa
 ### Kann ich die fertigen Firmware-Dateien direkt nutzen?
 Nur für einen schnellen Hardwaretest. Die Release-Dateien baut die CI ohne echte Zugangsdaten: Sie öffnen den Hotspot „CO2 Wandsensor Setup“ (Passwort `co2-sensor-setup`), über den du Display und Sensor prüfen kannst, in Home Assistant tauchen sie nur mit dem CI-Schlüssel auf. Flashen mit [ESPHome Web](https://web.esphome.io). Für den Alltag die Firmware immer selbst mit eigener `secrets.yaml` bauen.
 
+### Welche Einschmelzmuttern und Schrauben genau?
+Handelsübliche Einschmelzmuttern M2 × 3 mit 3,2 mm Außendurchmesser (die verbreiteten Packungen „M2 x 3 x 3,2“) und Linsenkopfschrauben M2 × 4 nach ISO 7380. Muttern mit anderem Außendurchmesser gehen, wenn im Generator `INSERT_HOLE_D` angepasst wird.
+
+### Kabel von unten oder von hinten?
+Beides ist als Ausbrechfeld vorbereitet. Hinten mit Winkelstecker für die Hohlwanddose und den Tischständer, unten mit geradem Stecker für ein Kabel auf Putz. Siehe [Aufbau](aufbau.md#4-kabelaustritt-wählen).
+
 ### Warum werden Zeichnung und Bilder generiert?
 Damit sie immer zum Modell passen. Parameter ändern, Tools starten, committen. Die CI prüft, ob die Tools weiterhin laufen.

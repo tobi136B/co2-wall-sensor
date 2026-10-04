@@ -26,5 +26,11 @@ The wall plate uses the two horizontal box screws. Most German flush wall boxes 
 ### Can I use the published firmware files directly?
 Only for a quick hardware test. The release binaries are built by CI without real credentials: they open the hotspot "CO2 Wall Sensor Setup" (password `co2-sensor-setup`) where you can check display and sensor, and they show up in Home Assistant only with the CI key. Flash them with [ESPHome Web](https://web.esphome.io). For daily use always build the firmware yourself with your own `secrets.yaml`.
 
+### Which inserts and screws exactly?
+Generic M2 × 3 heat-set inserts with 3.2 mm outer diameter (the common "M2 x 3 x 3.2" packs) and M2 × 4 button head screws ISO 7380. Inserts with a different outer diameter work if you change `INSERT_HOLE_D` in the generator.
+
+### Cable from below or from the back?
+Both are prepared as knock-outs. Back with a right-angle plug for the flush wall box and the desk stand, bottom with a straight plug for a surface mounted cable. See [assembly](assembly.md#4-choose-the-cable-exit).
+
 ### Why are the drawing and images generated?
 Because they then always match the model. Change a parameter, run the tools, commit. The CI checks that the tools still run.
