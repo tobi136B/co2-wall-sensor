@@ -87,9 +87,15 @@ jobs:
       - name: Collect binaries
         run: |
           mkdir -p dist
-          for f in esphome/.esphome/build/*/.pioenvs/*/firmware.factory.bin esphome/.esphome/build/*/.pioenvs/*/firmware.ota.bin; do
-            [ -f "$f" ] && cp "$f" "dist/co2-wall-sensor-${{ matrix.lang }}.$(basename "$f" | sed 's/^firmware\.//')"
-          done
+          echo "Binaries found in the build tree:"
+          find esphome/.esphome -type f -name '*.bin' -printf '%p (%s bytes)\n' | grep -v -E '/(bootloader|partition|ota_data)' || true
+          factory=$(find esphome/.esphome -type f -name '*factory.bin' | head -n 1)
+          ota=$(find esphome/.esphome -type f -name '*ota.bin' ! -name 'ota_data*' | head -n 1)
+          if [ -z "$factory" ]; then
+            factory=$(find esphome/.esphome -type f -name 'firmware.bin' | head -n 1)
+          fi
+          [ -n "$factory" ] && cp "$factory" "dist/co2-wall-sensor-${{ matrix.lang }}.factory.bin"
+          [ -n "$ota" ] && cp "$ota" "dist/co2-wall-sensor-${{ matrix.lang }}.ota.bin"
           ls -l dist
       - uses: actions/upload-artifact@v4
         with:
