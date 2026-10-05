@@ -2,6 +2,20 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.4.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.3.0...v1.4.0) (2026-10-05)
+
+
+### Added
+
+* **cad:** sensor carrier profiles for different SCD41 boards with spring tongue ([4884566](https://github.com/tobi136B/co2-wall-sensor/commit/4884566fa0200700a9ffd2bd03d331de52491c9b)), closes [#7](https://github.com/tobi136B/co2-wall-sensor/issues/7)
+* generate shop link tables from hardware/bom.csv ([27f08ae](https://github.com/tobi136B/co2-wall-sensor/commit/27f08ae2e01583154e715adda9edb1a230080099))
+* readable bill of materials in hardware/bom.yaml ([4d5691e](https://github.com/tobi136B/co2-wall-sensor/commit/4d5691edf74087e0b451b58f861e5ddc2cf3e3b5))
+
+
+### Documentation
+
+* add sensor carrier profiles and online configurator to the roadmap ([f5e4023](https://github.com/tobi136B/co2-wall-sensor/commit/f5e4023f99dcf99ea56c6cae3dcb68d4f661ada3))
+
 ## [1.3.0] - 2026-10-05
 
 ### Added
