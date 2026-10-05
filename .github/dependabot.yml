@@ -9,6 +9,8 @@ updates:
     labels: [dependencies]
   - package-ecosystem: pip
     directory: /
+    # requirements.txt only sets minimum versions, raise them only when needed
+    versioning-strategy: increase-if-necessary
     schedule:
       interval: monthly
     commit-message:
