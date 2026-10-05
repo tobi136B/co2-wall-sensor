@@ -48,9 +48,8 @@ jobs:
     needs: [release-please, build]
     if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -91,8 +90,33 @@ jobs:
           name: CO2 Wall Sensor ${{ steps.tag.outputs.tag }}
           body_path: release_notes.md
           files: dist/*
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-dist
+          path: dist/*.bin
+
+  pages:
+    name: Deploy project page
+    needs: publish
+    if: always() && needs.publish.result == 'success'
+    # GitHub Pages must be enabled once (Settings > Pages > Source: GitHub Actions).
+    # Until then this job fails without affecting the release.
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-dist
+          path: dist
       - name: Build project page
-        run: python tools/build_site.py --version "${{ steps.tag.outputs.version }}" --dist dist --out _site
+        run: python tools/build_site.py --version "${{ needs.publish.outputs.version }}" --dist dist --out _site
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
