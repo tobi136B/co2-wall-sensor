@@ -1,0 +1,107 @@
+# Bill of materials: the only place for parts, prices and shop links.
+# Stückliste: die einzige Stelle für Teile, Preise und Shop-Links.
+#
+# After a change on GitHub (pencil icon, "Commit changes") the README tables and the
+# project page are updated automatically within about a minute.
+# Nach einer Änderung auf GitHub (Stift-Symbol, "Commit changes") werden die
+# README-Tabellen und die Projektseite in etwa einer Minute automatisch aktualisiert.
+#
+#   name / name_de   part name in English / German, **bold** is allowed
+#   qty              quantity, leave it out for consumables
+#   aliexpress /     price in EUR with a dot, optionally with a pack size:
+#   amazon             price: 8.99 (2 pcs)        becomes "8,99 € (2 Stk.)" in German
+#                    link: the complete https link. Leave the whole shop block out if
+#                    there is no offer. Without a price the link is shown as "Link".
+#                    A trailing ¹ refers to the footnote below the README table.
+
+
+- name: "Sensirion **SCD41** breakout, blue **15 × 20 mm** board"
+  name_de: "Sensirion **SCD41** Platine, blau, **15 × 20 mm**"
+  qty: 1
+  details: "blue 15 x 20 mm board, CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V"
+  used_for: sensor chamber
+  aliexpress:
+    price: "20.99"
+    link: https://de.aliexpress.com/item/1005009740863220.html
+
+- name: "**ESP32-C3 SuperMini**"
+  name_de: "**ESP32-C3 SuperMini**"
+  qty: 1
+  details: "USB-C, WiFi, 22.5 x 18 mm"
+  used_for: controller
+  aliexpress:
+    price: "2.79"
+    link: https://de.aliexpress.com/item/1005007479144456.html
+  amazon:
+    price: "8.99 (2 pcs)"
+    link: https://www.amazon.de/dp/B0DMNBWTFD
+
+- name: "**Waveshare 2inch LCD Module** (ST7789V, 240 × 320)"
+  name_de: "**Waveshare 2inch LCD Module** (ST7789V, 240 × 320)"
+  qty: 1
+  details: "ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm"
+  used_for: display
+  aliexpress:
+    price: "12.39"
+    link: https://de.aliexpress.com/item/1005008772378337.html
+  amazon:
+    price: "16.31"
+    link: https://www.amazon.de/dp/B081Q79X2F
+
+- name: 'Heat-set insert **M2 × 3**, outer diameter 3.2 mm (variant "M2 (OD3.2)", length 3 mm)'
+  name_de: 'Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm (Variante "M2 (OD3.2)", Länge 3 mm)'
+  qty: 10
+  details: "outer diameter 3.2 mm (AliExpress variant M2 OD3.2, length 3 mm), hole 3.0 x 3.4 mm; the Amazon set has OD 3.0, then set INSERT_HOLE_D to 2.8"
+  used_for: "display 4, back cover 4, sensor carrier 2"
+  aliexpress:
+    link: https://de.aliexpress.com/item/1005008575446687.html
+  amazon:
+    price: "6.99 (200 pcs, OD 3.0) ¹"
+    link: https://www.amazon.de/dp/B0DZHK4JRC
+
+- name: "Button head screw **M2 × 4**, ISO 7380"
+  name_de: "Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380"
+  qty: 10
+  details: "ISO 7380, hex socket 1.3 mm"
+  used_for: "display 4, back cover 4, sensor carrier 2"
+  amazon:
+    price: "4.30 (50 pcs)"
+    link: https://www.amazon.de/dp/B0DGXPQ7TW
+
+- name: "USB cable with **right-angle USB-C plug** (angled up/down) for the back port"
+  name_de: "USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten"
+  qty: 1
+  details: "USB-C end angled up/down, for the back cable port; for the bottom port any straight cable with an overmould up to 12 x 7 mm"
+  used_for: power
+  amazon:
+    price: "7.69"
+    link: https://www.amazon.de/dp/B01MSIE2L1
+
+- name: "USB power module for the flush wall box (installation by a qualified electrician), or any USB charger"
+  name_de: USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät
+  qty: 1
+  details: "230 V to 5 V, USB-A; installation only by a qualified electrician; alternatively any USB charger"
+  used_for: power
+  amazon:
+    price: "8.99"
+    link: https://www.amazon.de/dp/B0HHF42X68
+
+- name: Silicone wire AWG 30
+  name_de: Silikonlitze AWG 30
+  details: about 1 m
+  used_for: wiring
+  amazon:
+    price: "15.49 (8 colours)"
+    link: https://www.amazon.de/dp/B0DH2FBWH7
+
+- name: Heat-set insert and screw M2 (optional)
+  name_de: Einschmelzmutter und Schraube M2 (optional)
+  qty: 2
+  details: same as above
+  used_for: lock tab
+
+- name: Filament PETG
+  name_de: Filament PETG
+  qty: 1
+  details: about 110 g
+  used_for: all printed parts

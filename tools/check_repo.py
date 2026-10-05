@@ -5,7 +5,7 @@ Repository consistency checks, run by the CI.
 * English and German documents have the same structure (headings and images).
 * The print files in cad/ were exported from the current parameters of the Fusion generator.
 * Every link in the bill of materials is an absolute https link and the README tables
-  match hardware/bom.csv.
+  match hardware/bom.yaml.
 
 Usage:   python tools/check_repo.py            (check)
          python tools/check_repo.py --write    (write cad/build_info.json from the current parameters,
@@ -91,8 +91,10 @@ def check_print_files() -> list[str]:
 
 
 def check_bom() -> list[str]:
-    """Shop links are https and the README tables match hardware/bom.csv."""
+    """Shop links are https and the README tables match hardware/bom.yaml."""
     errors = bom.check_links()
+    if errors:
+        return errors
     for lang, path in bom.READMES.items():
         old, new = bom.updated_readme(lang)
         if old != new:

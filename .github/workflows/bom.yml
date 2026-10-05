@@ -1,13 +1,13 @@
 name: Shop links
 
-# Edit hardware/bom.csv (on GitHub: open the file, pencil icon, commit to main).
+# Edit hardware/bom.yaml (on GitHub: open the file, pencil icon, commit to main).
 # This workflow then updates the tables in README.md and README.de.md and deploys the
 # project page again with the firmware of the latest release. No new release is needed.
 
 on:
   push:
     branches: [main]
-    paths: [hardware/bom.csv]
+    paths: [hardware/bom.yaml]
   workflow_dispatch:
 
 permissions:
@@ -30,7 +30,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - name: Generate the tables from hardware/bom.csv
+      - run: pip install pyyaml
+      - name: Generate the tables from hardware/bom.yaml
         run: python tools/bom.py
       - name: Commit if something changed
         run: |
@@ -40,7 +41,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "docs: update bill of materials tables from bom.csv"
+          git commit -am "docs: update bill of materials tables from bom.yaml"
           git push
       - name: Latest release
         id: release
@@ -71,6 +72,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+      - run: pip install pyyaml
       - uses: actions/download-artifact@v8
         with:
           name: release-dist

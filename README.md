@@ -75,7 +75,7 @@ Technical drawing (A3, ISO first angle): [English PDF](docs/drawing/co2_wall_sen
 
 About 45 € in total. The links are suggestions, checked in October 2026; prices change often.
 
-<!-- bom:start (generated from hardware/bom.csv) -->
+<!-- bom:start (generated from hardware/bom.yaml) -->
 | Qty | Part | AliExpress | Amazon.de |
 |----:|------|-----------:|----------:|
 | 1 | Sensirion **SCD41** breakout, blue **15 × 20 mm** board | [20.99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
@@ -90,7 +90,7 @@ About 45 € in total. The links are suggestions, checked in October 2026; price
 
 ¹ With inserts of 3.0 mm outer diameter set the Fusion parameter `INSERT_HOLE_D` to 2.8.
 The rails are sized for the common blue **15 × 20 mm** SCD41 breakout; other boards need new values for `SCD_W` and `SCD_L`.
-Machine-readable: [`hardware/bom.csv`](hardware/bom.csv). This file is the only place for parts, prices and shop links; the table above and the project page are generated from it.
+Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the only place for parts, prices and shop links; the table above and the project page are generated from it.
 
 ## Quick start
 
@@ -145,7 +145,7 @@ co2-wall-sensor/
 ├── esphome/
 │   ├── co2-wall-sensor*.yaml        device files: own build and browser installer, EN and DE
 │   └── common/                      shared firmware logic and network variants
-├── hardware/bom.csv                 bill of materials with shop links
+├── hardware/bom.yaml                bill of materials with shop links
 ├── homeassistant/                   blueprint, automations and dashboard card (German in homeassistant/de)
 ├── site/                            template of the project page
 └── tools/                           generators for drawing, wiring, preview, print plates, project page, checks
