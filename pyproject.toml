@@ -6,3 +6,8 @@ extend-exclude = ["cad/fusion/generate_enclosure/generate_enclosure.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# long user-facing texts
+"tools/build_site.py" = ["E501"]
+"tools/release_notes.py" = ["E501"]

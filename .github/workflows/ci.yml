@@ -10,63 +10,82 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 env:
   ESPHOME_VERSION: "2026.9.1"
 
 jobs:
-  tools:
-    name: Tools (drawing, wiring, preview)
+  docs:
+    name: Docs, drawing and repository checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
       - name: Install dependencies
         run: pip install -r requirements.txt ruff
-      - name: Lint
-        run: ruff check tools
-      - name: Generate drawing, wiring diagram and display preview
+      - name: Lint and format check
+        run: |
+          ruff check tools
+          ruff format --check tools
+      - name: Generate drawing, wiring diagram, display preview and print plates
         run: |
           python tools/drawing.py
           python tools/wiring.py
           python tools/display_preview.py
-      - uses: actions/upload-artifact@v4
+          python tools/build_3mf.py
+      - name: Repository checks (EN/DE parity, print files match parameters, BOM links)
+        run: python tools/check_repo.py
+      - name: Check links in the documentation
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress './**/*.md'
+          fail: true
+      - uses: actions/upload-artifact@v7
         with:
           name: generated-docs
           path: |
             docs/drawing/
             docs/images/wiring_*.png
             docs/images/display_preview_*.png
+            cad/3mf/
 
   firmware:
-    name: Firmware (${{ matrix.lang }})
+    name: Firmware (${{ matrix.id }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
-          - lang: en
+          - id: en
             config: co2-wall-sensor.yaml
-          - lang: de
+          - id: de
             config: co2-wall-sensor-de.yaml
+          - id: en-installer
+            config: co2-wall-sensor-factory.yaml
+          - id: de-installer
+            config: co2-wall-sensor-de-factory.yaml
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: Cache PlatformIO and ESPHome build
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.platformio
             esphome/.esphome
-          key: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.lang }}-${{ hashFiles('esphome/**/*.yaml') }}
-          restore-keys: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.lang }}-
+          key: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.id }}-${{ hashFiles('esphome/**/*.yaml') }}
+          restore-keys: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.id }}-
       - name: Install ESPHome
         run: pip install "esphome==${ESPHOME_VERSION}"
-      - name: Create CI secrets (no real credentials)
+      - name: Create CI secrets (no real credentials, only used by the own-build configs)
         run: |
           python - <<'PY'
           import base64, os
@@ -87,18 +106,15 @@ jobs:
       - name: Collect binaries
         run: |
           mkdir -p dist
-          echo "Binaries found in the build tree:"
-          find esphome/.esphome -type f -name '*.bin' -printf '%p (%s bytes)\n' | grep -v -E '/(bootloader|partition|ota_data)' || true
           factory=$(find esphome/.esphome -type f -name '*factory.bin' | head -n 1)
           ota=$(find esphome/.esphome -type f -name '*ota.bin' ! -name 'ota_data*' | head -n 1)
-          if [ -z "$factory" ]; then
-            factory=$(find esphome/.esphome -type f -name 'firmware.bin' | head -n 1)
-          fi
-          [ -n "$factory" ] && cp "$factory" "dist/co2-wall-sensor-${{ matrix.lang }}.factory.bin"
-          [ -n "$ota" ] && cp "$ota" "dist/co2-wall-sensor-${{ matrix.lang }}.ota.bin"
+          [ -z "$factory" ] && factory=$(find esphome/.esphome -type f -name 'firmware.bin' | head -n 1)
+          cp "$factory" "dist/co2-wall-sensor-${{ matrix.id }}.factory.bin"
+          [ -z "$ota" ] && ota=$(find esphome/.esphome -type f -name 'firmware.bin' | head -n 1)
+          cp "$ota" "dist/co2-wall-sensor-${{ matrix.id }}.ota.bin"
           ls -l dist
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
-          name: firmware-${{ matrix.lang }}
+          name: firmware-${{ matrix.id }}
           path: dist/*.bin
           if-no-files-found: error

@@ -1,0 +1,93 @@
+blueprint:
+  name: CO2 ventilation reminder / Lüftungserinnerung
+  description: >-
+    Sends a notification to your phone when the CO2 level stays above a threshold, and
+    once more when the air is good again. Made for the CO2 Wall Sensor
+    (https://github.com/tobi136B/co2-wall-sensor) but works with any CO2 sensor.
+
+
+    Schickt eine Benachrichtigung aufs Handy, wenn der CO2-Wert eine Zeit lang über einer
+    Schwelle liegt, und noch einmal, wenn die Luft wieder gut ist.
+  domain: automation
+  source_url: https://github.com/tobi136B/co2-wall-sensor/blob/main/homeassistant/blueprints/co2_ventilation_reminder.yaml
+  input:
+    co2_sensor:
+      name: CO2 sensor
+      selector:
+        entity:
+          filter:
+            - domain: sensor
+              device_class: carbon_dioxide
+    threshold:
+      name: Ventilate above / Lüften ab
+      default: 1400
+      selector:
+        number:
+          min: 600
+          max: 3000
+          step: 50
+          unit_of_measurement: ppm
+    good_level:
+      name: Air is good again below / Luft wieder gut unter
+      default: 900
+      selector:
+        number:
+          min: 400
+          max: 2000
+          step: 50
+          unit_of_measurement: ppm
+    delay:
+      name: Only after / Erst nach
+      description: The level has to stay above the threshold this long.
+      default:
+        minutes: 5
+      selector:
+        duration:
+    notify_device:
+      name: Phone / Handy
+      description: Device with the Home Assistant companion app.
+      selector:
+        device:
+          filter:
+            - integration: mobile_app
+    title:
+      name: Title
+      default: "Ventilate! / Lüften!"
+      selector:
+        text:
+    good_message:
+      name: Message when the air is good again
+      default: "Air is good again, you can close the window. / Luft ist wieder gut, Fenster kann zu."
+      selector:
+        text:
+
+mode: single
+max_exceeded: silent
+
+trigger:
+  - platform: numeric_state
+    entity_id: !input co2_sensor
+    above: !input threshold
+    for: !input delay
+
+variables:
+  sensor: !input co2_sensor
+  threshold: !input threshold
+
+action:
+  - domain: mobile_app
+    type: notify
+    device_id: !input notify_device
+    title: !input title
+    message: "{{ state_attr(sensor, 'friendly_name') or sensor }}: {{ states(sensor) | int(0) }} ppm (> {{ threshold | int }} ppm)"
+  - wait_for_trigger:
+      - platform: numeric_state
+        entity_id: !input co2_sensor
+        below: !input good_level
+    timeout:
+      hours: 6
+    continue_on_timeout: false
+  - domain: mobile_app
+    type: notify
+    device_id: !input notify_device
+    message: !input good_message

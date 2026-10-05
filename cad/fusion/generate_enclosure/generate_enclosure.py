@@ -5,51 +5,66 @@ CO2 Wall Sensor: parametric enclosure generator for Autodesk Fusion
 Creates a new Fusion design that contains every part as its own component:
 
     Housing        front housing with display window and isolated sensor chamber
-    SensorCarrier  removable floor of the sensor chamber, carries SCD41 (front) and ESP32-C3 (back)
-    BackCover      back cover with dovetail rail and cable knock-out
-    WallPlate      82 x 82 plate that covers a German flush wall box (cable from the wall)
+    SensorCarrier  removable floor of the sensor chamber: SCD41 slides into rails on the
+                   front, the ESP32-C3 sits between guides on the back
+    BackCover      back cover with dovetail rail
+    PortBack       cable port module, cable leaves to the back (right-angle plug)
+    PortBottom     cable port module, cable leaves at the bottom (straight plug)
+    WallPlate      82 x 82 plate that covers a German flush wall box
+    LockTab        optional lock tab, screws the device to the wall plate
     DeskStand      desk stand using the same rail, device leans back by 12 degrees
-    Dummy_*        reference bodies for display, SCD41, ESP32-C3 and the USB-C plug
+    Dummy_*        reference bodies for display, SCD41, ESP32-C3 and USB-C plugs
 
 Run it in Fusion: Utilities > Scripts and Add-Ins > "+" > add this folder >
 select generate_enclosure > Run.
 
-All dimensions live in the PARAMETERS block (millimetres). Change a value,
-run the script again, done. Set EXPORT = True to also write STL and STEP files
-into cad/stl and cad/step next to this repository.
+Dimensions
+----------
+Every value of the PARAMETERS block becomes a Fusion user parameter
+(Modify > Change Parameters). To change the enclosure, edit the values there
+and run the script again: it reads the parameters of the open design and
+rebuilds every part with them. The values below are the defaults.
 
-Fastening: every screw connection uses the same M2 heat-set insert and the same
-M2 x 4 button head screw (ISO 7380). The USB cable can leave the device either at
-the bottom or at the back: both openings are printed as thin knock-outs, break out
-the one you need after printing.
+Fastening
+---------
+Every screw connection uses the same M2 heat-set insert and the same M2 x 4
+button head screw (ISO 7380). Nothing is glued. The cable port module is
+clamped between housing and back cover, swap it to change the cable exit.
 
 Coordinate system: front face at z = 0, wall side towards +z, +y points up.
 """
+import hashlib
+import json
 import math
 import os
+import re
 
 import adsk.core
 import adsk.fusion
 
+VERSION = '1.3'          # enclosure version, engraved into every part
+
 # ===================== PARAMETERS =====================
-# --- device body ---
+# --- device ---
 BODY = 69.8             # outer width and height of the device
 WALL = 2.0              # wall thickness
 LIP = 2.0               # front lip in front of the display glass
-DEPTH = 22.0            # device depth without rail
+DEPTH = 24.0            # device depth without rail
 COVER_T = 2.5           # back cover thickness
 R_CORNER = 4.0          # outer corner radius
-R_FRONT = 2.5           # soft front edge
+R_FRONT = 2.5           # soft front edge, ends in a 45 degree foot on the print bed
 WINDOW_CHAMFER = 0.8    # chamfer around the display window
-CLEARANCE = 0.3         # fit clearance per side
+FIT = 0.3               # fit clearance per side for all sliding and plugged parts
 TOP_BAND = 5.0          # solid band above the display bay, holds two cover inserts
-# --- fasteners: one insert type and one screw type for everything ---
+# --- fasteners: one insert type, one screw type ---
 INSERT_HOLE_D = 3.0     # hole for M2 x 3 heat-set insert (outer diameter 3.2)
 INSERT_HOLE_L = 3.4     # hole depth (insert length 3.0 + 0.4)
+INSERT_LEAD = 0.4       # entry chamfer, centres the insert while pressing
 BOSS_D = 5.0            # boss around an insert
+BOSS_FILLET = 0.6       # fillet at the root of the bosses
 SCREW_CLEAR_D = 2.4     # clearance hole for M2
 HEAD_D, HEAD_H = 4.2, 1.3   # counterbore for M2 ISO 7380 button head (head 3.5 x 1.1)
-# --- Waveshare 2inch LCD (ST7789V), mounted in landscape ---
+# --- display: Waveshare 2inch LCD Module ---
 LCD_W, LCD_H, LCD_PCB = 58.0, 35.0, 1.6
 GLASS_W, GLASS_H, GLASS_T = 48.2, 34.7, 2.5     # GLASS_T is an assumption, measure it
 ACTIVE_W, ACTIVE_H = 40.8, 30.6
@@ -58,52 +73,130 @@ LCD_HOLE_X, LCD_HOLE_Y = 26.5, 15.0
 LCD_BOSS_D = 4.6        # slightly smaller boss, sits right next to the glass
 # --- chin: sensor chamber in front, ESP32-C3 behind ---
 DIVIDER = 2.5           # wall between display bay and chin
-FLOOR_Z, FLOOR_T = 11.0, 2.0    # sensor carrier (removable floor of the chamber)
-RIB_H = 0.5             # ESP32-C3 sits this far above the carrier
-PLUG_T = 6.0            # thickness of the right-angle USB-C plug
-PLUG_SPACE = 13.0       # free space below the USB-C socket for the plug
+FLOOR_Z, FLOOR_T = 12.0, 2.0    # sensor carrier (removable floor of the chamber)
+RIB_H = 1.2             # ESP32-C3 sits this far above the carrier
 C3_W, C3_H, C3_PCB = 18.0, 22.5, 1.0
 C3_X = 13.0
-SCD_W, SCD_H, SCD_T = 20.0, 20.0, 8.1          # PLACEHOLDER, measure your SCD41 board (PCB + sensor)
-KNOCKOUT_T = 0.6        # thickness of the break-out membranes
+PLUG_SPACE = 13.0       # free space below the USB-C socket for the plug
+PLUG_W, PLUG_H = 12.0, 7.0      # overmould of a straight USB-C plug
+BOOT_D = 7.0            # hole for the cable boot of a right-angle plug
+SCD_W, SCD_L, SCD_PCB = 15.0, 20.0, 1.6        # SCD41 breakout board
+SCD_H = 7.0             # height of the SCD41 above the board
+SCD_LIP = 0.8           # rail lip under the board edge
+# --- cable port module ---
+PORT_W = 16.0           # width of the module (outside)
+PORT_STEP = 1.2         # the module is wider behind the outer skin, so it cannot fall out
+PORT_TOP = 12.5         # height of the module in the back cover (from the inner bottom wall)
 # --- dovetail rail ---
 RAIL_FOOT, RAIL_HEAD, RAIL_H, RAIL_L = 12.0, 16.0, 3.0, 14.0
 RAIL_Y0 = -10.0         # lower end of the rail
 RAIL_TRAVEL = 15.0      # insert the device, then slide it 15 mm down
-RAIL_CLEARANCE = 0.3
-# --- wall plate for flush wall box (68 mm hole, 60 mm screw spacing) ---
+RAIL_LEAD = 0.6         # lead-in chamfer on rail and slot
+# --- wall plate ---
 PLATE = 82.0
 PLATE_T = 7.0
 BOX_RIM_D, BOX_RIM_T = 78.0, 1.5
 BOX_SCREW_SPACING = 60.0
+LOCK_X = -10.5          # position of the optional lock tab
 # --- desk stand ---
 TILT = 12.0             # device leans back by this angle
 STAND_GAP = 5.0         # air gap below the device, keeps the vents free
-# --- output ---
-EXPORT = False          # True: write STL + STEP into ../../stl and ../../step
+# --- labels ---
+LABEL_H = 2.2           # text height of the embossed part labels
+LABEL_DEPTH = 0.4
 
-# ===================== DERIVED DIMENSIONS =====================
-COVER_Z = DEPTH - COVER_T
-XL, XR = -BODY / 2 + WALL, BODY / 2 - WALL
-Y_TOP_IN = BODY / 2 - WALL
-BAY_W, BAY_H = LCD_W + 2 * CLEARANCE, LCD_H + 2 * CLEARANCE
-BAY_X0, BAY_X1 = LCD_X - BAY_W / 2, LCD_X + BAY_W / 2
-BAY_Y1 = Y_TOP_IN - TOP_BAND
-BAY_Y0 = BAY_Y1 - BAY_H
-LCD_Y = (BAY_Y0 + BAY_Y1) / 2
-Y_DIV_LOW = BAY_Y0 - DIVIDER
-Y_CHIN_LOW = -BODY / 2 + WALL
-Y_CHIN_MID = (Y_CHIN_LOW + Y_DIV_LOW) / 2
-C3_Y0 = Y_CHIN_LOW + PLUG_SPACE                  # lower edge of the ESP32-C3 (USB-C socket)
-C3_Z0 = FLOOR_Z + FLOOR_T + RIB_H                # underside of the ESP32-C3 PCB
-PLUG_Z = C3_Z0 + C3_PCB + 1.6                    # centre of the USB-C socket
-B = 2.4                                          # boss centre distance from the inner walls
-COVER_SCREWS = [(XL + B, Y_CHIN_LOW + B), (XR - B, Y_CHIN_LOW + B),
-                (-20.0, Y_TOP_IN - TOP_BAND / 2), (20.0, Y_TOP_IN - TOP_BAND / 2)]
-CARRIER_SCREWS = [(XL + B, Y_DIV_LOW - B), (XR - B, Y_DIV_LOW - B)]
-LCD_HOLES = [(LCD_X + sx * LCD_HOLE_X, LCD_Y + sy * LCD_HOLE_Y) for sx in (-1, 1) for sy in (-1, 1)]
-CABLE = (C3_X - 7, C3_X + 7, Y_CHIN_LOW + 0.5, C3_Y0 - 0.5)   # cable window towards the back
+EXPORT = False          # True: write STL + STEP into ../../stl and ../../step
+USE_DOC_PARAMS = True   # True: take over the user parameters of the open design (changes made in Fusion)
+
+
+def derive():
+    """Values that follow from the parameters. Called again after loading Fusion parameters."""
+    global CLEARANCE, RAIL_CLEARANCE, COVER_Z, XL, XR, Y_TOP_IN, BAY_W, BAY_H, BAY_X0, BAY_X1, BAY_Y1, BAY_Y0
+    global LCD_Y, Y_DIV_LOW, Y_CHIN_LOW, Y_CHIN_MID, C3_Y0, C3_Z0, PLUG_Z, SOCKET_TOP, B, COVER_SCREWS
+    global CARRIER_SCREWS, LCD_HOLES, CABLE, PORT_X0, PORT_X1, PORT_Z0, PORT_Y1, BOOT_Y, SCD_Y0, SCD_ZT
+    global LOCK_Z, LOCK_POINTS
+    CLEARANCE = FIT
+    RAIL_CLEARANCE = FIT
+    COVER_Z = DEPTH - COVER_T
+    XL, XR = -BODY / 2 + WALL, BODY / 2 - WALL
+    Y_TOP_IN = BODY / 2 - WALL
+    BAY_W, BAY_H = LCD_W + 2 * CLEARANCE, LCD_H + 2 * CLEARANCE
+    BAY_X0, BAY_X1 = LCD_X - BAY_W / 2, LCD_X + BAY_W / 2
+    BAY_Y1 = Y_TOP_IN - TOP_BAND
+    BAY_Y0 = BAY_Y1 - BAY_H
+    LCD_Y = (BAY_Y0 + BAY_Y1) / 2
+    Y_DIV_LOW = BAY_Y0 - DIVIDER
+    Y_CHIN_LOW = -BODY / 2 + WALL
+    Y_CHIN_MID = (Y_CHIN_LOW + Y_DIV_LOW) / 2
+    C3_Y0 = Y_CHIN_LOW + PLUG_SPACE                  # lower edge of the ESP32-C3 (USB-C socket)
+    C3_Z0 = FLOOR_Z + FLOOR_T + RIB_H                # underside of the ESP32-C3 PCB
+    PLUG_Z = C3_Z0 + C3_PCB + 1.6                    # centre of the USB-C socket
+    SOCKET_TOP = C3_Z0 + C3_PCB + 3.2
+    B = 2.4                                          # boss centre distance from the inner walls
+    COVER_SCREWS = [(XL + B, Y_CHIN_LOW + B), (XR - B, Y_CHIN_LOW + B),
+                    (-20.0, Y_TOP_IN - TOP_BAND / 2), (20.0, Y_TOP_IN - TOP_BAND / 2)]
+    CARRIER_SCREWS = [(XL + B, Y_DIV_LOW - B), (XR - B, Y_DIV_LOW - B)]
+    LCD_HOLES = [(LCD_X + sx * LCD_HOLE_X, LCD_Y + sy * LCD_HOLE_Y) for sx in (-1, 1) for sy in (-1, 1)]
+    CABLE = (C3_X - 7, C3_X + 7, Y_CHIN_LOW + 0.5, C3_Y0 - 0.5)   # cable passage in wall plate and stand
+    PORT_X0, PORT_X1 = C3_X - PORT_W / 2, C3_X + PORT_W / 2
+    PORT_Z0 = PLUG_Z - PLUG_H / 2 - 1.2              # lower end of the port opening in the bottom wall
+    PORT_Y1 = Y_CHIN_LOW + PORT_TOP                  # upper end of the port opening in the back cover
+    BOOT_Y = C3_Y0 - 6.0                             # cable boot of the right-angle plug
+    SCD_Y0 = Y_DIV_LOW - 0.2 - 1.0 - SCD_L           # lower edge of the SCD41 board (1 mm end stop above)
+    SCD_ZT = FLOOR_Z                                 # board lies against the carrier
+    LOCK_Z = COVER_Z - 4.0                           # height of the lock insert in the bottom wall
+    LOCK_POINTS = (LOCK_X - 3.0, LOCK_X + 3.0)       # x of the housing insert and of the wall plate insert
+
+
+derive()
 VI = adsk.core.ValueInput
+ANGLE_PARAMS = {'TILT'}
+
+
+# ----------------------------------------------------------------------------- Fusion user parameters
+def parameter_specs():
+    """(name, default, comment) for every number of the PARAMETERS block, read from this file."""
+    text = open(os.path.abspath(__file__), encoding='utf-8').read()
+    block = text[text.index('# ===================== PARAMETERS'):text.index('\nEXPORT =')]
+    specs = []
+    for line in block.splitlines():
+        m = re.match(r'^([A-Z0-9_, ]+?)\s*=\s*([^#]+?)\s*(?:#\s*(.*))?$', line)
+        if not m:
+            continue
+        names = [n.strip() for n in m.group(1).split(',')]
+        for n in names:
+            specs.append((n, globals()[n], (m.group(3) or '').strip()))
+    return specs
+
+
+def parameters_fingerprint():
+    """sha256 over the parameter values (the same function lives in tools/check_repo.py)."""
+    values = ';'.join(f'{n}={float(v):.6g}' for n, v, _c in parameter_specs())
+    return hashlib.sha256(values.encode('utf-8')).hexdigest()
+
+
+def load_user_parameters(design):
+    """Take over the values of a previous run, so changes made in Fusion survive a rebuild."""
+    if design is None or not USE_DOC_PARAMS:
+        return 0
+    if not any(o.component.name == 'WallPlate' for o in design.rootComponent.occurrences):
+        return 0
+    count = 0
+    for name, _default, _c in parameter_specs():
+        p = design.userParameters.itemByName(name)
+        if p is None:
+            continue
+        globals()[name] = round(math.degrees(p.value) if name in ANGLE_PARAMS else p.value * 10.0, 6)
+        count += 1
+    derive()
+    return count
+
+
+def write_user_parameters(design):
+    for name, _default, comment in parameter_specs():
+        value = globals()[name]
+        unit = 'deg' if name in ANGLE_PARAMS else 'mm'
+        design.userParameters.add(name, VI.createByString(f'{value:g} {unit}'), unit, comment)
 
 
 # ----------------------------------------------------------------------------- helpers
@@ -133,6 +226,7 @@ def _offset_plane(comp, base, value, axis):
         inp = comp.constructionPlanes.createInput()
         inp.setByOffset(base, VI.createByReal(-cm(value)))
         pl = comp.constructionPlanes.add(inp)
+    pl.isLightBulbOn = False
     return pl
 
 
@@ -174,6 +268,24 @@ def poly_sketch(comp, plane, points, name):
     return sk
 
 
+def rounded_rect_sketch(comp, z, half_w, half_h, r, name):
+    """Rounded rectangle centred on the z axis in the plane z."""
+    sk = comp.sketches.add(plane_z(comp, z))
+    sk.name = name
+    lines, arcs = sk.sketchCurves.sketchLines, sk.sketchCurves.sketchArcs
+    k = r * (1 - math.sqrt(0.5))
+    for sx, sy in ((1, 1), (-1, 1), (-1, -1), (1, -1)):
+        cx, cy = sx * (half_w - r), sy * (half_h - r)
+        arcs.addByThreePoints(sketch_pt(sk, cx + sx * r, cy, z),
+                              sketch_pt(sk, sx * (half_w - k), sy * (half_h - k), z),
+                              sketch_pt(sk, cx, cy + sy * r, z))
+    w, h = half_w - r, half_h - r
+    for a, b in (((half_w, -h), (half_w, h)), ((w, half_h), (-w, half_h)),
+                 ((-half_w, h), (-half_w, -h)), ((-w, -half_h), (w, -half_h))):
+        lines.addByTwoPoints(sketch_pt(sk, a[0], a[1], z), sketch_pt(sk, b[0], b[1], z))
+    return sk
+
+
 def _profiles(sk):
     oc = adsk.core.ObjectCollection.create()
     for p in sk.profiles:
@@ -202,6 +314,13 @@ def cylinders(comp, centres, dia, z0, z1, op, name, body=None):
     return extrude(comp, sk, z1 - z0, op, name, body)
 
 
+def cylinders_y(comp, centres_xz, dia, y0, y1, op, name, body=None):
+    """Cylinders along the y axis."""
+    ym = (y0 + y1) / 2
+    sk = circle_sketch(comp, plane_y(comp, ym), [((x, ym, z), dia) for x, z in centres_xz], name)
+    return extrude(comp, sk, y1 - y0, op, name, body)
+
+
 def prism_x(comp, points_yz, x0, x1, op, name, body=None):
     """Polygon in the YZ plane, extruded along x."""
     xm = (x0 + x1) / 2
@@ -209,12 +328,18 @@ def prism_x(comp, points_yz, x0, x1, op, name, body=None):
     return extrude(comp, sk, x1 - x0, op, name, body)
 
 
+def prism_y(comp, points_xz, y0, y1, op, name, body=None):
+    """Polygon in the XZ plane, extruded along y."""
+    ym = (y0 + y1) / 2
+    sk = poly_sketch(comp, plane_y(comp, ym), [(x, ym, z) for x, z in points_xz], name)
+    return extrude(comp, sk, y1 - y0, op, name, body)
+
+
 def dovetail(comp, z_foot, foot, head, height, y0, y1, op, name, body=None):
     """Trapezoid (narrow at the foot, wide at the head) extruded along y."""
-    ym = (y0 + y1) / 2
     zh = z_foot + height
-    pts = [(-foot / 2, ym, z_foot), (foot / 2, ym, z_foot), (head / 2, ym, zh), (-head / 2, ym, zh)]
-    return extrude(comp, poly_sketch(comp, plane_y(comp, ym), pts, name), y1 - y0, op, name, body)
+    pts = [(-foot / 2, z_foot), (foot / 2, z_foot), (head / 2, zh), (-head / 2, zh)]
+    return prism_y(comp, pts, y0, y1, op, name, body)
 
 
 def dovetail_slot(comp, body):
@@ -225,6 +350,11 @@ def dovetail_slot(comp, body):
     dovetail(comp, DEPTH - 0.01, RAIL_FOOT + 2 * c, RAIL_HEAD + 2 * c, RAIL_H + c, y0, y1, cut, 'DovetailSlot', body)
     hw = RAIL_HEAD / 2 + c
     box(comp, -hw, y1 - 0.01, DEPTH - 0.01, hw, y1 + RAIL_TRAVEL, DEPTH + RAIL_H + c, cut, 'InsertionWindow', body)
+    # lead-in: chamfer the edges where the rail enters the slot
+    edges = [e for e in body.edges if _edge_in_plane(e, 'y', y1)
+             and _edge_within(e, lambda p: abs(p.x) <= cm(hw) + 1e-6 and cm(DEPTH) - 1e-6 <= p.z
+                              <= cm(DEPTH + RAIL_H + c) + 1e-6)]
+    try_chamfer(comp, edges, RAIL_LEAD, 'SlotLeadIn')
 
 
 def fillet(comp, edges, radius, name):
@@ -247,10 +377,49 @@ def chamfer(comp, edges, dist, name):
     if oc.count == 0:
         return None
     inp = comp.features.chamferFeatures.createInput2()
-    inp.chamferEdgeSets.addEqualDistanceChamferEdgeSet(oc, VI.createByReal(cm(dist)), True)
+    inp.chamferEdgeSets.addEqualDistanceChamferEdgeSet(oc, VI.createByReal(cm(dist)), False)
     f = comp.features.chamferFeatures.add(inp)
     f.name = name
     return f
+
+
+def try_chamfer(comp, edges, dist, name):
+    """Cosmetic chamfer: skip it if the geometry does not allow it."""
+    try:
+        return chamfer(comp, edges, dist, name)
+    except RuntimeError:
+        print('note: chamfer', name, 'skipped')
+        return None
+
+
+def try_fillet(comp, edges, radius, name):
+    try:
+        return fillet(comp, edges, radius, name)
+    except RuntimeError:
+        print('note: fillet', name, 'skipped')
+        return None
+
+
+def _edge_points(e):
+    return [e.startVertex.geometry, e.endVertex.geometry] if e.startVertex else [e.pointOnEdge]
+
+
+def _edge_in_plane(e, axis, value):
+    return all(abs(getattr(p, axis) - cm(value)) < 1e-5 for p in _edge_points(e) + [e.pointOnEdge])
+
+
+def _edge_within(e, pred):
+    return all(pred(p) for p in _edge_points(e) + [e.pointOnEdge])
+
+
+def circular_edges(body, radius, centre_pred):
+    out = []
+    for e in body.edges:
+        g = e.geometry
+        if isinstance(g, (adsk.core.Circle3D, adsk.core.Arc3D)) and abs(g.radius - cm(radius)) < 1e-5:
+            if centre_pred(g.center):
+                out.append(e)
+    return out
 
 
 def z_edges(body, length, pred=lambda p: True):
@@ -277,11 +446,77 @@ def new_component(root, name):
     return occ.component
 
 
-# ----------------------------------------------------------------------------- parts
-def insert_holes(comp, points, z_top, body=None):
-    """Blind holes for M2 heat-set inserts, opening at z_top towards +z."""
+def combine(comp, target, tools, op, name, keep_tools=False):
+    oc = adsk.core.ObjectCollection.create()
+    for t in tools:
+        oc.add(t)
+    inp = comp.features.combineFeatures.createInput(target, oc)
+    inp.operation = op
+    inp.isKeepToolBodies = keep_tools
+    f = comp.features.combineFeatures.add(inp)
+    f.name = name
+    return f
+
+
+def bed_foot(comp, body, z_face, half_w, half_h, r_corner, r_edge, direction, name):
+    """Replace the lowest part of a rounded edge that touches the print bed by a 45 degree foot.
+
+    A fillet that starts tangent to the bed prints badly (almost horizontal overhang, elephant foot).
+    The foot is tangent to the fillet, so the edge still looks round.
+    """
+    t = r_edge * (1 - math.sqrt(0.5))          # height where the fillet is at 45 degrees
+    h = 2 * t                                    # height of the foot
+    ops = adsk.fusion.FeatureOperations
+    z_top = z_face + direction * h
+    s0 = rounded_rect_sketch(comp, z_face, half_w - h, half_h - h, max(r_corner - h, 0.3), name + 'Bed')
+    s1 = rounded_rect_sketch(comp, z_top, half_w, half_h, r_corner, name + 'Top')
+    li = comp.features.loftFeatures.createInput(ops.NewBodyFeatureOperation)
+    li.loftSections.add(s0.profiles.item(0))
+    li.loftSections.add(s1.profiles.item(0))
+    keep = comp.features.loftFeatures.add(li).bodies.item(0)
+    z0, z1 = sorted((z_face - direction * 1.0, z_top))
+    ring = box(comp, -half_w - 2, -half_h - 2, z0, half_w + 2, half_h + 2, z1, ops.NewBodyFeatureOperation,
+               name + 'Ring').bodies.item(0)
+    combine(comp, ring, [keep], ops.CutFeatureOperation, name + 'Cutter')
+    combine(comp, body, [ring], ops.CutFeatureOperation, name)
+
+
+def label(comp, body, z_face, x0, y0, x1, y1, text, flip=False, name='Label', height=None):
+    """Engrave a text into a face that lies in the plane z_face and faces +z (or -z with flip)."""
+    sk = comp.sketches.add(plane_z(comp, z_face))
+    sk.name = name
+    inp = sk.sketchTexts.createInput2(text, cm(height or LABEL_H))
+    inp.setAsMultiLine(sketch_pt(sk, x0, y0, z_face), sketch_pt(sk, x1, y1, z_face),
+                       adsk.core.HorizontalAlignments.CenterHorizontalAlignment,
+                       adsk.core.VerticalAlignments.MiddleVerticalAlignment, 0)
+    inp.isHorizontalFlip = flip
+    txt = sk.sketchTexts.add(inp)
+    ei = comp.features.extrudeFeatures.createInput(txt, adsk.fusion.FeatureOperations.CutFeatureOperation)
+    ei.setSymmetricExtent(VI.createByReal(cm(2 * LABEL_DEPTH)), True)
+    ei.participantBodies = [body]
+    comp.features.extrudeFeatures.add(ei).name = name
+
+
+# ----------------------------------------------------------------------------- fasteners
+def insert_holes(comp, points, z_top, body):
+    """Blind holes for M2 heat-set inserts, opening at z_top towards +z, with entry chamfer."""
     cut = adsk.fusion.FeatureOperations.CutFeatureOperation
-    return cylinders(comp, points, INSERT_HOLE_D, z_top - INSERT_HOLE_L, z_top + 0.1, cut, 'M2InsertHoles', body)
+    cylinders(comp, points, INSERT_HOLE_D, z_top - INSERT_HOLE_L, z_top + 0.1, cut, 'M2InsertHoles', body)
+    lead_chamfer(comp, body, [(x, y, z_top) for x, y in points])
+
+
+def lead_chamfer(comp, body, centres):
+    def at(c):
+        return any(abs(c.x - cm(x)) < 1e-4 and abs(c.y - cm(y)) < 1e-4 and abs(c.z - cm(z)) < 1e-4
+                   for x, y, z in centres)
+    try_chamfer(comp, circular_edges(body, INSERT_HOLE_D / 2, at), INSERT_LEAD, 'InsertLeadIn')
+
+
+def boss_fillets(comp, body, points, dia, z_base, name):
+    def at(c):
+        return abs(c.z - cm(z_base)) < 1e-4 and any(abs(c.x - cm(x)) < 1e-4 and abs(c.y - cm(y)) < 1e-4
+                                                      for x, y in points)
+    try_fillet(comp, circular_edges(body, dia / 2, at), BOSS_FILLET, name)
 
 
 def screw_holes(comp, points, z_face, body, counterbore=True):
@@ -292,6 +527,7 @@ def screw_holes(comp, points, z_face, body, counterbore=True):
         cylinders(comp, points, HEAD_D, z_face - HEAD_H, z_face + 0.1, cut, 'M2HeadRecess', body)
 
 
+# ----------------------------------------------------------------------------- parts
 def build_housing(root, ops):
     NEW, CUT, JOIN = ops
     comp = new_component(root, 'Housing')
@@ -299,6 +535,7 @@ def build_housing(root, ops):
     body.name = 'Housing'
     fillet(comp, z_edges(body, DEPTH), R_CORNER, 'CornerRadius')
     fillet(comp, list(planar_face_at_z(body, 0).edges), R_FRONT, 'SoftFrontEdge')
+    bed_foot(comp, body, 0, BODY / 2, BODY / 2, R_CORNER, R_FRONT, 1, 'FrontBedFoot')
     box(comp, XL, Y_CHIN_LOW, COVER_Z, XR, Y_TOP_IN, DEPTH + 1, CUT, 'CoverSeat')
 
     # display bay and window
@@ -310,7 +547,7 @@ def build_housing(root, ops):
     chamfer(comp, [e for lp in front.loops if not lp.isOuter for e in lp.edges], WINDOW_CHAMFER, 'WindowChamfer')
     # display: 4 bosses with M2 inserts at the PCB mounting holes
     cylinders(comp, LCD_HOLES, LCD_BOSS_D, LIP, LIP + GLASS_T, JOIN, 'LcdBosses', body)
-    insert_holes(comp, LCD_HOLES, LIP + GLASS_T)
+    insert_holes(comp, LCD_HOLES, LIP + GLASS_T, body)
 
     # chin: open sensor chamber in front (closed later by the SensorCarrier), ESP bay behind
     box(comp, XL, Y_CHIN_LOW, WALL, XR, Y_DIV_LOW, COVER_Z + 1, CUT, 'Chin')
@@ -319,8 +556,9 @@ def build_housing(root, ops):
     # bosses: 2 full height (cover screws at the bottom), 2 up to the carrier (carrier screws)
     cylinders(comp, COVER_SCREWS[:2], BOSS_D, WALL, COVER_Z, JOIN, 'CoverBossesBottom', body)
     cylinders(comp, CARRIER_SCREWS, BOSS_D, WALL, FLOOR_Z, JOIN, 'CarrierBosses', body)
-    insert_holes(comp, COVER_SCREWS, COVER_Z)
-    insert_holes(comp, CARRIER_SCREWS, FLOOR_Z)
+    boss_fillets(comp, body, COVER_SCREWS[:2] + CARRIER_SCREWS, BOSS_D, WALL, 'BossRootFillets')
+    insert_holes(comp, COVER_SCREWS, COVER_Z, body)
+    insert_holes(comp, CARRIER_SCREWS, FLOOR_Z, body)
     # ledges along the side walls carry the sensor carrier and seal the chamber
     for x0, x1 in ((XL, XL + 1.2), (XR - 1.2, XR)):
         box(comp, x0, Y_CHIN_LOW, FLOOR_Z - 1.5, x1, Y_DIV_LOW, FLOOR_Z, JOIN, 'CarrierLedge', body)
@@ -329,46 +567,83 @@ def build_housing(root, ops):
     bottom = plane_y(comp, -BODY / 2 + WALL / 2)
     xs = [-21 + 3.5 * i for i in range(13)]
     extrude(comp, rect_sketch(comp, bottom, [((x - 0.7, 0, 3.5), (x + 0.7, 0, FLOOR_Z - 2.0)) for x in xs],
-                              'BottomVents'), WALL + 1, CUT, 'BottomVents')
+                              'BottomVents'), WALL + 1, CUT, 'BottomVents', body)
     for xp in (-BODY / 2 + WALL / 2, BODY / 2 - WALL / 2):
         slots = [((0, Y_CHIN_MID + o - 0.7, 3.5), (0, Y_CHIN_MID + o + 0.7, FLOOR_Z - 2.0)) for o in (-7, -3.5, 0)]
-        extrude(comp, rect_sketch(comp, plane_x(comp, xp), slots, 'SideVents'), WALL + 1, CUT, 'SideVents')
+        extrude(comp, rect_sketch(comp, plane_x(comp, xp), slots, 'SideVents'), WALL + 1, CUT, 'SideVents', body)
 
-    # USB knock-out in the bottom wall (cable straight down), thin membrane on the outside
-    kz0, kz1 = PLUG_Z - 3.3, min(PLUG_Z + 3.3, COVER_Z - 0.1)
-    box(comp, C3_X - 6.5, -BODY / 2 - 1, kz0, C3_X + 6.5, Y_CHIN_LOW + 0.1, kz1, CUT, 'BottomCableOpening', body)
-    box(comp, C3_X - 6.5, -BODY / 2, kz0, C3_X + 6.5, -BODY / 2 + KNOCKOUT_T, kz1, JOIN, 'BottomKnockout', body)
+    # cable port: stepped opening in the bottom wall, open towards the back, the port module fills it
+    c = FIT / 2
+    y_step = -BODY / 2 + WALL / 2
+    box(comp, PORT_X0 - c, -BODY / 2 - 1, PORT_Z0 - c, PORT_X1 + c, Y_CHIN_LOW + 0.01, DEPTH + 1, CUT, 'PortOpening',
+        body)
+    box(comp, PORT_X0 - PORT_STEP - c, y_step - c, PORT_Z0 - c, PORT_X1 + PORT_STEP + c, Y_CHIN_LOW + 0.01, DEPTH + 1,
+        CUT, 'PortStep', body)
+
+    # optional lock: insert in a boss behind the bottom wall, screw comes from the lock tab below
+    lx = LOCK_POINTS[0]
+    cylinders_y(comp, [(lx, LOCK_Z)], BOSS_D, Y_CHIN_LOW - 0.01, Y_CHIN_LOW + 3.0, JOIN, 'LockBoss', body)
+    cut_y = adsk.fusion.FeatureOperations.CutFeatureOperation
+    cylinders_y(comp, [(lx, LOCK_Z)], INSERT_HOLE_D, -BODY / 2 - 0.1, -BODY / 2 + INSERT_HOLE_L, cut_y,
+                'LockInsertHole', body)
+    try_chamfer(comp, circular_edges(body, INSERT_HOLE_D / 2,
+                                     lambda p: abs(p.y + cm(BODY / 2)) < 1e-4 and abs(p.x - cm(lx)) < 1e-4),
+                INSERT_LEAD, 'LockLeadIn')
+
+    label(comp, body, COVER_Z, -17, BAY_Y1 + 0.6, 17, Y_TOP_IN - 0.6, f'CO2 WALL SENSOR v{VERSION}', name='Label',
+          height=1.8)
     return comp
 
 
 def build_sensor_carrier(root, ops):
-    """Removable floor of the sensor chamber. SCD41 in front, ESP32-C3 on the back."""
+    """Removable floor of the sensor chamber. SCD41 slides into rails on the front, ESP32-C3 on the back."""
     NEW, CUT, JOIN = ops
     comp = new_component(root, 'SensorCarrier')
     s = 0.2
-    body = box(comp, XL + s, Y_CHIN_LOW + s, FLOOR_Z, XR - s, Y_DIV_LOW - s, FLOOR_Z + FLOOR_T, NEW,
-               'Carrier').bodies.item(0)
+    y_lo, y_hi = Y_CHIN_LOW + s, Y_DIV_LOW - s
+    body = box(comp, XL + s, y_lo, FLOOR_Z, XR - s, y_hi, FLOOR_Z + FLOOR_T, NEW, 'Carrier').bodies.item(0)
     body.name = 'SensorCarrier'
     # notches around the two full-height cover bosses
-    r = BOSS_D / 2 + 0.3
+    r = BOSS_D / 2 + 0.3 + BOSS_FILLET
     for x, y in COVER_SCREWS[:2]:
-        box(comp, x - r, y - r - 2, FLOOR_Z - 1, x + r, y + r, FLOOR_Z + FLOOR_T + 1, CUT, 'BossNotch', body)
+        box(comp, x - r, y - r - 2, FLOOR_Z - 2, x + r, y + r, FLOOR_Z + FLOOR_T + 1, CUT, 'BossNotch', body)
     screw_holes(comp, CARRIER_SCREWS, FLOOR_Z + FLOOR_T, body, counterbore=False)
-    # SCD41 pocket on the front side
-    sx0, sy0 = -SCD_W / 2 - 0.3, Y_CHIN_MID - SCD_H / 2 - 0.3
-    for x0, y0, x1, y1 in ((sx0 - 1.2, sy0, sx0, sy0 + SCD_H + 0.6), (-sx0, sy0, -sx0 + 1.2, sy0 + SCD_H + 0.6)):
-        box(comp, x0, y0, FLOOR_Z - 1.5, x1, y1, FLOOR_Z, JOIN, 'ScdGuide', body)
+
+    # SCD41: two rails with a groove for the board edges, end stop on top, snap bump at the entry
+    zb = SCD_ZT - SCD_PCB
+    g = 0.15                                      # play of the board in the groove
+    z_lip = zb - g - SCD_LIP
+    for sx in (-1, 1):
+        x_in, x_edge, x_out = SCD_W / 2 - SCD_LIP, SCD_W / 2 + g, SCD_W / 2 + g + 1.2
+        pts = [(sx * x_in, z_lip), (sx * x_out, z_lip), (sx * x_out, FLOOR_Z), (sx * x_edge, FLOOR_Z),
+               (sx * x_edge, zb - g), (sx * x_in, zb - g)]
+        prism_y(comp, pts, y_lo, y_hi, JOIN, 'ScdRail', body)
+        # end stop above the board
+        box(comp, sx * x_in, SCD_Y0 + SCD_L + g, z_lip, sx * x_out, y_hi, FLOOR_Z, JOIN, 'ScdStop', body)
+        # snap bump on the lip just below the board
+        box(comp, sx * x_in, max(SCD_Y0 - 1.6, y_lo), zb - g - 0.001, sx * (SCD_W / 2 - 0.1), SCD_Y0 - g, zb - g + 0.25, JOIN,
+            'ScdSnap', body)
     # cable notch for the SCD41 wires (seal with a drop of hot glue)
-    box(comp, -SCD_W / 2 - 6, Y_DIV_LOW - 4, FLOOR_Z - 0.5, -SCD_W / 2 - 2, Y_DIV_LOW + 0.1, FLOOR_Z + FLOOR_T + 0.5,
+    box(comp, -SCD_W / 2 - 6, y_hi - 4, FLOOR_Z - 0.5, -SCD_W / 2 - 2, y_hi + 0.1, FLOOR_Z + FLOOR_T + 0.5,
         CUT, 'ScdCableNotch', body)
-    # ESP32-C3 support ribs and side guide on the back
+
+    # ESP32-C3: support ribs, side guides, end stops below the board (the cable pulls downwards)
+    top = FLOOR_Z + FLOOR_T
     for x in (C3_X - 6, C3_X + 6):
-        box(comp, x - 0.75, C3_Y0, FLOOR_Z + FLOOR_T, x + 0.75, Y_DIV_LOW - s, FLOOR_Z + FLOOR_T + RIB_H, JOIN,
-            'C3Rib', body)
-    # side guides left and right, the board itself is fixed with double-sided foam tape on the ribs
-    # (no pins on the back cover, so the cover prints flat without supports)
-    for x0, x1 in ((C3_X - C3_W / 2 - 1.4, C3_X - C3_W / 2 - 0.2), (C3_X + C3_W / 2 + 0.2, C3_X + C3_W / 2 + 1.4)):
-        box(comp, x0, C3_Y0, FLOOR_Z + FLOOR_T, x1, C3_Y0 + 8, C3_Z0 + C3_PCB + 1.0, JOIN, 'C3SideGuide', body)
+        box(comp, x - 0.75, C3_Y0, top, x + 0.75, y_hi, C3_Z0, JOIN, 'C3Rib', body)
+    for x0, x1 in ((C3_X - C3_W / 2 - 1.4, C3_X - C3_W / 2 - 0.15), (C3_X + C3_W / 2 + 0.15, C3_X + C3_W / 2 + 1.4)):
+        box(comp, x0, C3_Y0 - 1.2, top, x1, y_hi, C3_Z0 + C3_PCB + 0.5, JOIN, 'C3SideGuide', body)
+    for x0, x1 in ((C3_X - C3_W / 2 - 0.15, C3_X - C3_W / 2 + 1.5), (C3_X + C3_W / 2 - 1.5, C3_X + C3_W / 2 + 0.15)):
+        box(comp, x0, C3_Y0 - 1.2, top, x1, C3_Y0 - 0.05, C3_Z0 + C3_PCB, JOIN, 'C3EndStop', body)
+    # short groove at the lower end (no solder pads there): floor below and lip above the board edge
+    for sx in (-1, 1):
+        xa, xb = sorted((C3_X + sx * (C3_W / 2 - 0.5), C3_X + sx * (C3_W / 2 + 0.2)))
+        box(comp, xa, C3_Y0 - 0.05, top, xb, C3_Y0 + 1.2, C3_Z0, JOIN, 'C3GrooveFloor', body)
+        box(comp, xa, C3_Y0 - 0.05, C3_Z0 + C3_PCB + 0.1, xb, C3_Y0 + 1.2, C3_Z0 + C3_PCB + 0.8, JOIN, 'C3GrooveLip',
+            body)
+
+    label(comp, body, top, XL + 4, Y_CHIN_LOW + 7, C3_X - C3_W / 2 - 2.5, y_hi - 5,
+          f'CARRIER v{VERSION}\nPRINT: EDGE DOWN', name='Label', height=1.8)
     return comp
 
 
@@ -379,10 +654,44 @@ def build_back_cover(root, ops):
     body = box(comp, XL + s, Y_CHIN_LOW + s, COVER_Z, XR - s, Y_TOP_IN - s, DEPTH, NEW, 'Cover').bodies.item(0)
     body.name = 'BackCover'
     screw_holes(comp, COVER_SCREWS, DEPTH, body)
-    # cable knock-out towards the back (right-angle plug), thin membrane on the outside
-    box(comp, CABLE[0], CABLE[2], COVER_Z - 1, CABLE[1], CABLE[3], DEPTH + 1, CUT, 'BackCableOpening', body)
-    box(comp, CABLE[0], CABLE[2], DEPTH - KNOCKOUT_T, CABLE[1], CABLE[3], DEPTH, JOIN, 'BackKnockout', body)
+    # notch for the cable port module
+    c = FIT / 2
+    box(comp, PORT_X0 - c, Y_CHIN_LOW - 1, COVER_Z - 1, PORT_X1 + c, PORT_Y1 + c, DEPTH + 1, CUT, 'PortNotch', body)
     dovetail(comp, DEPTH, RAIL_FOOT, RAIL_HEAD, RAIL_H, RAIL_Y0, RAIL_Y0 + RAIL_L, JOIN, 'Rail', body)
+    edges = [e for e in body.edges if _edge_in_plane(e, 'y', RAIL_Y0)
+             and _edge_within(e, lambda p: p.z > cm(DEPTH) + 1e-4)]
+    try_chamfer(comp, edges, RAIL_LEAD, 'RailLeadIn')
+    label(comp, body, COVER_Z, -28, -6, 0, 6, f'BACK COVER v{VERSION}\nTHIS FACE DOWN', flip=True, name='Label')
+    return comp
+
+
+def build_port(root, ops, variant):
+    """Cable port module, clamped between housing and back cover. Print it with the back face down.
+
+    It fills the opening at the lower back edge. Variant 'back': the cable boot of a right-angle plug leaves
+    through the back, the plug body is caught behind the module (strain relief). Variant 'bottom': the
+    overmould of a straight plug leaves through the bottom and is held by a snug fit.
+    """
+    NEW, CUT, JOIN = ops
+    name = 'PortBack' if variant == 'back' else 'PortBottom'
+    comp = new_component(root, name)
+    x0, x1 = PORT_X0, PORT_X1
+    y_step = -BODY / 2 + WALL / 2
+    # L-shaped body: stepped tongue in the bottom wall, tongue in the back cover
+    body = box(comp, x0, -BODY / 2, PORT_Z0, x1, Y_CHIN_LOW, DEPTH, NEW, 'BottomTongue').bodies.item(0)
+    body.name = name
+    box(comp, x0 - PORT_STEP, y_step, PORT_Z0, x1 + PORT_STEP, Y_CHIN_LOW, DEPTH, JOIN, 'Step', body)
+    box(comp, x0, Y_CHIN_LOW - 0.01, COVER_Z, x1, PORT_Y1, DEPTH, JOIN, 'BackTongue', body)
+    # lip under the back cover: the module cannot leave towards the back
+    box(comp, x0, PORT_Y1 - 0.5, COVER_Z - 0.8, x1, PORT_Y1 + 1.0, COVER_Z, JOIN, 'CoverLip', body)
+    if variant == 'back':
+        # boot hole, open to the +x side so the cable can be laid in (the back cover closes it)
+        cylinders(comp, [(C3_X, BOOT_Y)], BOOT_D, COVER_Z - 1, DEPTH + 1, CUT, 'BootHole', body)
+        box(comp, C3_X, BOOT_Y - BOOT_D / 2, COVER_Z - 1, x1 + 1, BOOT_Y + BOOT_D / 2, DEPTH + 1, CUT, 'BootSlot', body)
+    else:
+        g = 0.1
+        box(comp, C3_X - PLUG_W / 2 - g, -BODY / 2 - 1, PLUG_Z - PLUG_H / 2 - g, C3_X + PLUG_W / 2 + g,
+            Y_CHIN_LOW + 1, PLUG_Z + PLUG_H / 2 + g, CUT, 'PlugHole', body)
     return comp
 
 
@@ -391,8 +700,10 @@ def build_wall_plate(root, ops, cable):
     comp = new_component(root, 'WallPlate')
     body = box(comp, -PLATE / 2, -PLATE / 2, DEPTH, PLATE / 2, PLATE / 2, DEPTH + PLATE_T, NEW, 'Plate').bodies.item(0)
     body.name = 'WallPlate'
-    fillet(comp, z_edges(body, PLATE_T), R_CORNER + (PLATE - BODY) / 2, 'ConcentricCorners')
+    rk = R_CORNER + (PLATE - BODY) / 2
+    fillet(comp, z_edges(body, PLATE_T), rk, 'ConcentricCorners')
     fillet(comp, list(planar_face_at_z(body, DEPTH).edges), 2.0, 'FrontEdge')
+    bed_foot(comp, body, DEPTH, PLATE / 2, PLATE / 2, rk, 2.0, 1, 'FrontBedFoot')
     z_wall = DEPTH + PLATE_T
     cylinders(comp, [(0, 0)], BOX_RIM_D, z_wall - BOX_RIM_T, z_wall + 1, CUT, 'BoxRimRecess', body)
     dovetail_slot(comp, body)
@@ -404,6 +715,40 @@ def build_wall_plate(root, ops, cable):
     heads = [((-a - 3.3, -3.3, 0), (-a + 3.3, 3.3, 0)), ((a - 3.3, -3.3, 0), (a + 3.3, 3.3, 0))]
     extrude(comp, rect_sketch(comp, plane_z(comp, DEPTH + 1.0), heads, 'ScrewHeadRecess'), 3.0, CUT,
             'ScrewHeadRecess', body)
+    # insert for the optional lock tab, in the front face below the device
+    lock_y = _lock_plate_y()
+    cylinders(comp, [(LOCK_POINTS[1], lock_y)], INSERT_HOLE_D, DEPTH - 0.1, DEPTH + INSERT_HOLE_L, CUT, 'LockInsertHole',
+              body)
+    try_chamfer(comp, circular_edges(body, INSERT_HOLE_D / 2,
+                                     lambda p: abs(p.z - cm(DEPTH)) < 1e-4 and abs(p.y - cm(lock_y)) < 1e-4),
+                INSERT_LEAD, 'LockLeadIn')
+    label(comp, body, z_wall - BOX_RIM_T, -20, 21, 20, 29, f'WALL PLATE v{VERSION}\nPRINT: FRONT FACE DOWN',
+          name='Label')
+    return comp
+
+
+def _lock_plate_y():
+    return -PLATE / 2 + 2.0 + INSERT_HOLE_D / 2 + 0.2
+
+
+def build_lock_tab(root, ops):
+    """Optional lock tab below the device: one screw into the housing, one into the wall plate."""
+    NEW, CUT, JOIN = ops
+    comp = new_component(root, 'LockTab')
+    y_top = -BODY / 2 - 0.2
+    z_front = LOCK_Z - 4.0
+    body = box(comp, LOCK_X - 6, -PLATE / 2, z_front, LOCK_X + 6, y_top, DEPTH, NEW, 'Tab').bodies.item(0)
+    body.name = 'LockTab'
+    fillet(comp, [e for e in body.edges if _edge_in_plane(e, 'y', -PLATE / 2) and _edge_in_plane(e, 'z', z_front)],
+           1.5, 'FrontEdge')
+    # screw 1 upwards into the housing
+    lx = LOCK_POINTS[0]
+    cylinders_y(comp, [(lx, LOCK_Z)], SCREW_CLEAR_D, -PLATE / 2 - 1, y_top + 1, CUT, 'M2Clearance', body)
+    cylinders_y(comp, [(lx, LOCK_Z)], HEAD_D, -PLATE / 2 - 1, y_top - 1.3, CUT, 'M2HeadRecess', body)
+    # screw 2 backwards into the wall plate
+    py = _lock_plate_y()
+    cylinders(comp, [(LOCK_POINTS[1], py)], SCREW_CLEAR_D, z_front - 1, DEPTH + 1, CUT, 'M2Clearance', body)
+    cylinders(comp, [(LOCK_POINTS[1], py)], HEAD_D, z_front - 1, DEPTH - 1.3, CUT, 'M2HeadRecess', body)
     return comp
 
 
@@ -411,7 +756,7 @@ def build_desk_stand(root, ops, cable):
     NEW, CUT, JOIN = ops
     comp = new_component(root, 'DeskStand')
     t = math.tan(math.radians(TILT))
-    z_front, z_back = -2.0, 46.0
+    z_front, z_back = -2.0, DEPTH + 24.0
     # In device coordinates the table plane rises towards the back, so the device leans back.
     y_foot = -BODY / 2 - STAND_GAP - t * (DEPTH - z_front)
 
@@ -450,13 +795,49 @@ def build_dummies(root, ops):
     box(lcd, BAY_X0 + 4, LCD_Y - 10, LIP + GLASS_T + LCD_PCB, BAY_X0 + 10, LCD_Y + 10, LIP + GLASS_T + LCD_PCB + 6, NEW,
         'PH2Connector')
     scd = new_component(root, 'Dummy_SCD41')
-    box(scd, -SCD_W / 2, Y_CHIN_MID - SCD_H / 2, FLOOR_Z - SCD_T, SCD_W / 2, Y_CHIN_MID + SCD_H / 2, FLOOR_Z - 0.01,
-        NEW, 'SCD41')
+    zb = SCD_ZT - SCD_PCB
+    box(scd, -SCD_W / 2, SCD_Y0, zb, SCD_W / 2, SCD_Y0 + SCD_L, SCD_ZT - 0.01, NEW, 'Pcb')
+    box(scd, -5.05, SCD_Y0 + 1.0, zb - SCD_H, 5.05, SCD_Y0 + 11.1, zb, NEW, 'SCD41')
     esp = new_component(root, 'Dummy_ESP32_C3')
     box(esp, C3_X - C3_W / 2, C3_Y0, C3_Z0, C3_X + C3_W / 2, C3_Y0 + C3_H, C3_Z0 + C3_PCB, NEW, 'C3Pcb')
-    box(esp, C3_X - 4.5, C3_Y0 - 0.5, C3_Z0 + C3_PCB, C3_X + 4.5, C3_Y0 + 7.0, C3_Z0 + C3_PCB + 3.2, NEW, 'UsbCSocket')
-    box(esp, C3_X - 6, C3_Y0 - 12.5, PLUG_Z - PLUG_T / 2, C3_X + 6, C3_Y0 - 0.5, PLUG_Z + PLUG_T / 2, NEW,
-        'RightAnglePlug')
+    box(esp, C3_X - 4.45, C3_Y0 - 0.5, C3_Z0 + C3_PCB, C3_X + 4.45, C3_Y0 + 7.0, SOCKET_TOP, NEW, 'UsbCSocket')
+    angled = new_component(root, 'Dummy_PlugAngled')
+    pb = box(angled, C3_X - PLUG_W / 2, C3_Y0 - 11.5, PLUG_Z - PLUG_H / 2, C3_X + PLUG_W / 2, C3_Y0 - 1.0,
+             COVER_Z - 0.2, NEW, 'Body').bodies.item(0)
+    cylinders(angled, [(C3_X, BOOT_Y)], BOOT_D - 0.6, COVER_Z - 0.21, DEPTH + 5, ops[2], 'Boot', pb)
+    straight = new_component(root, 'Dummy_PlugStraight')
+    box(straight, C3_X - PLUG_W / 2, -BODY / 2 - 12, PLUG_Z - PLUG_H / 2, C3_X + PLUG_W / 2, C3_Y0 - 1.0,
+        PLUG_Z + PLUG_H / 2, NEW, 'Overmould')
+
+
+# ----------------------------------------------------------------------------- assembly
+def add_joints(root):
+    """Device parts move together and slide on the wall plate (0 = mounted, 15 mm = released)."""
+    occ = {o.component.name: o for o in root.occurrences}
+    device = ['Housing', 'SensorCarrier', 'BackCover', 'PortBack', 'Dummy_LCD_2inch', 'Dummy_SCD41',
+              'Dummy_ESP32_C3', 'Dummy_PlugAngled']
+    group = adsk.core.ObjectCollection.create()
+    for n in device:
+        group.add(occ[n])
+    root.rigidGroups.add(group, True)
+    occ['WallPlate'].isGrounded = True
+    plate_group = adsk.core.ObjectCollection.create()
+    plate_group.add(occ['WallPlate'])
+    plate_group.add(occ['LockTab'])
+    root.rigidGroups.add(plate_group, True)
+    target = pt(0, RAIL_Y0, DEPTH)
+    vertex = min((v for b in occ['WallPlate'].bRepBodies for v in b.vertices),
+                 key=lambda v: v.geometry.distanceTo(target))
+    geo = adsk.fusion.JointGeometry.createByPoint(vertex)
+    ji = root.asBuiltJoints.createInput(occ['Housing'], occ['WallPlate'], geo)
+    ji.setAsSliderJointMotion(adsk.fusion.JointDirections.YAxisJointDirection)
+    joint = root.asBuiltJoints.add(ji)
+    joint.name = 'RailSlider'
+    lim = joint.jointMotion.slideLimits
+    lim.isMinimumValueEnabled = True
+    lim.minimumValue = 0.0
+    lim.isMaximumValueEnabled = True
+    lim.maximumValue = cm(RAIL_TRAVEL)
 
 
 # ----------------------------------------------------------------------------- checks and export
@@ -473,22 +854,30 @@ def check_interference(design, root, components):
     return result.count
 
 
+PRINT_PARTS = {'Housing': 'housing', 'SensorCarrier': 'sensor_carrier', 'BackCover': 'back_cover',
+               'PortBack': 'cable_port_back', 'PortBottom': 'cable_port_bottom', 'WallPlate': 'wall_plate',
+               'LockTab': 'lock_tab', 'DeskStand': 'desk_stand'}
+
+
 def export_files(design, root):
     repo_cad = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     stl_dir, step_dir = os.path.join(repo_cad, 'stl'), os.path.join(repo_cad, 'step')
     os.makedirs(stl_dir, exist_ok=True)
     os.makedirs(step_dir, exist_ok=True)
     em = design.exportManager
-    names = {'Housing': 'housing', 'SensorCarrier': 'sensor_carrier', 'BackCover': 'back_cover',
-             'WallPlate': 'wall_plate', 'DeskStand': 'desk_stand'}
     for occ in root.occurrences:
-        if occ.component.name in names:
+        if occ.component.name in PRINT_PARTS:
             for b in occ.bRepBodies:
-                opt = em.createSTLExportOptions(b, os.path.join(stl_dir, names[occ.component.name] + '.stl'))
+                opt = em.createSTLExportOptions(b, os.path.join(stl_dir, PRINT_PARTS[occ.component.name] + '.stl'))
                 opt.meshRefinement = adsk.fusion.MeshRefinementSettings.MeshRefinementHigh
                 opt.isBinaryFormat = True
                 em.execute(opt)
     em.execute(em.createSTEPExportOptions(os.path.join(step_dir, 'co2_wall_sensor_assembly.step'), root))
+    # fingerprint of the parameters, the CI checks that the print files belong to the current parameters
+    with open(os.path.join(repo_cad, 'build_info.json'), 'w', encoding='utf-8') as f:
+        json.dump({'enclosure_version': VERSION, 'parameters_sha256': parameters_fingerprint(),
+                   'parts': sorted(PRINT_PARTS.values())}, f, indent=2)
+        f.write('\n')
     print('Exported to', repo_cad)
 
 
@@ -496,11 +885,13 @@ def run(_context: str):
     app = adsk.core.Application.get()
     doc = app.activeDocument
     old = adsk.fusion.Design.cast(app.activeProduct) if doc else None
+    taken = load_user_parameters(old)
     if old and not doc.isSaved and any(o.component.name == 'WallPlate' for o in old.rootComponent.occurrences):
         doc.close(False)  # discard an unsaved previous run of this generator
     app.documents.add(adsk.core.DocumentTypes.FusionDesignDocumentType)
     design = adsk.fusion.Design.cast(app.activeProduct)
     design.designType = adsk.fusion.DesignTypes.ParametricDesignType
+    write_user_parameters(design)
     root = design.rootComponent
     ops = (adsk.fusion.FeatureOperations.NewBodyFeatureOperation,
            adsk.fusion.FeatureOperations.CutFeatureOperation,
@@ -509,18 +900,29 @@ def run(_context: str):
     build_housing(root, ops)
     build_sensor_carrier(root, ops)
     build_back_cover(root, ops)
+    build_port(root, ops, 'back')
+    build_port(root, ops, 'bottom')
     build_wall_plate(root, ops, CABLE)
+    build_lock_tab(root, ops)
     build_desk_stand(root, ops, CABLE)
     build_dummies(root, ops)
 
-    wall = check_interference(design, root, {'Housing', 'SensorCarrier', 'BackCover', 'WallPlate', 'Dummy_LCD_2inch',
-                                             'Dummy_SCD41', 'Dummy_ESP32_C3'})
-    desk = check_interference(design, root, {'Housing', 'SensorCarrier', 'BackCover', 'DeskStand', 'Dummy_ESP32_C3'})
+    device = {'Housing', 'SensorCarrier', 'BackCover', 'Dummy_LCD_2inch', 'Dummy_SCD41', 'Dummy_ESP32_C3'}
+    wall = check_interference(design, root, device | {'PortBack', 'Dummy_PlugAngled', 'WallPlate', 'LockTab'})
+    bottom = check_interference(design, root, device | {'PortBottom', 'Dummy_PlugStraight', 'WallPlate', 'LockTab'})
+    desk = check_interference(design, root, device | {'PortBack', 'Dummy_PlugAngled', 'DeskStand'})
+    add_joints(root)
     for occ in root.occurrences:
-        if occ.component.name == 'DeskStand':
+        if occ.component.name in ('DeskStand', 'PortBottom', 'Dummy_PlugStraight'):
             occ.isLightBulbOn = False
+    root.isJointsFolderLightBulbOn = False
+    for comp in design.allComponents:
+        for sk in comp.sketches:
+            sk.isVisible = False
+    app.userInterface.activeSelections.clear()
     app.activeViewport.fit()
-    print('Interference wall assembly:', wall, '| desk assembly:', desk)
+    print('Parameters taken over from the previous design:', taken)
+    print('Interference wall/back exit:', wall, '| wall/bottom exit:', bottom, '| desk:', desk)
     print('Device W x H x D mm:', BODY, BODY, DEPTH, '+ rail', RAIL_H)
     print('Volume cm3:', {o.component.name: round(sum(b.volume for b in o.bRepBodies), 2) for o in root.occurrences})
     if EXPORT:

@@ -1,0 +1,46 @@
+# =============================================================================
+#  CO2 Wall Sensor  |  network settings of the browser installer firmware
+# -----------------------------------------------------------------------------
+#  Contains no credentials. WiFi is set up right after flashing in the browser
+#  (Improv via USB) or via the hotspot the device opens when it has no WiFi.
+#  Home Assistant discovers the device, new releases show up as firmware
+#  update, and the ESPHome dashboard offers to adopt it.
+# =============================================================================
+
+substitutions:
+  manifest_url: "https://tobi136b.github.io/co2-wall-sensor/firmware/manifest-${language}.json"
+  import_url: "github://tobi136B/co2-wall-sensor/esphome/${import_file}@main"
+
+esphome:
+  name_add_mac_suffix: true
+
+dashboard_import:
+  package_import_url: ${import_url}
+  import_full_config: false
+
+api:
+
+ota:
+  - platform: esphome
+  - platform: http_request
+
+http_request:
+  verify_ssl: true
+
+update:
+  - platform: http_request
+    id: firmware_update
+    name: "${txt_firmware}"
+    source: ${manifest_url}
+    update_interval: 24h
+
+wifi:
+  # Many ESP32-C3 SuperMini boards have a poorly matched antenna and drop the
+  # connection at full transmit power. 8.5 dB is a well known stable value.
+  output_power: 8.5dB
+  ap:
+    ssid: "${friendly_name}"
+
+captive_portal:
+
+improv_serial:

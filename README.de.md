@@ -3,18 +3,19 @@
 # CO2-Wandsensor
 
 **Kompakter CO2-, Temperatur- und Feuchtesensor für Home Assistant.<br>
-Sitzt unsichtbar auf einer Hohlwanddose oder steht auf dem Schreibtisch.**
+Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
-![Lizenz](https://img.shields.io/badge/Lizenz-MIT-green)
+[![Software: MIT](https://img.shields.io/badge/Software-MIT-green)](LICENSE)
+[![Hardware: CERN-OHL-P](https://img.shields.io/badge/Hardware-CERN--OHL--P--2.0-blue)](LICENSE-HARDWARE)
 
-[English](README.md) | **Deutsch**
+[English](README.md) | **Deutsch** | [Projektseite und Browser-Installer](https://tobi136b.github.io/co2-wall-sensor/de/)
 
-<img src="docs/images/hero_wall.png" width="46%" alt="Gerät auf der Wandplatte">
-<img src="docs/images/desk_stand.png" width="46%" alt="Gerät auf dem Tischständer">
+<img src="docs/images/exploded.gif" width="88%" alt="Animierte Explosionsansicht des CO2-Wandsensors">
 
 </div>
 
@@ -22,15 +23,15 @@ Sitzt unsichtbar auf einer Hohlwanddose oder steht auf dem Schreibtisch.**
 
 ## Highlights
 
+* **Im Browser flashen.** ESP32-C3 per USB anschließen, auf der [Projektseite](https://tobi136b.github.io/co2-wall-sensor/de/) auf *Installieren* klicken, WLAN eintragen. Home Assistant findet das Gerät und bietet neue Versionen als Firmware-Update an.
 * **Echte CO2-Messung** mit dem Sensirion SCD41 (photoakustisch, NDIR), dazu Temperatur und Luftfeuchte.
-* **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Temperatur und Luftfeuchte. Kein Umschalten, keine Tasten.
-* **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene auf der Rückseite passt auf die **Wandplatte** (verdeckt eine Standard-Hohlwanddose Ø 68 mm, das Kabel kommt aus der Wand) oder auf den **Tischständer**.
-* **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer, durch einen verschraubten Sensorträger und eine Trennwand vom ESP32 getrennt. Frischluft kommt von unten, die Front bleibt geschlossen und staubunempfindlich.
-* **Eine Schraubensorte, überall Metallgewinde.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4 (ISO 7380) halten Display, Sensorträger und Rückdeckel. Keine Kunststoffgewinde, keine Clips, die ausleiern.
-* **Kabel von unten oder hinten, Entscheidung nach dem Druck.** Zwei unsichtbare Ausbrechfelder: hinten für einen Winkelstecker in die Dose oder den Tischständer, unten für einen geraden Stecker.
-* **Native Home-Assistant-Integration** über ESPHome: Schwellen, Nachtmodus, Helligkeit und Kalibrierung direkt aus HA bedienbar.
-* **Vollständig parametrisches CAD.** Das Gehäuse entsteht per Python-Skript in Autodesk Fusion. Wert ändern, Skript starten, fertig. Technische Zeichnung und Verdrahtungsplan werden aus denselben Quellen erzeugt.
-* **Zweisprachig.** Firmware, Doku und Zeichnungen auf Englisch und Deutsch.
+* **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Temperatur und Luftfeuchte.
+* **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (verdeckt eine Standard-Hohlwanddose Ø 68 mm) oder den **Tischständer**. Eine optionale Sicherungslasche schraubt es an der Wand fest.
+* **Kabel von hinten oder unten**, entschieden nach dem Druck mit einem kleinen, tauschbaren **Kabelport-Modul**, das gleichzeitig als Zugentlastung dient.
+* **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. Der SCD41 gleitet in Schienen, der ESP32-C3 sitzt in Führungen.
+* **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer unterhalb der Elektronik, Frischluft kommt von unten, die Front bleibt geschlossen.
+* **Vollständig parametrisches CAD.** Jedes Maß ist ein Fusion-Benutzerparameter. Wert ändern, Skript starten, neue STL, STEP, Druckplatten und Zeichnung.
+* **Zweisprachig.** Firmware, Doku, Zeichnungen und Projektseite auf Englisch und Deutsch.
 
 <div align="center">
 <img src="docs/images/display_preview_de.png" width="96%" alt="Displaylayout in den drei Luftqualitätsstufen">
@@ -44,7 +45,8 @@ flowchart LR
     SCD41["SCD41<br>CO2 / Temp / Feuchte"] -- I2C --> ESP["ESP32-C3 SuperMini<br>ESPHome"]
     ESP -- SPI --> LCD["2&quot; IPS-Display<br>320 x 240"]
     ESP <-- "WLAN, native API" --> HA["Home Assistant"]
-    USB["USB-C 5 V<br>(aus der Hohlwanddose)"] --> ESP
+    USB["USB-C 5 V<br>(Hohlwanddose oder Kabel auf Putz)"] --> ESP
+    GH["GitHub Releases"] -. "Firmware-Update" .-> HA
 ```
 
 Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisiert das Display, bewertet die Luftqualität anhand zweier Schwellen (Standard 1000 und 1400 ppm) und meldet alles an Home Assistant.
@@ -53,15 +55,14 @@ Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisie
 
 | | |
 |---|---|
-| Gerät | 69,8 × 69,8 × 22 mm (+ 3 mm Schiene) |
+| Gerät | 69,8 × 69,8 × 24 mm (+ 3 mm Schiene) |
 | Wandplatte | 82 × 82 × 7 mm, passt auf Hohlwanddosen Ø 68 mm mit 60 mm Schraubabstand |
 | Displayfenster | 41,8 × 31,6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 bis 5000 ppm, ±(50 ppm + 5 % vom Messwert) |
 | Versorgung | 5 V über USB-C, ca. 0,5 W |
-| Neigung auf dem Tischständer | 12° nach hinten |
-| Verbindungselemente | 10 × Einschmelzmutter M2 × 3 (AD 3,2), 10 × M2 × 4 ISO 7380 |
-| Kabelaustritt | hinten (Winkelstecker) oder unten (gerader Stecker), Ausbrechfelder |
-| Druckmaterial | PETG (PLA möglich), ca. 100 g |
+| Kabelaustritt | hinten (Winkelstecker) oder unten (gerader Stecker), tauschbares Port-Modul |
+| Verbindungselemente | 10 Einschmelzmuttern M2 × 3 (AD 3,2), 10 Schrauben M2 × 4 ISO 7380 (+ je 2 für die Sicherungslasche) |
+| Druckmaterial | PETG (PLA möglich), ca. 110 g |
 
 Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_sensor_drawing_de.pdf) | [Englisch (PDF)](docs/drawing/co2_wall_sensor_drawing_en.pdf)
 
@@ -72,39 +73,41 @@ Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_
 
 ## Stückliste
 
-| Anz. | Teil | Hinweis | ca. |
-|----:|------|---------|----:|
-| 1 | Sensirion **SCD41** Modul | CO2, Temperatur, Feuchte, I2C | 20 bis 35 € |
-| 1 | **ESP32-C3 SuperMini** | USB-C, WLAN | 3 € |
-| 1 | **Waveshare 2inch LCD Module** | ST7789V, 240 × 320, IPS, SPI | 10 € |
-| 1 | USB-C-Kabel | **Winkelstecker** für Austritt hinten (Dose, Tischständer) oder **gerader Stecker** für Austritt unten | 5 € |
-| 1 | Netzteil 5 V / 1 A | oder Unterputz-USB-Einsatz in der Dose | 5 € |
-| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm | Display 4, Rückdeckel 4, Sensorträger 2 | 3 € je 100 |
-| 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 | gleiche Stellen, einzige Schraubensorte | 3 € je 100 |
-| | Litze AWG 28 bis 30, doppelseitiges Schaumklebeband | Verdrahtung, SCD41 und ESP32-C3 fixieren | |
+Insgesamt rund 45 €. Die Links sind Vorschläge, Stand Oktober 2026; Preise ändern sich oft.
 
+| Anz. | Teil | AliExpress | Amazon.de |
+|----:|------|-----------:|----------:|
+| 1 | Sensirion **SCD41** Platine, blau, **15 × 20 mm** | [20,99 €](https://de.aliexpress.com/item/1005009740863220.html) | |
+| 1 | **ESP32-C3 SuperMini** | [2,79 €](https://de.aliexpress.com/item/1005007479144456.html) | [8,99 € (2 Stk.)](https://www.amazon.de/dp/B0DMNBWTFD) |
+| 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12,39 €](https://de.aliexpress.com/item/1005008772378337.html) | [16,31 €](https://www.amazon.de/dp/B081Q79X2F) |
+| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm (Variante "M2 (OD3.2)", Länge 3 mm) | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) ¹ |
+| 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 | | [4,30 € (50 Stk.)](https://www.amazon.de/dp/B0DGXPQ7TW) |
+| 1 | USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten | | [7,69 €](https://www.amazon.de/dp/B01MSIE2L1) |
+| 1 | USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät | | [8,99 €](https://www.amazon.de/dp/B0HHF42X68) |
+| | Silikonlitze AWG 30 | | [15,49 € (8 Farben)](https://www.amazon.de/dp/B0DH2FBWH7) |
+
+¹ Bei Muttern mit 3,0 mm Außendurchmesser den Fusion-Parameter `INSERT_HOLE_D` auf 2,8 setzen.
+Die Schienen passen für die verbreitete blaue **15 × 20 mm** SCD41-Platine; andere Platinen brauchen neue Werte für `SCD_W` und `SCD_L`.
 Maschinenlesbar: [`hardware/bom.csv`](hardware/bom.csv)
 
 ## Schnellstart
 
-1. **Drucken:** die fünf Teile aus [`cad/stl`](cad/stl) (Gehäuse, Sensorträger, Rückdeckel, Wandplatte, Tischständer). Druckeinstellungen: [docs/de/aufbau.md](docs/de/aufbau.md).
-2. **Verdrahten:** nach [docs/de/verdrahtung.md](docs/de/verdrahtung.md).
+1. **Drucken:** die beiden fertigen Druckplatten [`co2_wall_sensor_device.3mf`](cad/3mf/co2_wall_sensor_device.3mf) und [`co2_wall_sensor_mounts.3mf`](cad/3mf/co2_wall_sensor_mounts.3mf) (alle Teile schon in Drucklage) oder die einzelnen Dateien aus [`cad/stl`](cad/stl). Einstellungen: [docs/de/aufbau.md](docs/de/aufbau.md).
+2. **Verdrahten** nach [docs/de/verdrahtung.md](docs/de/verdrahtung.md) und **zusammenbauen** nach [docs/de/aufbau.md](docs/de/aufbau.md).
 
    <img src="docs/images/wiring_de.png" width="80%" alt="Verdrahtungsplan">
 
-3. **Flashen:** `esphome/secrets.yaml.example` nach `secrets.yaml` kopieren, ausfüllen und [`esphome/co2-wall-sensor-de.yaml`](esphome/co2-wall-sensor-de.yaml) im ESPHome Builder installieren. Testdateien für einen schnellen Hardwarecheck hängen an jedem [Release](https://github.com/tobi136B/co2-wall-sensor/releases) (siehe [FAQ](docs/de/faq.md)).
-4. **Home Assistant** findet das Gerät automatisch. Beispiel-Automationen und eine Dashboard-Karte liegen in [`homeassistant/de`](homeassistant/de).
+3. **Flashen** direkt aus dem Browser auf der [Projektseite](https://tobi136b.github.io/co2-wall-sensor/de/). Selbst bauen: `esphome/secrets.yaml.example` nach `secrets.yaml` kopieren, ausfüllen und [`esphome/co2-wall-sensor-de.yaml`](esphome/co2-wall-sensor-de.yaml) im ESPHome Builder installieren.
+4. **Home Assistant** findet das Gerät automatisch.
 
 <div align="center">
-<img src="docs/images/exploded_view.png" width="80%" alt="Explosionsansicht">
-<br><sub>Explosionsansicht: Display, Gehäuse, SCD41, Sensorträger, ESP32-C3, Rückdeckel mit Schiene, Wandplatte</sub>
-<br><br>
-<img src="docs/images/interior.png" width="46%" alt="Innenansicht ohne Rückdeckel">
-<img src="docs/images/back_view.png" width="46%" alt="Rückansicht mit vier M2-Schrauben und Schiene">
-<br><sub>Links: Innenansicht, die USB-C-Buchse zeigt nach unten zu beiden Ausbrechfeldern. Rechts: Rückdeckel mit vier versenkten M2-Schrauben und der Schwalbenschwanzschiene.</sub>
+<img src="docs/images/cable_port_back.png" width="32%" alt="Kabel nach hinten">
+<img src="docs/images/interior.png" width="32%" alt="Innenansicht">
+<img src="docs/images/cable_port_bottom.png" width="32%" alt="Kabel nach unten">
+<br><sub>Kabel nach hinten, Innenansicht, Kabel nach unten</sub>
 </div>
 
-## Entitäten in Home Assistant
+## Home Assistant
 
 | Entität | Typ | Zweck |
 |---------|-----|-------|
@@ -114,7 +117,14 @@ Maschinenlesbar: [`hardware/bom.csv`](hardware/bom.csv)
 | Display Helligkeit | Licht | dimmen oder ausschalten |
 | Nachtmodus (22 bis 6 Uhr dimmen) | Schalter | automatisches Dimmen in der Nacht |
 | SCD41 kalibrieren (Frischluft 420 ppm) | Taste | Zwangskalibrierung an der frischen Luft |
+| Firmware | Update | neue Versionen (Firmware des Browser-Installers) |
 | WLAN Signal, Laufzeit, Neustart | Diagnose | |
+
+**Lüftungserinnerung:** Ein fertiger Blueprint schickt eine Nachricht aufs Handy, wenn der CO2-Wert hoch bleibt, und noch einmal, wenn die Luft wieder gut ist.
+
+[![Blueprint in Home Assistant importieren](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ftobi136B%2Fco2-wall-sensor%2Fblob%2Fmain%2Fhomeassistant%2Fblueprints%2Fco2_ventilation_reminder.yaml)
+
+Weitere Beispiele (Automationen, Dashboard-Karte) liegen in [`homeassistant/de`](homeassistant/de).
 
 ## Projektstruktur
 
@@ -122,56 +132,57 @@ Maschinenlesbar: [`hardware/bom.csv`](hardware/bom.csv)
 co2-wall-sensor/
 ├── cad/
 │   ├── fusion/generate_enclosure/   Fusion-Skript, einzige Quelle für die gesamte Geometrie
-│   ├── fusion/co2_wall_sensor.f3d   Fusion-Archiv der Baugruppe
+│   ├── fusion/co2_wall_sensor.f3d   Fusion-Archiv der Baugruppe (mit Schiebegelenk)
+│   ├── 3mf/                         druckfertige Platten
 │   ├── step/                        STEP der kompletten Baugruppe
-│   └── stl/                         Druckdateien
+│   ├── stl/                         einzelne Druckdateien
+│   └── build_info.json              Fingerabdruck der Parameter, aus denen die Druckdateien stammen
 ├── docs/                            Aufbau, Verdrahtung, Designnotizen, FAQ (Deutsch in docs/de)
 │   ├── drawing/                     technische Zeichnung, PDF + PNG, EN und DE
-│   └── images/                      Renderings, Verdrahtungsplan, Displayvorschau
+│   └── images/                      Renderings, Animation, Verdrahtungsplan, Displayvorschau
 ├── esphome/
-│   ├── co2-wall-sensor.yaml         Gerätedatei, englische Oberfläche
-│   ├── co2-wall-sensor-de.yaml      Gerätedatei, deutsche Oberfläche
-│   └── common/base.yaml             gemeinsame Firmware-Logik
-├── hardware/bom.csv                 Stückliste
-├── homeassistant/                   Automationen und Dashboard-Karte (Deutsch in homeassistant/de)
-└── tools/                           Generatoren für Zeichnung, Verdrahtungsplan und Displayvorschau
+│   ├── co2-wall-sensor*.yaml        Gerätedateien: eigener Build und Browser-Installer, EN und DE
+│   └── common/                      gemeinsame Firmware-Logik und Netzwerk-Varianten
+├── hardware/bom.csv                 Stückliste mit Shop-Links
+├── homeassistant/                   Blueprint, Automationen und Dashboard-Karte (Deutsch in homeassistant/de)
+├── site/                            Vorlage der Projektseite
+└── tools/                           Generatoren für Zeichnung, Verdrahtung, Vorschau, Druckplatten, Projektseite, Prüfungen
 ```
 
 ## Gehäuse anpassen
 
-Alle Maße stehen am Anfang von [`generate_enclosure.py`](cad/fusion/generate_enclosure/generate_enclosure.py) im Block `PARAMETERS`.
+Jedes Maß ist ein **Fusion-Benutzerparameter**.
 
-1. In Fusion *Dienstprogramme > Skripte und Zusatzmodule* öffnen, mit **+** den Ordner `cad/fusion/generate_enclosure` hinzufügen.
-2. Werte anpassen, zum Beispiel `SCD_W`, `SCD_H`, `SCD_T` für eine andere Sensorplatine, und das Skript ausführen.
-3. Das Skript baut alle Teile neu und prüft Wand- und Tischaufbau automatisch auf Kollisionen. Mit `EXPORT = True` schreibt es neue STL- und STEP-Dateien.
-4. Zeichnung, Verdrahtungsplan und Displayvorschau neu erzeugen:
+1. In Fusion *Dienstprogramme > Skripte und Zusatzmodule* öffnen, mit **+** den Ordner `cad/fusion/generate_enclosure` hinzufügen und das Skript einmal ausführen.
+2. *Ändern > Parameter ändern* öffnen und Werte anpassen, zum Beispiel `FIT` für strammere oder lockerere Passungen, `SCD_W`/`SCD_L` für eine andere Sensorplatine oder `INSERT_HOLE_D` für andere Einschmelzmuttern.
+3. Das Skript erneut starten. Es übernimmt deine Parameter, baut alle Teile neu und prüft Wand- und Tischaufbau auf Kollisionen. Mit `EXPORT = True` schreibt es neue STL- und STEP-Dateien und `cad/build_info.json`.
+4. Zeichnung, Druckplatten und die übrigen generierten Dateien neu erzeugen:
 
 ```bash
 pip install -r requirements.txt
-python tools/drawing.py
-python tools/wiring.py
-python tools/display_preview.py
+python tools/drawing.py && python tools/build_3mf.py
+python tools/wiring.py && python tools/display_preview.py
+python tools/check_repo.py
 ```
 
-Mehr Hintergrund: [Designnotizen](docs/de/design.md) und [FAQ](docs/de/faq.md).
+Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die Druckdateien zu den eingecheckten Parametern gehören. Mehr Hintergrund: [Designnotizen](docs/de/design.md) und [FAQ](docs/de/faq.md).
 
 ## Vor dem ersten Druck
 
-* **SCD41-Platine:** Im Modell steckt ein Platzhalter mit 20 × 20 × 8,1 mm. Eigene Platine nachmessen und `SCD_W/SCD_H/SCD_T` anpassen.
+* **SCD41-Platine:** Die Schienen passen für die blaue 15 × 20 mm Platine. Sieht deine anders aus, bitte nachmessen.
 * **Displayglas:** Waveshare dokumentiert die Glasdicke nicht, angenommen sind 2,5 mm (`GLASS_T`).
-* **Firmware:** Die Konfiguration wird von der CI geprüft und kompiliert. Das Displaylayout ist noch nicht auf echter Hardware getestet, Rückmeldungen sind willkommen.
+* **Stand der Hardware:** Gehäuse und Firmware sind im CAD und in der CI geprüft. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 
 ## Ausblick
 
-* [ ] Displaylayout und Thermik auf echter Hardware prüfen
-* [ ] Optionaler Helligkeitssensor für automatische Displayhelligkeit
+* [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 * [ ] Optionaler Drucksensor (BMP280) für die CO2-Druckkompensation in Echtzeit
-* [ ] Druckbarer Lichtleiter für eine Variante mit Status-LED
+* [ ] Wandplatte für Wände ohne Hohlwanddose
 
 ## Mitmachen
 
-Issues und Pull Requests sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md).
+Issues, Ideen und Pull Requests sind willkommen, siehe [CONTRIBUTING.md](CONTRIBUTING.md). Fragen und Fotos deines Nachbaus gehören in die [Discussions](https://github.com/tobi136B/co2-wall-sensor/discussions). Sicherheitsprobleme: [SECURITY.md](SECURITY.md).
 
 ## Lizenz
 
-[MIT](LICENSE) © Tobias Schneider. Nachbauen, anpassen, teilen.
+Software und Firmware: [MIT](LICENSE). Hardware (Gehäuse, Druckdateien, Zeichnung, Stückliste): [CERN-OHL-P-2.0](LICENSE-HARDWARE). © 2026 Tobias Schneider. Nachbauen, anpassen, teilen.

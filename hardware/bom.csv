@@ -1,11 +1,11 @@
-qty,part,specification,used_for,approx_price_eur
-1,Sensirion SCD41 breakout,"CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V",sensor chamber,20-35
-1,ESP32-C3 SuperMini,"USB-C, WiFi, 22.5 x 18 mm",controller,3
-1,Waveshare 2inch LCD Module,"ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm",display,10
-1,USB-C cable,"right-angle plug (back exit) or straight plug (bottom exit), length to suit",power,5
-1,USB power supply 5 V / 1 A,"plug-in or flush mounted USB insert",power,5
-10,Heat-set insert M2 x 3,"outer diameter 3.2 mm, hole 3.0 x 3.4 mm","display 4, back cover 4, sensor carrier 2",
-10,Button head screw M2 x 4,"ISO 7380, hex socket 1.3 mm, stainless A2","display 4, back cover 4, sensor carrier 2",
-1,Stranded wire,"AWG 28-30, about 1 m",wiring,
-1,Double-sided foam tape,small pieces,fixing SCD41 and ESP32-C3,
-1,Filament PETG,about 100 g,all printed parts,3
+qty,part,specification,used_for,price_eur_aliexpress,aliexpress,price_eur_amazon,amazon_de
+1,Sensirion SCD41 breakout,"blue 15 x 20 mm board, CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V",sensor chamber,20.99,https://de.aliexpress.com/item/1005009740863220.html,,
+1,ESP32-C3 SuperMini,"USB-C, WiFi, 22.5 x 18 mm",controller,2.79,https://de.aliexpress.com/item/1005007479144456.html,8.99 (2 pcs),https://www.amazon.de/dp/B0DMNBWTFD
+1,Waveshare 2inch LCD Module,"ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm",display,12.39,https://de.aliexpress.com/item/1005008772378337.html,16.31,https://www.amazon.de/dp/B081Q79X2F
+10,Heat-set insert M2 x 3,"outer diameter 3.2 mm (AliExpress variant M2 OD3.2, length 3 mm), hole 3.0 x 3.4 mm; the Amazon set has OD 3.0, then set INSERT_HOLE_D to 2.8","display 4, back cover 4, sensor carrier 2",,https://de.aliexpress.com/item/1005008575446687.html,6.99 (200 pcs),https://www.amazon.de/dp/B0DZHK4JRC
+10,Button head screw M2 x 4,"ISO 7380, hex socket 1.3 mm","display 4, back cover 4, sensor carrier 2",,,4.30 (50 pcs),https://www.amazon.de/dp/B0DGXPQ7TW
+1,USB cable with right-angle USB-C plug,"USB-C end angled up/down, for the back cable port; for the bottom port any straight cable with an overmould up to 12 x 7 mm",power,,,7.69,https://www.amazon.de/dp/B01MSIE2L1
+1,USB power module for the flush wall box,"230 V to 5 V, USB-A; installation only by a qualified electrician; alternatively any USB charger",power,,,8.99,https://www.amazon.de/dp/B0HHF42X68
+1,Stranded silicone wire AWG 30,about 1 m,wiring,,,15.49 (8 colours),https://www.amazon.de/dp/B0DH2FBWH7
+2,Heat-set insert and screw M2 (optional),same as above,lock tab,,,,
+1,Filament PETG,about 110 g,all printed parts,,,,

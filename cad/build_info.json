@@ -1,0 +1,14 @@
+{
+  "enclosure_version": "1.3",
+  "parameters_sha256": "9a79b3f2369bf412789e772c82f53b4748168691778eb1a5717dca37eeffcc35",
+  "parts": [
+    "back_cover",
+    "cable_port_back",
+    "cable_port_bottom",
+    "desk_stand",
+    "housing",
+    "lock_tab",
+    "sensor_carrier",
+    "wall_plate"
+  ]
+}

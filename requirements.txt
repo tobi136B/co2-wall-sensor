@@ -1,4 +1,8 @@
-# Python tools in tools/ (drawing, wiring diagram, display preview)
+# Python tools in tools/ (drawing, wiring diagram, display preview, print plates, project page)
 matplotlib>=3.8
 pillow>=10.0
 pyyaml>=6.0
+numpy>=1.26
+trimesh>=4.4
+networkx>=3.2
+lxml>=5.0

@@ -9,7 +9,7 @@ Der SCD41 ist mit ±(50 ppm + 5 % vom Messwert) zwischen 400 und 5000 ppm spezif
 Standard sind 1000 ppm (Gelb) und 1400 ppm (Rot). Werte unter 1000 ppm gelten allgemein als unbedenklich, über 2000 ppm sollte dringend gelüftet werden. Beide Schwellen lassen sich jederzeit in Home Assistant ändern.
 
 ### Die Temperatur ist zu hoch.
-Nach 24 Stunden mit einem Referenzthermometer vergleichen und `temperature_offset` in der Gerätedatei anpassen. Prüfen, ob die Kabelkerbe zwischen ESP-Bereich und Sensorkammer abgedichtet ist.
+Nach 24 Stunden mit einem Referenzthermometer vergleichen und `temperature_offset` in der Gerätedatei anpassen. Prüfen, ob die Litzenkerbe zwischen ESP-Bereich und Sensorkammer abgedichtet ist.
 
 ### Kann ich ein anderes ESP32-Board nehmen?
 Ja. Jeder von ESPHome unterstützte ESP32 funktioniert, aber die Pins in `esphome/common/base.yaml` und die Aufnahme im Generator müssen angepasst werden. Der ESP32-C3 SuperMini wurde wegen Größe, USB-C und geringer Abwärme gewählt.
@@ -23,14 +23,23 @@ Nicht sinnvoll. Das Farbdisplay braucht dauerhaft Strom. Ein Akkugerät bräucht
 ### Meine Hohlwanddose sitzt hochkant.
 Die Wandplatte nutzt die beiden waagrechten Geräteschrauben. Die meisten Hohlwanddosen bieten waagrechte und senkrechte Schraubpositionen. Hat deine nur senkrechte, im Generator `ScrewSlots` um 90° drehen.
 
-### Kann ich die fertigen Firmware-Dateien direkt nutzen?
-Nur für einen schnellen Hardwaretest. Die Release-Dateien baut die CI ohne echte Zugangsdaten: Sie öffnen den Hotspot „CO2 Wandsensor Setup“ (Passwort `co2-sensor-setup`), über den du Display und Sensor prüfen kannst, in Home Assistant tauchen sie nur mit dem CI-Schlüssel auf. Flashen mit [ESPHome Web](https://web.esphome.io). Für den Alltag die Firmware immer selbst mit eigener `secrets.yaml` bauen.
+### Browser-Installer oder selbst bauen?
+Beides ist vollwertig. Der **Browser-Installer** auf der [Projektseite](https://tobi136b.github.io/co2-wall-sensor/) flasht eine fertige Firmware, in der keine WLAN-Zugangsdaten stecken. Nach dem Flashen trägst du dein WLAN im selben Browserfenster ein (oder über den Hotspot "CO2 Wall Sensor", den das Gerät ohne WLAN öffnet), Home Assistant findet das Gerät, und neue Releases erscheinen in Home Assistant als Firmware-Update. Wer die Konfiguration ändern will, klickt im ESPHome Dashboard auf "Übernehmen": Es holt die passende YAML aus diesem Repository. Der **eigene Build** mit deiner `secrets.yaml` bringt von Anfang an API-Verschlüsselung und volle Kontrolle.
+
+### Telefoniert das Gerät nach Hause?
+Nein. Die Firmware prüft nur das Release-Manifest auf der Projektseite auf Updates, und zwar nur, wenn du die Update-Entität aufrufst, oder einmal am Tag. Messwerte verlassen dein Netzwerk nie.
 
 ### Welche Einschmelzmuttern und Schrauben genau?
-Handelsübliche Einschmelzmuttern M2 × 3 mit 3,2 mm Außendurchmesser (die verbreiteten Packungen „M2 x 3 x 3,2“) und Linsenkopfschrauben M2 × 4 nach ISO 7380. Muttern mit anderem Außendurchmesser gehen, wenn im Generator `INSERT_HOLE_D` angepasst wird.
+Handelsübliche Einschmelzmuttern M2 × 3 mit 3,2 mm Außendurchmesser (die verbreiteten Packungen „M2 x 3 x 3,2“) und Linsenkopfschrauben M2 × 4 nach ISO 7380, je 10 Stück (12 mit der optionalen Sicherungslasche). Muttern mit anderem Außendurchmesser gehen, wenn `INSERT_HOLE_D` angepasst wird.
 
 ### Kabel von unten oder von hinten?
-Beides ist als Ausbrechfeld vorbereitet. Hinten mit Winkelstecker für die Hohlwanddose und den Tischständer, unten mit geradem Stecker für ein Kabel auf Putz. Siehe [Aufbau](aufbau.md#4-kabelaustritt-wählen).
+Beides. Die zwei Kabelport-Module drucken und das passende einsetzen: hinten mit Winkelstecker für die Hohlwanddose und den Tischständer, unten mit geradem Stecker für ein Kabel auf Putz. Später wechseln kostet vier Schrauben. Siehe [Aufbau](aufbau.md#4-kabelaustritt-wählen).
+
+### Mein gerader USB-C-Stecker passt nicht.
+Der Port unten nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder den Port hinten mit Winkelstecker nehmen.
+
+### Wie ändere ich ein Maß?
+Die erzeugte Konstruktion in Fusion öffnen, *Ändern > Parameter ändern*, Wert anpassen und das Skript erneut starten. Es übernimmt alle Parameter der offenen Konstruktion, baut alle Teile neu und prüft auf Kollisionen. Mit `EXPORT = True` schreibt es auch neue STL- und STEP-Dateien. Siehe [Designnotizen](design.md#parameter-in-fusion).
 
 ### Warum werden Zeichnung und Bilder generiert?
-Damit sie immer zum Modell passen. Parameter ändern, Tools starten, committen. Die CI prüft, ob die Tools weiterhin laufen.
+Damit sie immer zum Modell passen. Parameter ändern, Tools starten, committen. Die CI erzeugt sie neu, prüft, ob die Druckdateien zu den aktuellen Parametern gehören und ob alle Links in der Doku funktionieren.

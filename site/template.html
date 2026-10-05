@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{tagline}}">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{tagline}}">
+<meta property="og:image" content="{{base}}img/social_preview.png">
+<link rel="icon" href="{{base}}img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,700;125,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<style>
+  :root {
+    --plastic: #eef0f1;     /* the wall plate */
+    --panel: #ffffff;
+    --ink: #1d2226;
+    --muted: #5d666e;
+    --rule: #d5dadd;
+    --graphite: #2b3036;    /* the housing */
+    --good: #2ecc71;
+    --moderate: #f5b700;
+    --ventilate: #e74c3c;
+    --link: #0b6e99;
+    --radius-device: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --plastic: #171a1d; --panel: #20252a; --ink: #e9ecee; --muted: #a2abb3; --rule: #343b42;
+      --graphite: #0f1214; --link: #6cc4ec;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; background: var(--plastic); color: var(--ink);
+    font: 17px/1.6 "Atkinson Hyperlegible", system-ui, sans-serif;
+  }
+  a { color: var(--link); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+  h1, h2, h3 { font-family: "Archivo", system-ui, sans-serif; font-stretch: 112%; line-height: 1.1; margin: 0 0 .5em; }
+  h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 800; font-stretch: 125%; letter-spacing: -.01em; }
+  h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); font-weight: 700; margin-top: 0; }
+  h3 { font-size: 1.15rem; font-weight: 700; }
+  p { margin: 0 0 1em; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .lang { display: flex; justify-content: flex-end; gap: 14px; padding: 18px 0 0; font-size: .95rem; }
+  .lang a[aria-current] { color: var(--ink); text-decoration: none; font-weight: 700; }
+
+  /* hero: the device sits on the CO2 scale it shows */
+  .hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; padding: 40px 0 0; }
+  .hero p.lead { font-size: 1.25rem; color: var(--muted); max-width: 34em; }
+  .hero img { width: 100%; height: auto; display: block; }
+  .actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 28px; }
+  .btn {
+    display: inline-block; padding: 14px 22px; border-radius: 999px; font-weight: 700; text-decoration: none;
+    background: var(--graphite); color: #fff; border: 0; font: inherit; font-weight: 700; cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .btn { background: var(--ink); color: var(--plastic); } }
+  .btn.quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--rule); }
+  .version { color: var(--muted); font-size: .95rem; }
+
+  .scale { position: relative; margin: 44px 0 64px; }
+  .scale .bar {
+    height: 18px; border-radius: 9px;
+    background: linear-gradient(90deg, var(--good) 0%, var(--good) 37.5%, var(--moderate) 37.5%, var(--moderate) 62.5%,
+                var(--ventilate) 62.5%, var(--ventilate) 100%);
+  }
+  .scale ol { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: 37.5% 25% 37.5%; }
+  .scale li { padding-right: 12px; }
+  .scale b { display: block; font-family: "Archivo", sans-serif; font-stretch: 112%; font-size: 1.05rem; }
+  .scale span { color: var(--muted); font-size: .95rem; }
+  .scale .ticks { position: relative; height: 1.4em; color: var(--muted); font-size: .85rem; margin-top: 6px; }
+  .scale .ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .scale .ticks span:first-child { transform: none; }
+  .scale .ticks span:last-child { transform: translateX(-100%); }
+
+  section { padding: 56px 0; border-top: 1px solid var(--rule); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
+  .steps li { counter-increment: step; display: grid; grid-template-columns: 44px 1fr; gap: 14px; }
+  .steps li::before {
+    content: counter(step); width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+    font-family: "Archivo", sans-serif; font-weight: 800; background: var(--panel); box-shadow: inset 0 0 0 2px var(--rule);
+  }
+  .steps h3 { margin: 8px 0 4px; }
+  .steps p { margin: 0; color: var(--muted); }
+  .note { background: var(--panel); border-left: 4px solid var(--moderate); padding: 14px 18px; border-radius: 0 8px 8px 0; }
+
+  .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 8px; }
+  .shots figure { margin: 0; background: var(--panel); border-radius: var(--radius-device); padding: 10px; }
+  .shots img { width: 100%; height: auto; display: block; }
+  .shots figcaption { font-size: .95rem; color: var(--muted); padding: 8px 6px 2px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .98rem; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  th { font-family: "Archivo", sans-serif; font-stretch: 112%; font-weight: 700; }
+  td.qty { width: 3.5em; text-align: right; font-variant-numeric: tabular-nums; }
+  td.shop { white-space: nowrap; }
+  .scroll { overflow-x: auto; }
+  .downloads { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0 0; padding: 0; list-style: none; }
+  footer { padding: 40px 0 60px; color: var(--muted); font-size: .95rem; border-top: 1px solid var(--rule); }
+
+  @media (max-width: 860px) {
+    .hero, .two { grid-template-columns: 1fr; }
+    .shots { grid-template-columns: 1fr 1fr; }
+    .scale ol { grid-template-columns: 1fr; gap: 6px; }
+  }
+  @media (max-width: 520px) { .shots { grid-template-columns: 1fr; } body { font-size: 16px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="lang" aria-label="{{t_language}}">
+    <a href="{{base}}index.html" {{cur_en}}>English</a>
+    <a href="{{base}}de/index.html" {{cur_de}}>Deutsch</a>
+    <a href="https://github.com/tobi136B/co2-wall-sensor">GitHub</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <h1>{{title}}</h1>
+      <p class="lead">{{tagline}}</p>
+      <div class="actions">
+        <a class="btn" href="#install">{{t_install_cta}}</a>
+        <a class="btn quiet" href="#print">{{t_print_cta}}</a>
+        <span class="version">{{t_version}} {{version}}</span>
+      </div>
+    </div>
+    <img src="{{base}}img/hero_wall.png" alt="{{t_hero_alt}}" width="1600" height="1200">
+  </header>
+
+  <div class="scale" aria-label="{{t_scale_label}}">
+    <div class="bar"></div>
+    <div class="ticks"><span style="left:0">400 ppm</span><span style="left:37.5%">1000</span><span style="left:62.5%">1400</span><span style="left:100%">2000+</span></div>
+    <ol>
+      <li><b>{{t_good}}</b><span>{{t_good_text}}</span></li>
+      <li><b>{{t_moderate}}</b><span>{{t_moderate_text}}</span></li>
+      <li><b>{{t_ventilate}}</b><span>{{t_ventilate_text}}</span></li>
+    </ol>
+  </div>
+</div>
+
+<section id="install">
+  <div class="wrap two">
+    <div>
+      <h2>{{t_install_title}}</h2>
+      <p>{{t_install_intro}}</p>
+      <esp-web-install-button manifest="{{base}}firmware/manifest-{{lang}}.json">
+        <button slot="activate" class="btn">{{t_install_button}}</button>
+        <span slot="unsupported" class="note">{{t_unsupported}}</span>
+        <span slot="not-allowed" class="note">{{t_not_allowed}}</span>
+      </esp-web-install-button>
+      <p class="version" style="margin-top:14px">{{t_other_language}}</p>
+    </div>
+    <ol class="steps">
+      <li><div><h3>{{t_s1}}</h3><p>{{t_s1_text}}</p></div></li>
+      <li><div><h3>{{t_s2}}</h3><p>{{t_s2_text}}</p></div></li>
+      <li><div><h3>{{t_s3}}</h3><p>{{t_s3_text}}</p></div></li>
+      <li><div><h3>{{t_s4}}</h3><p>{{t_s4_text}}</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="display">
+  <div class="wrap">
+    <h2>{{t_display_title}}</h2>
+    <p>{{t_display_text}}</p>
+    <img src="{{base}}img/display_preview_{{lang}}.png" alt="{{t_display_alt}}" style="width:100%;height:auto">
+  </div>
+</section>
+
+<section id="print">
+  <div class="wrap">
+    <h2>{{t_print_title}}</h2>
+    <p>{{t_print_text}}</p>
+    <ul class="downloads">
+      <li><a class="btn" href="https://github.com/tobi136B/co2-wall-sensor/releases/latest/download/co2_wall_sensor_device.3mf">{{t_dl_device}}</a></li>
+      <li><a class="btn quiet" href="https://github.com/tobi136B/co2-wall-sensor/releases/latest/download/co2_wall_sensor_mounts.3mf">{{t_dl_mounts}}</a></li>
+      <li><a class="btn quiet" href="https://github.com/tobi136B/co2-wall-sensor/releases/latest">{{t_dl_all}}</a></li>
+    </ul>
+    <div class="shots" style="margin-top:28px">
+      <figure><img src="{{base}}img/exploded_view.png" alt="" loading="lazy"><figcaption>{{t_cap_exploded}}</figcaption></figure>
+      <figure><img src="{{base}}img/cable_port_back.png" alt="" loading="lazy"><figcaption>{{t_cap_back}}</figcaption></figure>
+      <figure><img src="{{base}}img/cable_port_bottom.png" alt="" loading="lazy"><figcaption>{{t_cap_bottom}}</figcaption></figure>
+      <figure><img src="{{base}}img/interior.png" alt="" loading="lazy"><figcaption>{{t_cap_interior}}</figcaption></figure>
+      <figure><img src="{{base}}img/sensor_carrier_front.png" alt="" loading="lazy"><figcaption>{{t_cap_carrier}}</figcaption></figure>
+      <figure><img src="{{base}}img/desk_stand.png" alt="" loading="lazy"><figcaption>{{t_cap_desk}}</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="parts">
+  <div class="wrap">
+    <h2>{{t_parts_title}}</h2>
+    <p>{{t_parts_text}}</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>{{t_qty}}</th><th>{{t_part}}</th><th>AliExpress</th><th>Amazon.de</th></tr></thead>
+        <tbody>
+{{bom_rows}}
+        </tbody>
+      </table>
+    </div>
+    <p class="version" style="margin-top:12px">{{t_prices}}</p>
+  </div>
+</section>
+
+<section id="docs">
+  <div class="wrap two">
+    <div>
+      <h2>{{t_docs_title}}</h2>
+      <p>{{t_docs_text}}</p>
+    </div>
+    <ul>
+      <li><a href="{{doc_assembly}}">{{t_doc_assembly}}</a></li>
+      <li><a href="{{doc_wiring}}">{{t_doc_wiring}}</a></li>
+      <li><a href="{{doc_design}}">{{t_doc_design}}</a></li>
+      <li><a href="{{doc_faq}}">{{t_doc_faq}}</a></li>
+      <li><a href="https://github.com/tobi136B/co2-wall-sensor/releases/latest/download/co2_wall_sensor_drawing_{{lang}}.pdf">{{t_doc_drawing}}</a></li>
+      <li><a href="{{blueprint}}">{{t_doc_blueprint}}</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>{{t_footer}}</p>
+  </div>
+</footer>
+</body>
+</html>

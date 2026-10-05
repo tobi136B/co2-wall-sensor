@@ -1,41 +1,101 @@
 name: Release
 
+# main:     release-please keeps a release pull request up to date (version + changelog from
+#           conventional commits). Merging it creates the release.
+# v* tags:  manual releases.
+# Either way the firmware is built, all print files are attached to the release and the
+# project page with the browser installer and the update manifests is deployed.
+
 on:
   push:
+    branches: [main]
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
+  release-please:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.rp.outputs.release_created }}
+      tag_name: ${{ steps.rp.outputs.tag_name }}
+    steps:
+      - id: rp
+        uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
   build:
+    needs: release-please
+    if: >-
+      always() && (startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+      || needs.release-please.outputs.release_created == 'true')
     uses: ./.github/workflows/ci.yml
 
-  release:
-    name: Publish release
-    needs: build
+  publish:
+    name: Publish release and project page
+    needs: [release-please, build]
+    if: always() && needs.build.result == 'success'
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ -n "${{ needs.release-please.outputs.tag_name }}" ]; then
+            tag="${{ needs.release-please.outputs.tag_name }}"
+          elif [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            tag="${GITHUB_REF_NAME}"
+          else
+            tag=$(git describe --tags --abbrev=0)
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v8
         with:
           pattern: firmware-*
           path: dist
           merge-multiple: true
-      - name: Prepare assets
-        run: |
-          cp cad/stl/*.stl cad/step/*.step docs/drawing/*.pdf dist/
-          ls -l dist
-      - uses: softprops/action-gh-release@v2
+      - uses: actions/download-artifact@v8
         with:
-          generate_release_notes: true
-          body: |
-            **Print files:** housing, back cover, wall plate and desk stand (STL) plus the full assembly (STEP).
-            **Drawing:** technical drawing in English and German (PDF).
-            **Firmware:** `*.factory.bin` for the first flash via USB (e.g. https://web.esphome.io), `*.ota.bin` for updates.
-            The firmware binaries are CI test builds without real credentials (setup hotspot password `co2-sensor-setup`).
-            For daily use build the firmware yourself with your own `secrets.yaml`, see the README.
-
-            **Deutsch:** Druckdateien (STL/STEP), Zeichnung (PDF, EN und DE) und Test-Firmware für Englisch und Deutsch.
-            Für den Alltag die Firmware mit eigener `secrets.yaml` selbst bauen, siehe README.de.md.
+          name: generated-docs
+          path: generated
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Prepare release assets and notes
+        run: |
+          cp cad/stl/*.stl cad/step/*.step dist/
+          cp generated/docs/drawing/*.pdf generated/cad/3mf/*.3mf dist/
+          python tools/release_notes.py "${{ steps.tag.outputs.version }}" > release_notes.md
+          ls -l dist
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: CO2 Wall Sensor ${{ steps.tag.outputs.tag }}
+          body_path: release_notes.md
           files: dist/*
+      - name: Build project page
+        run: python tools/build_site.py --version "${{ steps.tag.outputs.version }}" --dist dist --out _site
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v5

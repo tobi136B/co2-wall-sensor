@@ -69,12 +69,13 @@ TEXT = {
         "slots": "13 slots 1.4 wide, pitch 3.5 = {v}",
         "airflow": "Air enters from below\nthrough the sensor\nchamber (SCD41)",
         "cover_screws": "4x Ø{c}\ncounterbore Ø{d} x {h}\nscrew M2 x 4 ISO 7380\ninsert M2 x 3 in housing",
-        "cable_exit": "Knock-out {t} thick\nbreak out for a\nright-angle USB-C plug",
-        "bottom_ko": "Knock-out {t} thick (hidden, flush)\nbreak out for a straight USB-C plug",
+        "cable_exit": "Cable port module\n(back: right-angle plug,\nboot hole Ø{d})",
+        "bottom_ko": "Cable port module {w} wide, swappable:\nPortBack or PortBottom (straight plug)",
+        "lock": "Optional lock: insert M2 x 3\nfor the lock tab",
         "fasteners": "Fasteners (one screw type only)\n"
-        "10x heat-set insert M2 x 3, OD 3.2, hole Ø{hd} x {hl}\n"
-        "10x button head screw M2 x 4, ISO 7380\n"
-        "display 4 | back cover 4 | sensor carrier 2",
+        "10 (+2) heat-set inserts M2 x 3, OD 3.2, hole Ø{hd} x {hl}\n"
+        "10 (+2) button head screws M2 x 4, ISO 7380\n"
+        "display 4 | cover 4 | carrier 2 | (+2 optional lock tab)",
         "dovetail": "Dovetail\nfoot 12 / head 16\nheight 3",
         "slot_clear": "Clearance in slot: {v} per side",
         "plate_front": "Wall plate for flush wall box, front view",
@@ -123,12 +124,13 @@ TEXT = {
         "slots": "13 Schlitze 1,4 breit, Teilung 3,5 = {v}",
         "airflow": "Luft strömt von unten\ndurch die Sensorkammer\n(SCD41)",
         "cover_screws": "4x Ø{c}\nSenkung Ø{d} x {h}\nSchraube M2 x 4 ISO 7380\nEinschmelzmutter M2 x 3",
-        "cable_exit": "Ausbrechfeld {t} dick\nausbrechen für\nUSB-C Winkelstecker",
-        "bottom_ko": "Ausbrechfeld {t} dick (verdeckt, bündig)\nausbrechen für geraden USB-C-Stecker",
+        "cable_exit": "Kabelport-Modul\n(hinten: Winkelstecker,\nTülle Ø{d})",
+        "bottom_ko": "Kabelport-Modul {w} breit, tauschbar:\nPortBack oder PortBottom (gerader Stecker)",
+        "lock": "Optionale Sicherung: Mutter\nM2 x 3 für die Lasche",
         "fasteners": "Verbindungselemente (nur eine Schraubensorte)\n"
-        "10x Einschmelzmutter M2 x 3, AD 3,2, Bohrung Ø{hd} x {hl}\n"
-        "10x Linsenkopfschraube M2 x 4, ISO 7380\n"
-        "Display 4 | Rückdeckel 4 | Sensorträger 2",
+        "10 (+2) Einschmelzmuttern M2 x 3, AD 3,2, Bohrung Ø{hd} x {hl}\n"
+        "10 (+2) Linsenkopfschrauben M2 x 4, ISO 7380\n"
+        "Display 4 | Deckel 4 | Träger 2 | (+2 Sicherungslasche)",
         "dovetail": "Schwalbenschwanz\nFuß 12 / Kopf 16\nHöhe 3",
         "slot_clear": "Spiel in der Nut: {v} je Seite",
         "plate_front": "Wandplatte Hohlwanddose, Vorderansicht",
@@ -312,8 +314,7 @@ def sheet_device(sh: Sheet):
     y_chin_low, y_chin_mid = p["Y_CHIN_LOW"], p["Y_CHIN_MID"]
     rail_y0, rail_l, rail_h = p["RAIL_Y0"], p["RAIL_L"], p["RAIL_H"]
     vent_z0, vent_z1 = 3.5, p["FLOOR_Z"] - 2.0
-    ko_t = p["KNOCKOUT_T"]
-    ko_z0, ko_z1 = p["PLUG_Z"] - 3.3, min(p["PLUG_Z"] + 3.3, p["COVER_Z"] - 0.1)
+    pz0 = p["PORT_Z0"]
 
     # front view
     cx, cy = 85.0, 132.0
@@ -351,7 +352,7 @@ def sheet_device(sh: Sheet):
     sh.rect(sx + D, cy + rail_y0, rail_h, rail_l)
     for o in (-7, -3.5, 0):
         sh.rect(sx + vent_z0, cy + y_chin_mid + o - 0.7, vent_z1 - vent_z0, 1.4, lw=0.35)
-    sh.rect(sx + ko_z0, cy - W / 2, ko_z1 - ko_z0, p["WALL"], lw=LW_DIM, ls=DASHED)
+    sh.line([(sx + pz0, cy - W / 2), (sx + pz0, cy - W / 2 + p["WALL"]), (sx + D, cy - W / 2 + p["WALL"])], lw=0.3)
     sh.dim_h(sx, sx + D, cy - W / 2, cy - W / 2 - 12)
     sh.dim_h(sx, sx + D + rail_h, cy + W / 2, cy + W / 2 + 8)
     sh.dim_v(cy + rail_y0, cy + rail_y0 + rail_l, sx + D + rail_h, sx + D + rail_h + 8)
@@ -368,12 +369,15 @@ def sheet_device(sh: Sheet):
         sh.rect(cx + x - 0.7, uy - vent_z1, 1.4, vent_z1 - vent_z0, lw=0.35)
     sh.rect(cx - p["RAIL_HEAD"] / 2, uy - D - rail_h, p["RAIL_HEAD"], rail_h, lw=0.4)
     # seen from below the model +x axis points to the left, like in the front view
-    bx0, bx1 = cx - p["C3_X"] - 6.5, cx - p["C3_X"] + 6.5
-    sh.rect(bx0, uy - ko_z1, bx1 - bx0, ko_z1 - ko_z0, lw=0.35, ls=DASHED)
+    bx0, bx1 = cx - p["PORT_X1"], cx - p["PORT_X0"]
+    sh.rect(bx0, uy - D, bx1 - bx0, D - pz0, lw=0.4)
+    lx = cx - p["LOCK_POINTS"][0]
+    sh.circle(lx, uy - p["LOCK_Z"], p["INSERT_HOLE_D"])
     sh.dim_h(cx + xs[0] - 0.7, cx + xs[-1] + 0.7, uy, uy + 6, txt=t["slots"].format(v=sh.num(xs[-1] - xs[0] + 1.4)))
     sh.dim_v(uy - vent_z0, uy - vent_z1, cx + W / 2, cx + W / 2 + 8, txt=sh.num(vent_z1 - vent_z0))
-    sh.dim_h(bx0, bx1, uy - ko_z1, uy - D - rail_h - 6, txt=sh.num(bx1 - bx0))
-    sh.note(bx0 + 1, uy - ko_z1 + 1, cx - W / 2 - 30, uy - D - 14, t["bottom_ko"].format(t=sh.num(ko_t)))
+    sh.dim_h(bx0, bx1, uy - D, uy - D - rail_h - 6, txt=sh.num(bx1 - bx0))
+    sh.note(bx0 + 1, uy - D + 1, cx - W / 2 - 30, uy - D - 14, t["bottom_ko"].format(w=sh.num(bx1 - bx0)))
+    sh.note(lx, uy - p["LOCK_Z"], cx - W / 2 - 30, uy + 4, t["lock"])
     sh.text(cx + W / 2 + 18, uy - 8, t["airflow"], size=6.5, color="0.35")
 
     # rear view
@@ -385,8 +389,9 @@ def sheet_device(sh: Sheet):
     sh.rect(rx + xl, ry + y_chin_low + s, xr - xl, (y_top_in - s) - (y_chin_low + s), lw=0.35)
     sh.rect(rx - p["RAIL_HEAD"] / 2, ry + rail_y0, p["RAIL_HEAD"], rail_l)
     sh.rect(rx - p["RAIL_FOOT"] / 2, ry + rail_y0, p["RAIL_FOOT"], rail_l, lw=LW_DIM, ls=DASHED)
-    kx0, kx1, ky0, ky1 = p["CABLE"]
-    sh.rect(rx + kx0, ry + ky0, kx1 - kx0, ky1 - ky0, lw=0.35, ls=DASHED)
+    kx0, kx1, ky0, ky1 = p["PORT_X0"], p["PORT_X1"], -W / 2 + p["WALL"], p["PORT_Y1"]
+    sh.rect(rx + kx0, ry + ky0, kx1 - kx0, ky1 - ky0, lw=0.4)
+    sh.circle(rx + p["C3_X"], ry + p["BOOT_Y"], p["BOOT_D"], lw=0.35)
     screws = p["COVER_SCREWS"]
     for bx, by in screws:
         sh.circle(rx + bx, ry + by, p["SCREW_CLEAR_D"])
@@ -397,7 +402,6 @@ def sheet_device(sh: Sheet):
     sh.dim_h(rx + screws[2][0], rx + screws[3][0], ry + W / 2, ry + W / 2 + 8)
     sh.dim_v(ry - W / 2, ry + screws[0][1], rx + W / 2, rx + W / 2 + 8)
     sh.dim_v(ry + screws[2][1], ry + W / 2, rx + W / 2, rx + W / 2 + 8)
-    sh.dim_h(rx + kx0, rx + kx1, ry + ky0, ry - W / 2 + 3, txt=sh.num(kx1 - kx0))
     sh.note(
         rx + screws[1][0],
         ry + screws[1][1],
@@ -405,7 +409,7 @@ def sheet_device(sh: Sheet):
         ry - 14,
         t["cover_screws"].format(c=sh.num(p["SCREW_CLEAR_D"]), d=sh.num(p["HEAD_D"]), h=sh.num(p["HEAD_H"])),
     )
-    sh.note(rx + kx1, ry + ky1, rx + W / 2 + 12, ry + 10, t["cable_exit"].format(t=sh.num(ko_t)))
+    sh.note(rx + kx1, ry + ky1, rx + W / 2 + 12, ry + 10, t["cable_exit"].format(d=sh.num(p["BOOT_D"])))
     sh.note(rx - p["RAIL_HEAD"] / 2, ry + rail_y0 + 2, rx - W / 2 - 4, ry - 16, t["dovetail"])
 
     # detail of the rail
@@ -463,6 +467,8 @@ def sheet_adapters(sh: Sheet):
     kx0, kx1, ky0, ky1 = p["CABLE"]
     ky0, ky1 = ky0 - 1, ky1 + 1
     sh.rect(cx - kx1, cy + ky0, kx1 - kx0, ky1 - ky0)  # seen from the front, model +x is on the left
+    lock_y = -P_ / 2 + 2.0 + p["INSERT_HOLE_D"] / 2 + 0.2
+    sh.circle(cx - p["LOCK_POINTS"][1], cy + lock_y, p["INSERT_HOLE_D"])
     for sx in (-a, a):
         sh.rect(cx + sx - 2, cy - 1.75, 4, 3.5)
         sh.rect(cx + sx - 3.3, cy - 3.3, 6.6, 6.6, lw=0.3)

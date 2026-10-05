@@ -1,0 +1,37 @@
+# CO2 Wall Sensor, English interface, firmware of the browser installer.
+# No credentials inside: WiFi is set up via Improv (USB) or the device hotspot.
+# Built by CI and published on https://tobi136b.github.io/co2-wall-sensor/
+
+substitutions:
+  language: en
+  import_file: co2-wall-sensor-factory.yaml
+  txt_firmware: "Firmware"
+  name: co2-wall-sensor
+  friendly_name: CO2 Wall Sensor
+  decimal_separator: "."
+  # Home Assistant entity names
+  txt_temperature: "Temperature"
+  txt_humidity: "Humidity"
+  txt_air_quality: "Air quality"
+  txt_wifi_signal: "WiFi signal"
+  txt_uptime: "Uptime"
+  txt_threshold_yellow: "CO2 threshold yellow"
+  txt_threshold_red: "CO2 threshold red"
+  txt_night_mode: "Night mode (dim 22:00 to 06:00)"
+  txt_restart: "Restart"
+  txt_calibrate: "Calibrate SCD41 (fresh air 420 ppm)"
+  txt_brightness: "Display brightness"
+  # Status texts on the display and in Home Assistant
+  txt_status_starting: "Starting"
+  txt_status_good: "Good"
+  txt_status_moderate: "Moderate"
+  txt_status_ventilate: "Ventilate!"
+  # Optional overrides (defaults in common/base.yaml)
+  # co2_yellow_default: "1000"
+  # co2_red_default: "1400"
+  # temperature_offset: "2.0"
+  # altitude: "300m"
+
+packages:
+  base: !include common/base.yaml
+  network: !include common/network_factory.yaml

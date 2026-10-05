@@ -22,7 +22,7 @@ Jedes elektronische Gerät heizt sich selbst auf. Ein ESP32 mit WLAN und ein Dis
 * **Eigene Sensorkammer** im Kinn des Gehäuses, zum Display durch eine Trennwand und zum ESP durch den verschraubten Sensorträger abgeschlossen. Der Träger ist ein eigenes Teil, dadurch lässt sich der SCD41 leicht einbauen und tauschen.
 * **Luft kommt von unten** durch 13 Schlitze im Boden und je 3 Schlitze an den Seiten. Warme Luft der Elektronik steigt hinter dem Display nach oben, weg vom Sensor.
 * **ESP32-C3 statt klassischem ESP32:** ein Kern, kein USB-UART-Chip, kein Laderegler. Weniger Abwärme.
-* **Kabelkerbe mit Heißkleber abgedichtet**, damit keine warme Luft vom ESP in die Kammer gezogen wird.
+* **Litzenkerbe mit Heißkleber abgedichtet**, damit keine warme Luft vom ESP in die Kammer gezogen wird.
 * **Nachtmodus** dimmt das Hintergrundlicht und reduziert dabei auch die Wärme.
 * Der Rest wird mit `temperature_offset` in der Firmware ausgeglichen (Standard 2,0 °C, mit Referenz prüfen).
 
@@ -45,17 +45,39 @@ Kunststoffgewinde nutzen sich nach wenigen Zyklen ab, und selbstschneidende Schr
 
 * **10 × Einschmelzmutter M2 × 3** (Außendurchmesser 3,2 mm, Bohrung Ø 3,0 × 3,4 mm): 4 für das Display, 4 für den Rückdeckel, 2 für den Sensorträger.
 * **10 × Linsenkopfschraube (Halbrundkopf) M2 × 4, ISO 7380.** Ein Innensechskantschlüssel für das ganze Gerät.
+* **Je +2** für die optionale Sicherungslasche, die das Gerät mit der Wandplatte verbindet.
 
 Der Rückdeckel wird an vier Punkten gehalten: zwei Dome in den unteren Ecken und zwei Einschmelzmuttern in einem massiven 5 mm Band über dem Displayschacht. Die Linsenköpfe sitzen in 1,3 mm tiefen Senkungen, die Deckelfläche bleibt plan und gleitet sauber auf Wandplatte und Tischständer. Der Deckel hat innen weder Stifte noch Haken und druckt flach ohne Stützmaterial.
 
-## Kabelaustritt: Entscheidung nach dem Druck
+## Nichts ist geklebt
 
-Der ESP32-C3 sitzt mit der USB-C-Buchse **nach unten**, darunter sind 13 mm frei. Zwei Ausbrechfelder mit 0,6 mm sind vorbereitet und bündig mit der Außenfläche, also unsichtbar:
+* **SCD41:** Die Platine hat keine Befestigungslöcher. Sie wird in zwei Schienen mit Nut auf der Frontseite des Sensorträgers geschoben, oben hält ein Anschlag, unten eine kleine Rastnase.
+* **ESP32-C3:** Auch er hat keine Befestigungslöcher. Seitenführungen, zwei Anschläge und eine kurze Nut an seiner Unterkante halten ihn. Die Nut sitzt dort, wo die Platine keine Lötpunkte hat, an beiden Längsseiten können also Litzen angelötet werden.
+* **Sensorträger:** zwei Schrauben. Er ist der herausnehmbare Boden der Sensorkammer, der Sensor lässt sich tauschen, ohne das Display anzufassen.
 
-* **Rückdeckel:** für einen Winkelstecker. Das Kabel geht direkt in die Hohlwanddose oder durch den Tischständer.
-* **Unterseite:** für einen geraden Stecker, wenn das Kabel auf Putz läuft.
+## Kabelaustritt: ein tauschbares Port-Modul
 
-Man druckt ein Gehäuse und entscheidet vor Ort, welche Membran herausgebrochen wird. Die andere bleibt zu.
+Der ESP32-C3 sitzt mit der USB-C-Buchse **nach unten**, darunter sind 13 mm frei. Das Kabel verlässt das Gerät durch ein kleines L-förmiges **Kabelport-Modul** an der unteren hinteren Kante:
+
+* **PortBack:** Loch für die Tülle eines Winkelsteckers. Das Kabel geht direkt in die Hohlwanddose oder durch den Tischständer. Der Steckerkörper sitzt hinter dem Modul und wirkt so als Zugentlastung.
+* **PortBottom:** Öffnung für einen geraden Stecker, wenn das Kabel auf Putz läuft.
+
+Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt, eine Stufe in der Unterseite und eine Lippe unter dem Deckel halten es. Beide Versionen brauchen je 2 g Filament, man druckt beide und entscheidet vor Ort. Später wechseln kostet vier Schrauben. In v1.2 gab es dafür dünne Ausbrechfelder, die lassen sich nach dem Ausbrechen aber nicht wieder schließen.
+
+## Details für den Druck
+
+* **45° Fuß an Kanten auf dem Druckbett.** Eine Rundung, die tangential auf dem Druckbett beginnt, druckt schlecht: Die untersten Schichten sind fast waagrecht, und die erste Schicht quillt seitlich heraus (Elefantenfuß). Die weiche Frontkante endet deshalb in einer kurzen 45° Schräge, die tangential in die Rundung übergeht. Sie sieht rund aus, druckt aber sauber.
+* **Einführschrägen** an allen Mutterlöchern zentrieren die Mutter und geben dem verdrängten Kunststoff Platz.
+* **Verrundungen am Fuß der Dome** machen sie stabiler, sie brechen beim Eindrücken der Muttern nicht ab.
+* **Einführschräge an der Schiene**, damit das Gerät die Nut leicht findet.
+* **Eingeprägte Beschriftung** auf verdeckten Flächen: Teilname, Version und Drucklage.
+* **Ein Passungswert** (`FIT`) für alle Schiebe- und Steckpassungen.
+
+## Parameter in Fusion
+
+Jeder Wert des Parameterblocks wird ein Fusion-Benutzerparameter (*Ändern > Parameter ändern*), mit seiner Erklärung als Kommentar. Zum Ändern die Werte dort anpassen und das Skript erneut starten: Es liest die Parameter der offenen Konstruktion und baut alle Teile damit neu, inklusive Kollisionsprüfung. Das Modell entsteht per Skript und hat keine von Hand aufgebaute Zeitleiste, ein geänderter Wert wirkt also beim Skriptlauf und nicht sofort in der Zeitleiste.
+
+Die Baugruppe hat ein Schiebegelenk ("RailSlider"): Das Gerät lässt sich 15 mm auf der Schiene nach oben schieben, genau wie beim Abnehmen von der Wandplatte.
 
 ## Stromversorgung
 

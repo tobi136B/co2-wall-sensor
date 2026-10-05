@@ -31,3 +31,4 @@ substitutions:
 
 packages:
   base: !include common/base.yaml
+  network: !include common/network_secrets.yaml

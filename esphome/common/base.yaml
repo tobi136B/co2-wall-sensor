@@ -2,9 +2,13 @@
 #  CO2 Wall Sensor  |  shared firmware logic (language independent)
 # -----------------------------------------------------------------------------
 #  Do not flash this file directly. Use one of the device files:
-#    ../co2-wall-sensor.yaml     English user interface
-#    ../co2-wall-sensor-de.yaml  German user interface
-#  All user-visible texts come from substitutions defined in those files.
+#    ../co2-wall-sensor.yaml             own build, English interface
+#    ../co2-wall-sensor-de.yaml          own build, German interface
+#    ../co2-wall-sensor-factory.yaml     browser installer, English interface
+#    ../co2-wall-sensor-de-factory.yaml  browser installer, German interface
+#  Network settings come from network_secrets.yaml (own build) or
+#  network_factory.yaml (browser installer, WiFi set up via Improv or hotspot).
+#  All user-visible texts come from substitutions defined in the device files.
 #
 #  Hardware: ESP32-C3 SuperMini, Sensirion SCD41 (I2C), Waveshare 2inch LCD (ST7789V, SPI)
 #  Wiring:   docs/wiring.md
@@ -24,7 +28,7 @@ esphome:
   friendly_name: ${friendly_name}
   project:
     name: "tobi136b.co2-wall-sensor"
-    version: "1.2.0"
+    version: "1.3.0"  # x-release-please-version
   on_boot:
     priority: 600
     then:
@@ -40,26 +44,6 @@ esp32:
 
 logger:
   hardware_uart: USB_SERIAL_JTAG
-
-api:
-  encryption:
-    key: !secret api_encryption_key
-
-ota:
-  - platform: esphome
-    password: !secret ota_password
-
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  # Many ESP32-C3 SuperMini boards have a poorly matched antenna and drop the
-  # connection at full transmit power. 8.5 dB is a well known stable value.
-  output_power: 8.5dB
-  ap:
-    ssid: "${friendly_name} Setup"
-    password: !secret ap_password
-
-captive_portal:
 
 time:
   - platform: homeassistant

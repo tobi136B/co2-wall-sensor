@@ -2,6 +2,28 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.3.0] - 2026-10-05
+
+### Added
+* **Cable port modules:** a small swappable part at the lower back edge decides the cable exit. `PortBack` for a right-angle plug (the plug body is caught behind the module, strain relief), `PortBottom` for a straight plug. Print both, swap with four screws.
+* **SCD41 slides into rails** with end stop and snap bump on the sensor carrier, sized for the common 15 × 20 mm breakout.
+* **ESP32-C3 is held by guides, end stops and a short groove**, nothing in the device is glued any more.
+* **Optional lock tab** ties the device to the wall plate with two more M2 screws.
+* **All dimensions are Fusion user parameters** (*Modify > Change Parameters*); the script takes them over when it runs again.
+* Slider joint in the assembly: the device can be pushed up the rail in Fusion.
+* Engraved labels with part name, version and print orientation.
+* 45° foot on all rounded bed edges, entry chamfers on insert holes, fillets at boss roots, lead-in chamfer on the rail.
+* Renders of cable ports, sensor carrier and lock tab.
+
+### Changed
+* Device depth 24 mm (was 22) to fit a straight USB-C overmould and to give the SCD41 1.4 mm of air in front of its opening.
+* Wall plate is printed front face down (no 78 mm bridge on the wall side any more).
+* Sensor carrier is printed standing on its lower edge.
+* One fit value `FIT` for all sliding and plugged fits.
+
+### Removed
+* Knock-out membranes of v1.2, replaced by the cable port modules.
+
 ## [1.2.0] - 2026-10-04
 
 ### Added
@@ -43,4 +65,4 @@ All notable changes to this project. Format based on [Keep a Changelog](https://
 
 ---
 
-**Deutsch:** Die Änderungshistorie wird auf Englisch geführt. Kurz zusammengefasst: 1.2.0 verschraubt alles mit nur einer Schraubensorte (10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4), bringt den verschraubten Sensorträger und lässt den Kabelaustritt nach dem Druck wählen (unten oder hinten). 1.1.0 brachte die vollständige Zweisprachigkeit, eine aufgeteilte Firmware, CI mit Firmware-Builds, Displayvorschau und Explosionsansicht.
+**Deutsch:** Die Änderungshistorie wird auf Englisch geführt. Kurz zusammengefasst: 1.3.0 bringt tauschbare Kabelport-Module (Kabel hinten oder unten), Schienen für den SCD41, eine optionale Sicherungslasche, alle Maße als Fusion-Parameter und viele Details für einen sauberen Druck; im Gerät ist nichts mehr geklebt. 1.2.0 verschraubt alles mit nur einer Schraubensorte (10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4), bringt den verschraubten Sensorträger und lässt den Kabelaustritt nach dem Druck wählen (unten oder hinten). 1.1.0 brachte die vollständige Zweisprachigkeit, eine aufgeteilte Firmware, CI mit Firmware-Builds, Displayvorschau und Explosionsansicht.
