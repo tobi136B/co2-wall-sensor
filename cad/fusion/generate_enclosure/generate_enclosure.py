@@ -6,14 +6,17 @@ Creates a new Fusion design that contains every part as its own component:
 
     Housing        front housing with display window and isolated sensor chamber
     SensorCarrier  removable floor of the sensor chamber: SCD41 slides into rails on the
-                   front, the ESP32-C3 sits between guides on the back
+                   front and is held by a spring tongue, the ESP32-C3 sits between guides on
+                   the back. One carrier per SCD41 board profile (SCD_BOARDS), all other
+                   parts are the same for every board.
     BackCover      back cover with dovetail rail
     PortBack       cable port module, cable leaves to the back (right-angle plug)
     PortBottom     cable port module, cable leaves at the bottom (straight plug)
     WallPlate      82 x 82 plate that covers a German flush wall box
     LockTab        optional lock tab, screws the device to the wall plate
     DeskStand      desk stand using the same rail, device leans back by 12 degrees
-    Dummy_*        reference bodies for display, SCD41, ESP32-C3 and USB-C plugs
+    Dummy_*        reference bodies for display, SCD41, ESP32-C3 and USB-C plugs, shown
+                   transparent: they are never exported and never printed
 
 Run it in Fusion: Utilities > Scripts and Add-Ins > "+" > add this folder >
 select generate_enclosure > Run.
@@ -42,7 +45,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '1.3'          # enclosure version, engraved into every part
+VERSION = '1.4'          # enclosure version, engraved into every part
 
 # ===================== PARAMETERS =====================
 # --- device ---
@@ -80,9 +83,20 @@ C3_X = 13.0
 PLUG_SPACE = 13.0       # free space below the USB-C socket for the plug
 PLUG_W, PLUG_H = 12.0, 7.0      # overmould of a straight USB-C plug
 BOOT_D = 7.0            # hole for the cable boot of a right-angle plug
-SCD_W, SCD_L, SCD_PCB = 15.0, 20.0, 1.6        # SCD41 breakout board
-SCD_H = 7.0             # height of the SCD41 above the board
-SCD_LIP = 0.8           # rail lip under the board edge
+# SCD41 board as mounted: W across the rails, L in the slide direction. Defaults: profile '14x22'.
+# Offsets are seen from the front of the device: right and up are positive (right is -x in the model).
+SCD_W, SCD_L, SCD_PCB = 21.75, 13.51, 1.53      # SCD41 breakout board
+SCD_H = 6.3             # height of the SCD41 above the board
+SCD_SENSOR_X, SCD_SENSOR_Y = -3.95, 0.0         # centre of the SCD41 from the board centre, seen from the front
+SCD_PAD_X = 9.1         # solder pad column from the board centre, seen from the front (0: pads not on a rail)
+SCD_LIP = 0.8           # rail lip in front of the board edge
+SCD_STOP = 0.6          # end stop below the board
+# --- spring tongue: presses the SCD41 board against its end stop, takes up length tolerances ---
+SPRING_X = -1.0         # x of the tongue centre
+SPRING_W, SPRING_L = 4.0, 10.0  # width and free length of the tongue
+SPRING_T = 1.2          # thickness of the tongue (the carrier is FLOOR_T thick)
+SPRING_HOOK = 0.8       # height of the 45 degree hook in front of the tongue
+SPRING_PRELOAD = 0.4    # the hook is pushed back this far by a board of nominal length
 # --- cable port module ---
 PORT_W = 16.0           # width of the module (outside)
 PORT_STEP = 1.2         # the module is wider behind the outer skin, so it cannot fall out
@@ -108,13 +122,25 @@ LABEL_DEPTH = 0.4
 EXPORT = False          # True: write STL + STEP into ../../stl and ../../step
 USE_DOC_PARAMS = True   # True: take over the user parameters of the open design (changes made in Fusion)
 
+# Known SCD41 breakout boards. The export writes one sensor carrier per profile
+# (cad/stl/sensor_carrier_<name>.stl), plus sensor_carrier_custom.stl if the SCD_* parameters
+# of the design match none of them. Measure your board: see docs/measure-sensor.md.
+SCD_BOARDS = {
+    # 13.5 x 21.75 mm, pads GND VDD SCL SDA on a short edge, lies crosswise
+    '14x22': dict(SCD_W=21.75, SCD_L=13.51, SCD_PCB=1.53, SCD_H=6.3, SCD_SENSOR_X=-3.95, SCD_SENSOR_Y=0.0,
+                  SCD_PAD_X=9.1),
+    # 15 x 20 mm, stands upright
+    '15x20': dict(SCD_W=15.0, SCD_L=20.0, SCD_PCB=1.6, SCD_H=7.0, SCD_SENSOR_X=0.0, SCD_SENSOR_Y=-3.95,
+                  SCD_PAD_X=0.0),
+}
+
 
 def derive():
     """Values that follow from the parameters. Called again after loading Fusion parameters."""
     global CLEARANCE, RAIL_CLEARANCE, COVER_Z, XL, XR, Y_TOP_IN, BAY_W, BAY_H, BAY_X0, BAY_X1, BAY_Y1, BAY_Y0
     global LCD_Y, Y_DIV_LOW, Y_CHIN_LOW, Y_CHIN_MID, C3_Y0, C3_Z0, PLUG_Z, SOCKET_TOP, B, COVER_SCREWS
     global CARRIER_SCREWS, LCD_HOLES, CABLE, PORT_X0, PORT_X1, PORT_Z0, PORT_Y1, BOOT_Y, SCD_Y0, SCD_ZT
-    global LOCK_Z, LOCK_POINTS
+    global LOCK_Z, LOCK_POINTS, SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT
     CLEARANCE = FIT
     RAIL_CLEARANCE = FIT
     COVER_Z = DEPTH - COVER_T
@@ -142,8 +168,15 @@ def derive():
     PORT_Z0 = PLUG_Z - PLUG_H / 2 - 1.2              # lower end of the port opening in the bottom wall
     PORT_Y1 = Y_CHIN_LOW + PORT_TOP                  # upper end of the port opening in the back cover
     BOOT_Y = C3_Y0 - 6.0                             # cable boot of the right-angle plug
-    SCD_Y0 = Y_DIV_LOW - 0.2 - 1.0 - SCD_L           # lower edge of the SCD41 board (1 mm end stop above)
+    # SCD41: slides in from the top, stands on the end stop, the hook of the spring tongue presses on its top edge
+    SCD_Y0 = Y_CHIN_LOW + 0.2 + SCD_STOP + 0.15      # lower edge of the SCD41 board
+    SCD_TOP = SCD_Y0 + SCD_L                         # upper edge
     SCD_ZT = FLOOR_Z                                 # board lies against the carrier
+    HOOK_B = SCD_TOP - SPRING_PRELOAD                # pressing face of the hook: from the carrier face (y = HOOK_B)
+    HOOK_C = HOOK_B + SPRING_HOOK                    # ... at 45 degrees to the tip (y = HOOK_C)
+    HOOK_A = HOOK_C + SPRING_HOOK                    # entry ramp back to the carrier face (y = HOOK_A)
+    TONGUE_TIP = HOOK_A + 0.3                        # free end of the tongue (it grows upwards from its root
+    TONGUE_ROOT = TONGUE_TIP - SPRING_L              # when the carrier is printed on its lower edge)
     LOCK_Z = COVER_Z - 4.0                           # height of the lock insert in the bottom wall
     LOCK_POINTS = (LOCK_X - 3.0, LOCK_X + 3.0)       # x of the housing insert and of the wall plate insert
 
@@ -301,6 +334,9 @@ def extrude(comp, sk, length, op, name, body=None):
         inp.participantBodies = [body]
     f = comp.features.extrudeFeatures.add(inp)
     f.name = name
+    if op == adsk.fusion.FeatureOperations.NewBodyFeatureOperation:
+        for b in f.bodies:
+            b.name = name
     return f
 
 
@@ -595,34 +631,55 @@ def build_housing(root, ops):
     return comp
 
 
-def build_sensor_carrier(root, ops):
-    """Removable floor of the sensor chamber. SCD41 slides into rails on the front, ESP32-C3 on the back."""
+def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
+    """Removable floor of the sensor chamber. SCD41 slides into rails on the front, ESP32-C3 on the back.
+
+    The SCD41 board slides in from the top until it stands on the end stop. A tongue in the carrier carries
+    a 45 degree hook that springs over the upper board edge and presses the board onto the end stop, so the
+    board sits without play even if it is a few tenths longer or shorter than nominal. Printed on its lower
+    edge, the tongue grows upwards from its root and the rails become vertical channels.
+    """
     NEW, CUT, JOIN = ops
-    comp = new_component(root, 'SensorCarrier')
+    comp = new_component(root, name)
     s = 0.2
     y_lo, y_hi = Y_CHIN_LOW + s, Y_DIV_LOW - s
     body = box(comp, XL + s, y_lo, FLOOR_Z, XR - s, y_hi, FLOOR_Z + FLOOR_T, NEW, 'Carrier').bodies.item(0)
-    body.name = 'SensorCarrier'
+    body.name = name
     # notches around the two full-height cover bosses
     r = BOSS_D / 2 + 0.3 + BOSS_FILLET
     for x, y in COVER_SCREWS[:2]:
         box(comp, x - r, y - r - 2, FLOOR_Z - 2, x + r, y + r, FLOOR_Z + FLOOR_T + 1, CUT, 'BossNotch', body)
     screw_holes(comp, CARRIER_SCREWS, FLOOR_Z + FLOOR_T, body, counterbore=False)
 
-    # SCD41: two rails with a groove for the board edges, end stop on top, snap bump at the entry
+    # SCD41: two rails with a groove for the board edges, open at the top, end stop at the bottom
     zb = SCD_ZT - SCD_PCB
     g = 0.15                                      # play of the board in the groove
     z_lip = zb - g - SCD_LIP
+    yc = SCD_Y0 + SCD_L / 2
     for sx in (-1, 1):
         x_in, x_edge, x_out = SCD_W / 2 - SCD_LIP, SCD_W / 2 + g, SCD_W / 2 + g + 1.2
         pts = [(sx * x_in, z_lip), (sx * x_out, z_lip), (sx * x_out, FLOOR_Z), (sx * x_edge, FLOOR_Z),
                (sx * x_edge, zb - g), (sx * x_in, zb - g)]
         prism_y(comp, pts, y_lo, y_hi, JOIN, 'ScdRail', body)
-        # end stop above the board
-        box(comp, sx * x_in, SCD_Y0 + SCD_L + g, z_lip, sx * x_out, y_hi, FLOOR_Z, JOIN, 'ScdStop', body)
-        # snap bump on the lip just below the board
-        box(comp, sx * x_in, max(SCD_Y0 - 1.6, y_lo), zb - g - 0.001, sx * (SCD_W / 2 - 0.1), SCD_Y0 - g, zb - g + 0.25, JOIN,
-            'ScdSnap', body)
+        box(comp, sx * x_in, y_lo, z_lip, sx * x_out, SCD_Y0 - g, FLOOR_Z, JOIN, 'ScdEndStop', body)
+    if abs(SCD_PAD_X) > 1e-6:
+        # pads on a rail side: lip open in front of the pads, relief behind them for the solder joints
+        pad_x = -SCD_PAD_X                        # seen from the front, right is -x
+        sx = 1 if pad_x > 0 else -1
+        x0, x1 = sorted((sx * (SCD_W / 2 - SCD_LIP - 0.1), sx * (SCD_W / 2 + g)))
+        box(comp, x0, yc - 4.8, z_lip - 0.1, x1, yc + 4.8, zb - g + 0.01, CUT, 'ScdPadWindow', body)
+        box(comp, pad_x - 1.2, y_lo - 0.1, FLOOR_Z - 0.01, pad_x + 1.2, SCD_TOP + 1.0, FLOOR_Z + 0.6, CUT,
+            'ScdPadRelief', body)
+    # spring tongue: U-shaped slot, thinned from the back so it bends back into its own pocket
+    hw = SPRING_W / 2
+    for x0, x1 in ((SPRING_X - hw - 0.6, SPRING_X - hw), (SPRING_X + hw, SPRING_X + hw + 0.6)):
+        box(comp, x0, TONGUE_ROOT, FLOOR_Z - 1, x1, TONGUE_TIP + 0.6, FLOOR_Z + FLOOR_T + 1, CUT, 'TongueSlot', body)
+    box(comp, SPRING_X - hw - 0.6, TONGUE_TIP, FLOOR_Z - 1, SPRING_X + hw + 0.6, TONGUE_TIP + 0.6,
+        FLOOR_Z + FLOOR_T + 1, CUT, 'TongueSlot', body)
+    box(comp, SPRING_X - hw, TONGUE_ROOT + 1.0, FLOOR_Z + SPRING_T, SPRING_X + hw, TONGUE_TIP + 0.1,
+        FLOOR_Z + FLOOR_T + 1, CUT, 'TongueThinning', body)
+    hook = [(HOOK_B, FLOOR_Z + 0.01), (HOOK_C, FLOOR_Z - SPRING_HOOK), (HOOK_A, FLOOR_Z + 0.01)]
+    prism_x(comp, hook, SPRING_X - hw, SPRING_X + hw, JOIN, 'TongueHook', body)
     # cable notch for the SCD41 wires (seal with a drop of hot glue)
     box(comp, -SCD_W / 2 - 6, y_hi - 4, FLOOR_Z - 0.5, -SCD_W / 2 - 2, y_hi + 0.1, FLOOR_Z + FLOOR_T + 0.5,
         CUT, 'ScdCableNotch', body)
@@ -642,8 +699,8 @@ def build_sensor_carrier(root, ops):
         box(comp, xa, C3_Y0 - 0.05, C3_Z0 + C3_PCB + 0.1, xb, C3_Y0 + 1.2, C3_Z0 + C3_PCB + 0.8, JOIN, 'C3GrooveLip',
             body)
 
-    label(comp, body, top, XL + 4, Y_CHIN_LOW + 7, C3_X - C3_W / 2 - 2.5, y_hi - 5,
-          f'CARRIER v{VERSION}\nPRINT: EDGE DOWN', name='Label', height=1.8)
+    label(comp, body, top, XL + 4, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 4,
+          f'CARRIER v{VERSION}\nSCD {profile or "custom"}\nPRINT: EDGE DOWN', name='Label', height=1.5)
     return comp
 
 
@@ -796,8 +853,9 @@ def build_dummies(root, ops):
         'PH2Connector')
     scd = new_component(root, 'Dummy_SCD41')
     zb = SCD_ZT - SCD_PCB
-    box(scd, -SCD_W / 2, SCD_Y0, zb, SCD_W / 2, SCD_Y0 + SCD_L, SCD_ZT - 0.01, NEW, 'Pcb')
-    box(scd, -5.05, SCD_Y0 + 1.0, zb - SCD_H, 5.05, SCD_Y0 + 11.1, zb, NEW, 'SCD41')
+    box(scd, -SCD_W / 2, SCD_Y0, zb, SCD_W / 2, SCD_TOP, SCD_ZT - 0.01, NEW, 'Pcb')
+    sx, sy = -SCD_SENSOR_X, SCD_Y0 + SCD_L / 2 + SCD_SENSOR_Y
+    box(scd, sx - 5.05, sy - 5.05, zb - SCD_H, sx + 5.05, sy + 5.05, zb, NEW, 'SCD41')
     esp = new_component(root, 'Dummy_ESP32_C3')
     box(esp, C3_X - C3_W / 2, C3_Y0, C3_Z0, C3_X + C3_W / 2, C3_Y0 + C3_H, C3_Z0 + C3_PCB, NEW, 'C3Pcb')
     box(esp, C3_X - 4.45, C3_Y0 - 0.5, C3_Z0 + C3_PCB, C3_X + 4.45, C3_Y0 + 7.0, SOCKET_TOP, NEW, 'UsbCSocket')
@@ -808,6 +866,45 @@ def build_dummies(root, ops):
     straight = new_component(root, 'Dummy_PlugStraight')
     box(straight, C3_X - PLUG_W / 2, -BODY / 2 - 12, PLUG_Z - PLUG_H / 2, C3_X + PLUG_W / 2, C3_Y0 - 1.0,
         PLUG_Z + PLUG_H / 2, NEW, 'Overmould')
+    # reference parts are never printed: show them see-through so nobody mistakes them for enclosure parts
+    for comp in (lcd, scd, esp, angled, straight):
+        for b in comp.bRepBodies:
+            b.opacity = 0.45
+
+
+# ----------------------------------------------------------------------------- appearances
+APPEARANCES = {   # English and German names of the Fusion appearance library
+    'part': ('Plastic - Matte (White)', 'Kunststoff - matt (Weiß)'),
+    'pcb': ('Plastic - Matte (Blue)', 'Kunststoff - matt (Blau)'),
+    'sensor': ('Plastic - Matte (Gray)', 'Kunststoff - matt (Grau)'),
+    'black': ('Plastic - Matte (Black)', 'Kunststoff - matt (Schwarz)'),
+    'glass': ('Glass - Dark Color', 'Glas - dunkle Farbe'),
+    'metal': ('Steel - Satin', 'Stahl - satiniert'),
+}
+BODY_LOOK = {'Pcb': 'pcb', 'C3Pcb': 'pcb', 'SCD41': 'sensor', 'Glass': 'glass', 'UsbCSocket': 'metal'}
+
+
+def find_appearance(design, names):
+    for a in design.appearances:
+        if a.name in names:
+            return a
+    app = adsk.core.Application.get()
+    for lib in app.materialLibraries:
+        for a in lib.appearances:
+            if a.name in names:
+                return design.appearances.addByCopy(a, a.name)
+    return None
+
+
+def apply_appearances(design, root):
+    """Printed parts light, reference parts in their real colours. Missing appearances are skipped."""
+    looks = {k: find_appearance(design, v) for k, v in APPEARANCES.items()}
+    for occ in root.occurrences:
+        dummy = occ.component.name.startswith('Dummy_')
+        for b in occ.component.bRepBodies:
+            look = BODY_LOOK.get(b.name.split(' ')[0], 'black') if dummy else 'part'
+            if looks.get(look):
+                b.appearance = looks[look]
 
 
 # ----------------------------------------------------------------------------- assembly
@@ -848,18 +945,80 @@ def check_interference(design, root, components):
             for b in occ.bRepBodies:
                 bodies.add(b)
     result = design.analyzeInterference(design.createInterferenceInput(bodies))
+    # the hook of the spring tongue overlaps the SCD41 board on purpose: that is its preload
+    preload = SPRING_PRELOAD ** 2 / 2 * SPRING_W * 1.05
+    count = 0
     for r in result:
-        print('INTERFERENCE', r.entityOne.parentComponent.name, '<->', r.entityTwo.parentComponent.name,
-              round(r.interferenceBody.volume * 1000, 2), 'mm3')
-    return result.count
+        pair = {r.entityOne.parentComponent.name, r.entityTwo.parentComponent.name}
+        vol = r.interferenceBody.volume * 1000
+        if pair == {'SensorCarrier', 'Dummy_SCD41'} and vol <= preload:
+            continue
+        print('INTERFERENCE', *sorted(pair), round(vol, 2), 'mm3')
+        count += 1
+    return count
 
 
-PRINT_PARTS = {'Housing': 'housing', 'SensorCarrier': 'sensor_carrier', 'BackCover': 'back_cover',
+PRINT_PARTS = {'Housing': 'housing', 'BackCover': 'back_cover',
                'PortBack': 'cable_port_back', 'PortBottom': 'cable_port_bottom', 'WallPlate': 'wall_plate',
                'LockTab': 'lock_tab', 'DeskStand': 'desk_stand'}
 
 
-def export_files(design, root):
+def check_scd_fit():
+    """The SCD41 board with end stop and hook must fit the sensor chamber."""
+    problems = []
+    if HOOK_A + 0.3 > Y_DIV_LOW - 0.2:
+        problems.append(f'SCD_L {SCD_L:g} mm is too long for the chamber, at most about '
+                        f'{SCD_L - (HOOK_A + 0.3 - (Y_DIV_LOW - 0.2)):.1f} mm: mount the board the other way round')
+    if SCD_W / 2 + 1.35 > XR - 6.0:
+        problems.append(f'SCD_W {SCD_W:g} mm is too wide for the chamber')
+    if SCD_ZT - SCD_PCB - SCD_H < WALL + 0.5:
+        problems.append('SCD_PCB + SCD_H too high: the sensor would touch the front wall')
+    for msg in problems:
+        print('WARNING', msg)
+    return problems
+
+
+def scd_parameters():
+    return {k: globals()[k] for k in SCD_BOARDS['14x22']}
+
+
+def active_profile():
+    """Name of the board profile the SCD_* parameters belong to, None for a custom board."""
+    cur = scd_parameters()
+    for name, prof in SCD_BOARDS.items():
+        if all(abs(cur[k] - v) < 1e-6 for k, v in prof.items()):
+            return name
+    return None
+
+
+def carrier_files():
+    names = [f'sensor_carrier_{n}' for n in SCD_BOARDS]
+    return names if active_profile() else names + ['sensor_carrier_custom']
+
+
+def export_carriers(design, root, ops, stl_dir):
+    """One sensor carrier per board profile: build it, export it, remove it again."""
+    saved = scd_parameters()
+    jobs = [(n, prof) for n, prof in SCD_BOARDS.items()]
+    if active_profile() is None:
+        jobs.append(('custom', saved))
+    em = design.exportManager
+    for name, prof in jobs:
+        globals().update(prof)
+        derive()
+        comp = build_sensor_carrier(root, ops, f'Export_{name}', None if name == 'custom' else name)
+        occ = next(o for o in root.occurrences if o.component == comp)
+        opt = em.createSTLExportOptions(comp.bRepBodies.item(0), os.path.join(stl_dir, f'sensor_carrier_{name}.stl'))
+        opt.meshRefinement = adsk.fusion.MeshRefinementSettings.MeshRefinementHigh
+        opt.isBinaryFormat = True
+        em.execute(opt)
+        print('carrier', name, 'volume cm3', round(comp.bRepBodies.item(0).volume, 2))
+        occ.deleteMe()
+    globals().update(saved)
+    derive()
+
+
+def export_files(design, root, ops):
     repo_cad = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     stl_dir, step_dir = os.path.join(repo_cad, 'stl'), os.path.join(repo_cad, 'step')
     os.makedirs(stl_dir, exist_ok=True)
@@ -872,11 +1031,12 @@ def export_files(design, root):
                 opt.meshRefinement = adsk.fusion.MeshRefinementSettings.MeshRefinementHigh
                 opt.isBinaryFormat = True
                 em.execute(opt)
+    export_carriers(design, root, ops, stl_dir)
     em.execute(em.createSTEPExportOptions(os.path.join(step_dir, 'co2_wall_sensor_assembly.step'), root))
     # fingerprint of the parameters, the CI checks that the print files belong to the current parameters
     with open(os.path.join(repo_cad, 'build_info.json'), 'w', encoding='utf-8') as f:
         json.dump({'enclosure_version': VERSION, 'parameters_sha256': parameters_fingerprint(),
-                   'parts': sorted(PRINT_PARTS.values())}, f, indent=2)
+                   'parts': sorted(list(PRINT_PARTS.values()) + carrier_files())}, f, indent=2)
         f.write('\n')
     print('Exported to', repo_cad)
 
@@ -897,8 +1057,9 @@ def run(_context: str):
            adsk.fusion.FeatureOperations.CutFeatureOperation,
            adsk.fusion.FeatureOperations.JoinFeatureOperation)
 
+    scd_problems = check_scd_fit()
     build_housing(root, ops)
-    build_sensor_carrier(root, ops)
+    build_sensor_carrier(root, ops, profile=active_profile())
     build_back_cover(root, ops)
     build_port(root, ops, 'back')
     build_port(root, ops, 'bottom')
@@ -912,6 +1073,10 @@ def run(_context: str):
     bottom = check_interference(design, root, device | {'PortBottom', 'Dummy_PlugStraight', 'WallPlate', 'LockTab'})
     desk = check_interference(design, root, device | {'PortBack', 'Dummy_PlugAngled', 'DeskStand'})
     add_joints(root)
+    try:
+        apply_appearances(design, root)
+    except RuntimeError as e:
+        print('note: appearances skipped', e)
     for occ in root.occurrences:
         if occ.component.name in ('DeskStand', 'PortBottom', 'Dummy_PlugStraight'):
             occ.isLightBulbOn = False
@@ -923,7 +1088,9 @@ def run(_context: str):
     app.activeViewport.fit()
     print('Parameters taken over from the previous design:', taken)
     print('Interference wall/back exit:', wall, '| wall/bottom exit:', bottom, '| desk:', desk)
-    print('Device W x H x D mm:', BODY, BODY, DEPTH, '+ rail', RAIL_H)
+    for msg in scd_problems:
+        print('WARNING', msg)
+    print('Device W x H x D mm:', BODY, BODY, DEPTH, '+ rail', RAIL_H, '| SCD41 profile:', active_profile() or 'custom')
     print('Volume cm3:', {o.component.name: round(sum(b.volume for b in o.bRepBodies), 2) for o in root.occurrences})
     if EXPORT:
-        export_files(design, root)
+        export_files(design, root, ops)

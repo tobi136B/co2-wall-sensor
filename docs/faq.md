@@ -38,6 +38,9 @@ Both. Print the two cable port modules and use the one you need: back with a rig
 ### My straight USB-C plug does not fit.
 The bottom port takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or use the back port with a right-angle plug.
 
+### My SCD41 board looks different.
+Measure it and compare it with the known profiles. Only the small sensor carrier depends on the board, everything else stays the same. See [measure your sensor](measure-sensor.md).
+
 ### How do I change a dimension?
 Open the generated design in Fusion, go to *Modify > Change Parameters*, change the value and run the script again. It takes over all parameters of the open design, rebuilds every part and checks for interference. With `EXPORT = True` it also writes new STL and STEP files. See [design notes](design.md#parameters-in-fusion).
 

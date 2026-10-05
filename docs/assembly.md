@@ -11,7 +11,7 @@ Every part carries its name, the version and its print orientation as an engrave
 | Part | File | Orientation | Notes |
 |------|------|-------------|-------|
 | Housing | [`housing.stl`](../cad/stl/housing.stl) | front face down | The front lies on the bed (a textured PEI sheet looks great). A 45° foot on the front edge prevents elephant foot. No supports. |
-| Sensor carrier | [`sensor_carrier.stl`](../cad/stl/sensor_carrier.stl) | standing on its lower edge | The rails then print as vertical channels. Use a 5 mm brim. |
+| Sensor carrier | [`sensor_carrier_14x22.stl`](../cad/stl/sensor_carrier_14x22.stl) or [`sensor_carrier_15x20.stl`](../cad/stl/sensor_carrier_15x20.stl) | standing on its lower edge | **Matching your SCD41 board**, see [measure your sensor](measure-sensor.md). Printed on edge the rails become vertical channels and the spring tongue grows upwards. Use a 5 mm brim. |
 | Back cover | [`back_cover.stl`](../cad/stl/back_cover.stl) | inside face down | Label "THIS FACE DOWN". Rail points up, no supports. |
 | Cable port, back | [`cable_port_back.stl`](../cad/stl/cable_port_back.stl) | large back face down | For a right-angle plug. |
 | Cable port, bottom | [`cable_port_bottom.stl`](../cad/stl/cable_port_bottom.stl) | large back face down | For a straight plug. Print both ports, they take 2 g each. |
@@ -64,7 +64,7 @@ The module is clamped between housing and back cover. A step in the bottom wall 
 ![Interior](images/interior.png)
 
 1. **Display:** place it glass first into the display bay. Fix it with 4 × M2 × 4.
-2. **SCD41:** solder four wires of about 8 cm to GND, VDD, SCL and SDA. Slide the board from the lower edge into the two rails on the front side of the sensor carrier, sensor facing away from the carrier, until it snaps behind the small bump. Lead the wires through the notch at the upper edge.
+2. **SCD41:** solder four wires of about 8 cm to GND, VDD, SCL and SDA. Slide the board **from the top** into the two rails on the front side of the sensor carrier, sensor facing away from the carrier, pads towards the wire notch. Push it down until it stands on the end stops: the hook of the spring tongue clicks over the upper edge and holds the board without play. Lead the wires through the notch at the upper edge. To remove the board, push the tongue back with a small screwdriver.
 
    <img src="images/sensor_carrier_front.png" width="70%" alt="SCD41 in its rails">
 3. **ESP32-C3:** solder the wires to display and SCD41 ([wiring](wiring.md)). Plug the USB cable into the ESP32-C3 first:

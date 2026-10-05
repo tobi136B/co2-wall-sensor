@@ -51,7 +51,7 @@ The back cover is held at four points: two bosses in the bottom corners and two 
 
 ## Nothing is glued
 
-* **SCD41:** the breakout has no mounting holes. It slides into two rails with a groove on the front of the sensor carrier, an end stop above and a small snap bump below hold it in place.
+* **SCD41:** the breakout has no mounting holes. It slides from the top into two rails with a groove on the front of the sensor carrier and stands on an end stop. A tongue cut out of the carrier carries a 45° hook that springs over the upper edge and presses the board onto the stop, so tolerances of ±0.4 mm are taken up without play. Only this carrier depends on the board: there is one per board profile, see [measure your sensor](measure-sensor.md).
 * **ESP32-C3:** it has no mounting holes either. Side guides, two end stops and a short groove at its lower edge hold it. The groove sits where the board has no solder pads, so wires can be soldered along both edges.
 * **Sensor carrier:** two screws. It is the removable floor of the sensor chamber, so the sensor can be replaced without touching the display.
 

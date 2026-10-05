@@ -39,6 +39,7 @@ jobs:
           python tools/wiring.py
           python tools/display_preview.py
           python tools/build_3mf.py
+          python tools/measure_sketch.py
       - name: Repository checks (EN/DE parity, print files match parameters, BOM links)
         run: |
           # on main the Shop links workflow updates the README tables itself

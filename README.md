@@ -78,7 +78,7 @@ About 45 € in total. The links are suggestions, checked in October 2026; price
 <!-- bom:start (generated from hardware/bom.yaml) -->
 | Qty | Part | AliExpress | Amazon.de |
 |----:|------|-----------:|----------:|
-| 1 | Sensirion **SCD41** breakout, blue **15 × 20 mm** board | [20.99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
+| 1 | Sensirion **SCD41** breakout, **13.5 × 21.75 mm** or **15 × 20 mm** ² | [20.99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
 | 1 | **ESP32-C3 SuperMini** | [2.79 €](https://de.aliexpress.com/item/1005007479144456.html) | [8.99 € (2 pcs)](https://www.amazon.de/dp/B0DMNBWTFD) |
 | 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12.39 €](https://de.aliexpress.com/item/1005008772378337.html) | [16.31 €](https://www.amazon.de/dp/B081Q79X2F) |
 | 10 | Heat-set insert **M2 × 3**, outer diameter 3.2 mm (variant "M2 (OD3.2)", length 3 mm) | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6.99 € (200 pcs, OD 3.0)](https://www.amazon.de/dp/B0DZHK4JRC) ¹ |
@@ -89,7 +89,8 @@ About 45 € in total. The links are suggestions, checked in October 2026; price
 <!-- bom:end -->
 
 ¹ With inserts of 3.0 mm outer diameter set the Fusion parameter `INSERT_HOLE_D` to 2.8.
-The rails are sized for the common blue **15 × 20 mm** SCD41 breakout; other boards need new values for `SCD_W` and `SCD_L`.
+² Shops often show a different board than the one they send. Measure it on arrival and print the matching carrier.
+SCD41 boards come in different sizes. Only the small sensor carrier depends on the board: there is one for the **13.5 × 21.75 mm** and one for the **15 × 20 mm** board, others take six measurements. See [measure your sensor](docs/measure-sensor.md).
 Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the only place for parts, prices and shop links; the table above and the project page are generated from it.
 
 ## Quick start
@@ -156,7 +157,7 @@ co2-wall-sensor/
 Every dimension is a **Fusion user parameter**.
 
 1. In Fusion open *Utilities > Scripts and Add-Ins*, click **+** and add the folder `cad/fusion/generate_enclosure`. Run the script once.
-2. Open *Modify > Change Parameters* and adjust values, for example `FIT` for tighter or looser fits, `SCD_W`/`SCD_L` for a different sensor board or `INSERT_HOLE_D` for other inserts.
+2. Open *Modify > Change Parameters* and adjust values, for example `FIT` for tighter or looser fits, the `SCD_*` values for a different sensor board ([measure your sensor](docs/measure-sensor.md)) or `INSERT_HOLE_D` for other inserts.
 3. Run the script again. It takes over your parameters, rebuilds every part and checks wall and desk assembly for interference. With `EXPORT = True` it writes new STL and STEP files and `cad/build_info.json`.
 4. Regenerate drawing, print plates and the other generated files:
 
@@ -171,7 +172,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 
 ## Before your first print
 
-* **SCD41 board:** the rails fit the blue 15 × 20 mm breakout. Measure yours if it looks different.
+* **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md).
 * **Display glass:** Waveshare does not document the glass thickness, 2.5 mm is assumed (`GLASS_T`).
 * **Hardware status:** the enclosure and firmware are verified in CAD and CI. Photos and measurements of a printed device are welcome.
 

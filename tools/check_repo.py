@@ -33,6 +33,7 @@ DOC_PAIRS = [
     ("docs/design.md", "docs/de/design.md"),
     ("docs/faq.md", "docs/de/faq.md"),
     ("docs/wiring.md", "docs/de/verdrahtung.md"),
+    ("docs/measure-sensor.md", "docs/de/sensor-ausmessen.md"),
 ]
 
 

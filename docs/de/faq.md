@@ -38,6 +38,9 @@ Beides. Die zwei Kabelport-Module drucken und das passende einsetzen: hinten mit
 ### Mein gerader USB-C-Stecker passt nicht.
 Der Port unten nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder den Port hinten mit Winkelstecker nehmen.
 
+### Meine SCD41-Platine sieht anders aus.
+Ausmessen und mit den bekannten Profilen vergleichen. Nur der kleine Sensorträger hängt von der Platine ab, alles andere bleibt gleich. Siehe [Sensor ausmessen](sensor-ausmessen.md).
+
 ### Wie ändere ich ein Maß?
 Die erzeugte Konstruktion in Fusion öffnen, *Ändern > Parameter ändern*, Wert anpassen und das Skript erneut starten. Es übernimmt alle Parameter der offenen Konstruktion, baut alle Teile neu und prüft auf Kollisionen. Mit `EXPORT = True` schreibt es auch neue STL- und STEP-Dateien. Siehe [Designnotizen](design.md#parameter-in-fusion).
 

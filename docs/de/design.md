@@ -51,7 +51,7 @@ Der Rückdeckel wird an vier Punkten gehalten: zwei Dome in den unteren Ecken un
 
 ## Nichts ist geklebt
 
-* **SCD41:** Die Platine hat keine Befestigungslöcher. Sie wird in zwei Schienen mit Nut auf der Frontseite des Sensorträgers geschoben, oben hält ein Anschlag, unten eine kleine Rastnase.
+* **SCD41:** Die Platine hat keine Befestigungslöcher. Sie wird von oben in zwei Schienen mit Nut auf der Frontseite des Sensorträgers geschoben und steht auf einem Anschlag. Eine aus dem Träger ausgeschnittene Zunge trägt einen 45° Haken, der über die Oberkante schnappt und die Platine auf den Anschlag drückt. So werden Toleranzen von ±0,4 mm spielfrei ausgeglichen. Nur dieser Träger hängt von der Platine ab: Es gibt einen pro Platinenprofil, siehe [Sensor ausmessen](sensor-ausmessen.md).
 * **ESP32-C3:** Auch er hat keine Befestigungslöcher. Seitenführungen, zwei Anschläge und eine kurze Nut an seiner Unterkante halten ihn. Die Nut sitzt dort, wo die Platine keine Lötpunkte hat, an beiden Längsseiten können also Litzen angelötet werden.
 * **Sensorträger:** zwei Schrauben. Er ist der herausnehmbare Boden der Sensorkammer, der Sensor lässt sich tauschen, ohne das Display anzufassen.
 

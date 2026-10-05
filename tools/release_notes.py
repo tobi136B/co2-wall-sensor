@@ -19,6 +19,7 @@ ASSETS = f"""
 | File | What it is |
 |------|------------|
 | `co2_wall_sensor_device.3mf`, `co2_wall_sensor_mounts.3mf` | print-ready plates, every part in its print orientation |
+| `sensor_carrier_14x22.stl`, `sensor_carrier_15x20.stl` | sensor carrier, print the one matching your SCD41 board ([measure your sensor](https://github.com/tobi136B/co2-wall-sensor/blob/main/docs/measure-sensor.md)); the device plate contains the 14x22 carrier |
 | `*.stl` | single print files |
 | `co2_wall_sensor_assembly.step` | full assembly for any CAD program |
 | `co2_wall_sensor_drawing_en.pdf`, `..._de.pdf` | technical drawing, A3 |

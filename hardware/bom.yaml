@@ -15,10 +15,10 @@
 #                    A trailing ¹ refers to the footnote below the README table.
 
 
-- name: "Sensirion **SCD41** breakout, blue **15 × 20 mm** board"
-  name_de: "Sensirion **SCD41** Platine, blau, **15 × 20 mm**"
+- name: "Sensirion **SCD41** breakout, **13.5 × 21.75 mm** or **15 × 20 mm** ²"
+  name_de: "Sensirion **SCD41** Platine, **13,5 × 21,75 mm** oder **15 × 20 mm** ²"
   qty: 1
-  details: "blue 15 x 20 mm board, CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V"
+  details: "13.5 x 21.75 mm or 15 x 20 mm board (one sensor carrier each), CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V"
   used_for: sensor chamber
   aliexpress:
     price: "20.99"

@@ -1,6 +1,6 @@
 {
-  "enclosure_version": "1.3",
-  "parameters_sha256": "9a79b3f2369bf412789e772c82f53b4748168691778eb1a5717dca37eeffcc35",
+  "enclosure_version": "1.4",
+  "parameters_sha256": "a32cb3b0177c39cf88268104b460953652079d2f7d53d466335e93a8a7a3dc65",
   "parts": [
     "back_cover",
     "cable_port_back",
@@ -8,7 +8,8 @@
     "desk_stand",
     "housing",
     "lock_tab",
-    "sensor_carrier",
+    "sensor_carrier_14x22",
+    "sensor_carrier_15x20",
     "wall_plate"
   ]
 }

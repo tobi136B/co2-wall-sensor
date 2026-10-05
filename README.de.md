@@ -78,7 +78,7 @@ Insgesamt rund 45 €. Die Links sind Vorschläge, Stand Oktober 2026; Preise ä
 <!-- bom:start (generated from hardware/bom.yaml) -->
 | Anz. | Teil | AliExpress | Amazon.de |
 |----:|------|-----------:|----------:|
-| 1 | Sensirion **SCD41** Platine, blau, **15 × 20 mm** | [20,99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
+| 1 | Sensirion **SCD41** Platine, **13,5 × 21,75 mm** oder **15 × 20 mm** ² | [20,99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
 | 1 | **ESP32-C3 SuperMini** | [2,79 €](https://de.aliexpress.com/item/1005007479144456.html) | [8,99 € (2 Stk.)](https://www.amazon.de/dp/B0DMNBWTFD) |
 | 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12,39 €](https://de.aliexpress.com/item/1005008772378337.html) | [16,31 €](https://www.amazon.de/dp/B081Q79X2F) |
 | 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm (Variante "M2 (OD3.2)", Länge 3 mm) | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) ¹ |
@@ -89,7 +89,8 @@ Insgesamt rund 45 €. Die Links sind Vorschläge, Stand Oktober 2026; Preise ä
 <!-- bom:end -->
 
 ¹ Bei Muttern mit 3,0 mm Außendurchmesser den Fusion-Parameter `INSERT_HOLE_D` auf 2,8 setzen.
-Die Schienen passen für die verbreitete blaue **15 × 20 mm** SCD41-Platine; andere Platinen brauchen neue Werte für `SCD_W` und `SCD_L`.
+² Shops zeigen oft eine andere Platine als die, die geliefert wird. Nach dem Auspacken nachmessen und den passenden Träger drucken.
+SCD41-Platinen gibt es in verschiedenen Größen. Nur der kleine Sensorträger hängt von der Platine ab: Es gibt einen für die **13,5 × 21,75 mm** und einen für die **15 × 20 mm** Platine, für andere reichen sechs Messwerte. Siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md).
 Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Shop-Links stehen nur in dieser Datei; die Tabelle oben und die Projektseite werden daraus erzeugt.
 
 ## Schnellstart
@@ -156,7 +157,7 @@ co2-wall-sensor/
 Jedes Maß ist ein **Fusion-Benutzerparameter**.
 
 1. In Fusion *Dienstprogramme > Skripte und Zusatzmodule* öffnen, mit **+** den Ordner `cad/fusion/generate_enclosure` hinzufügen und das Skript einmal ausführen.
-2. *Ändern > Parameter ändern* öffnen und Werte anpassen, zum Beispiel `FIT` für strammere oder lockerere Passungen, `SCD_W`/`SCD_L` für eine andere Sensorplatine oder `INSERT_HOLE_D` für andere Einschmelzmuttern.
+2. *Ändern > Parameter ändern* öffnen und Werte anpassen, zum Beispiel `FIT` für strammere oder lockerere Passungen, die `SCD_*`-Werte für eine andere Sensorplatine ([Sensor ausmessen](docs/de/sensor-ausmessen.md)) oder `INSERT_HOLE_D` für andere Einschmelzmuttern.
 3. Das Skript erneut starten. Es übernimmt deine Parameter, baut alle Teile neu und prüft Wand- und Tischaufbau auf Kollisionen. Mit `EXPORT = True` schreibt es neue STL- und STEP-Dateien und `cad/build_info.json`.
 4. Zeichnung, Druckplatten und die übrigen generierten Dateien neu erzeugen:
 
@@ -171,7 +172,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 
 ## Vor dem ersten Druck
 
-* **SCD41-Platine:** Die Schienen passen für die blaue 15 × 20 mm Platine. Sieht deine anders aus, bitte nachmessen.
+* **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md).
 * **Displayglas:** Waveshare dokumentiert die Glasdicke nicht, angenommen sind 2,5 mm (`GLASS_T`).
 * **Stand der Hardware:** Gehäuse und Firmware sind im CAD und in der CI geprüft. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 

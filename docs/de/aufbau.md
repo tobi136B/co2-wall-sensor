@@ -11,7 +11,7 @@ Jedes Teil trägt auf einer verdeckten Fläche seinen Namen, die Version und die
 | Teil | Datei | Ausrichtung | Hinweise |
 |------|-------|-------------|----------|
 | Gehäuse | [`housing.stl`](../../cad/stl/housing.stl) | Front nach unten | Die Front liegt auf dem Druckbett (eine strukturierte PEI-Platte sieht super aus). Ein 45° Fuß an der Frontkante verhindert den Elefantenfuß. Kein Stützmaterial. |
-| Sensorträger | [`sensor_carrier.stl`](../../cad/stl/sensor_carrier.stl) | stehend auf der Unterkante | Die Schienen werden so zu senkrechten Kanälen. 5 mm Brim verwenden. |
+| Sensorträger | [`sensor_carrier_14x22.stl`](../../cad/stl/sensor_carrier_14x22.stl) oder [`sensor_carrier_15x20.stl`](../../cad/stl/sensor_carrier_15x20.stl) | stehend auf der Unterkante | **Passend zu deiner SCD41-Platine**, siehe [Sensor ausmessen](sensor-ausmessen.md). Stehend gedruckt werden die Schienen zu senkrechten Kanälen und die Federzunge wächst nach oben. 5 mm Brim verwenden. |
 | Rückdeckel | [`back_cover.stl`](../../cad/stl/back_cover.stl) | Innenseite nach unten | Beschriftung "THIS FACE DOWN". Schiene zeigt nach oben, kein Stützmaterial. |
 | Kabelport hinten | [`cable_port_back.stl`](../../cad/stl/cable_port_back.stl) | große Rückfläche nach unten | Für einen Winkelstecker. |
 | Kabelport unten | [`cable_port_bottom.stl`](../../cad/stl/cable_port_bottom.stl) | große Rückfläche nach unten | Für einen geraden Stecker. Am besten beide drucken, je 2 g. |
@@ -64,7 +64,7 @@ Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt. Eine Stufe in der Unt
 ![Innenansicht](../images/interior.png)
 
 1. **Display:** mit dem Glas voran in den Displayschacht legen und mit 4 × M2 × 4 verschrauben.
-2. **SCD41:** vier Litzen von ca. 8 cm an GND, VDD, SCL und SDA löten. Die Platine von der Unterkante in die beiden Schienen auf der Frontseite des Sensorträgers schieben, Sensor zeigt vom Träger weg, bis sie hinter der kleinen Rastnase einrastet. Die Litzen durch die Kerbe an der Oberkante führen.
+2. **SCD41:** vier Litzen von ca. 8 cm an GND, VDD, SCL und SDA löten. Die Platine **von oben** in die beiden Schienen auf der Frontseite des Sensorträgers schieben, Sensor zeigt vom Träger weg, Lötpunkte zur Kabelkerbe. Nach unten schieben, bis sie auf den Anschlägen steht: Der Haken der Federzunge schnappt über die Oberkante und hält die Platine spielfrei. Die Litzen durch die Kerbe an der Oberkante führen. Zum Herausnehmen die Zunge mit einem kleinen Schraubendreher nach hinten drücken.
 
    <img src="../images/sensor_carrier_front.png" width="70%" alt="SCD41 in den Schienen">
 3. **ESP32-C3:** die Litzen von Display und SCD41 anlöten ([Verdrahtung](verdrahtung.md)). Zuerst das USB-Kabel in den ESP32-C3 stecken:
