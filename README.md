@@ -177,6 +177,8 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 
 ## Roadmap
 
+* [ ] Sensor carrier profiles for different SCD41 boards ([#7](https://github.com/tobi136B/co2-wall-sensor/issues/7), v1.4)
+* [ ] Online configurator: sensor carrier STL from three measurements ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.5)
 * [ ] Verify display layout and thermals on real hardware, add photos
 * [ ] Optional pressure sensor (BMP280) for live CO2 pressure compensation
 * [ ] Wall plate variant for walls without a flush box
