@@ -21,6 +21,7 @@ Thanks for your interest in improving the CO2 Wall Sensor!
   python tools/drawing.py && python tools/wiring.py && python tools/display_preview.py && python tools/build_3mf.py
   python tools/check_repo.py
   ```
+* **Shop links and prices** live only in `hardware/bom.csv` (columns `part`, `part_de`, `price_eur_*`, `aliexpress`, `amazon_de`). `python tools/bom.py` updates the README tables; on `main` the *Shop links* workflow does that and redeploys the project page.
 * **Both languages.** User-facing text exists in English and German. Update both, or mention in the pull request that a translation is missing.
 * **Firmware texts** go into the substitutions of the four device files (`co2-wall-sensor*.yaml`), logic into `common/base.yaml`, network settings into `common/network_secrets.yaml` (own build) or `common/network_factory.yaml` (browser installer).
 * **Commit messages follow [Conventional Commits](https://www.conventionalcommits.org):** `feat:`, `fix:`, `docs:`, `cad:` (enclosure), `ci:`, `chore:`. Releases, version numbers and the changelog are created from them automatically (release-please), so do not edit `CHANGELOG.md` by hand.

@@ -40,7 +40,10 @@ jobs:
           python tools/display_preview.py
           python tools/build_3mf.py
       - name: Repository checks (EN/DE parity, print files match parameters, BOM links)
-        run: python tools/check_repo.py
+        run: |
+          # on main the Shop links workflow updates the README tables itself
+          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then python tools/bom.py; fi
+          python tools/check_repo.py
       - name: Check links in the documentation
         uses: lycheeverse/lychee-action@v2
         with:

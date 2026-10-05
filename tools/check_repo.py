@@ -4,7 +4,8 @@ Repository consistency checks, run by the CI.
 
 * English and German documents have the same structure (headings and images).
 * The print files in cad/ were exported from the current parameters of the Fusion generator.
-* Every link in the bill of materials is an absolute https link.
+* Every link in the bill of materials is an absolute https link and the README tables
+  match hardware/bom.csv.
 
 Usage:   python tools/check_repo.py            (check)
          python tools/check_repo.py --write    (write cad/build_info.json from the current parameters,
@@ -14,12 +15,13 @@ Usage:   python tools/check_repo.py            (check)
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import json
 import re
 import sys
 from pathlib import Path
+
+import bom
 
 ROOT = Path(__file__).resolve().parents[1]
 GENERATOR = ROOT / "cad" / "fusion" / "generate_enclosure" / "generate_enclosure.py"
@@ -89,13 +91,12 @@ def check_print_files() -> list[str]:
 
 
 def check_bom() -> list[str]:
-    errors = []
-    with open(ROOT / "hardware" / "bom.csv", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            for key in ("aliexpress", "amazon_de"):
-                link = row.get(key) or ""
-                if link and not link.startswith("https://"):
-                    errors.append(f"bom.csv: {row['part']}: {key} is not an https link")
+    """Shop links are https and the README tables match hardware/bom.csv."""
+    errors = bom.check_links()
+    for lang, path in bom.READMES.items():
+        old, new = bom.updated_readme(lang)
+        if old != new:
+            errors.append(f"{path.name}: bill of materials is out of date, run python tools/bom.py")
     return errors
 
 

@@ -1,0 +1,85 @@
+name: Shop links
+
+# Edit hardware/bom.csv (on GitHub: open the file, pencil icon, commit to main).
+# This workflow then updates the tables in README.md and README.de.md and deploys the
+# project page again with the firmware of the latest release. No new release is needed.
+
+on:
+  push:
+    branches: [main]
+    paths: [hardware/bom.csv]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  readme:
+    name: Update README tables
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Generate the tables from hardware/bom.csv
+        run: python tools/bom.py
+      - name: Commit if something changed
+        run: |
+          if git diff --quiet; then
+            echo "README tables already up to date"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "docs: update bill of materials tables from bom.csv"
+          git push
+      - name: Latest release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release view --json tagName --jq .tagName)
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          mkdir dist
+          gh release download "$tag" --dir dist --pattern '*.bin'
+          ls -l dist
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-dist
+          path: dist/*.bin
+
+  pages:
+    name: Deploy project page
+    needs: readme
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-dist
+          path: dist
+      - name: Build project page
+        run: python tools/build_site.py --version "${{ needs.readme.outputs.version }}" --dist dist --out _site
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v5

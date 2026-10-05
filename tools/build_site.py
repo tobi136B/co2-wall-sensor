@@ -10,14 +10,13 @@ Usage:   python tools/build_site.py --version 1.3.0 --dist dist --out _site
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
-import html
 import json
-import re
 import shutil
 from pathlib import Path
 from urllib.parse import quote
+
+import bom
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "https://github.com/tobi136B/co2-wall-sensor"
@@ -177,40 +176,6 @@ TEXT = {
     },
 }
 
-PART_DE = {
-    "Sensirion SCD41 breakout": "Sensirion SCD41 Platine (15 × 20 mm)",
-    "ESP32-C3 SuperMini": "ESP32-C3 SuperMini",
-    "Waveshare 2inch LCD Module": "Waveshare 2inch LCD Module",
-    "Heat-set insert M2 x 3": "Einschmelzmutter M2 × 3 (Außendurchmesser 3,2)",
-    "Button head screw M2 x 4": "Linsenkopfschraube M2 × 4, ISO 7380",
-    "USB cable with right-angle USB-C plug": "USB-Kabel mit USB-C Winkelstecker (oben/unten gewinkelt)",
-    "USB power module for the flush wall box": "USB-Netzteil für die Hohlwanddose (Elektrofachkraft)",
-    "Stranded silicone wire AWG 30": "Silikonlitze AWG 30",
-}
-
-
-def bom_rows(lang: str) -> str:
-    rows = []
-    with open(ROOT / "hardware" / "bom.csv", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            if not (r["aliexpress"] or r["amazon_de"]):
-                continue
-            part = PART_DE.get(r["part"], r["part"]) if lang == "de" else r["part"]
-            cells = []
-            for key, price in (("aliexpress", "price_eur_aliexpress"), ("amazon_de", "price_eur_amazon")):
-                if r[key]:
-                    label = re.sub(r"^([\d.]+)", r"\1 €", r[price]) if r[price] else "Link"
-                    if lang == "de":
-                        label = label.replace(".", ",").replace("pcs", "Stk.").replace("colours", "Farben")
-                    cells.append(f'<a href="{html.escape(r[key])}" rel="nofollow noopener">{html.escape(label)}</a>')
-                else:
-                    cells.append("")
-            rows.append(
-                f'          <tr><td class="qty">{r["qty"]}</td><td>{html.escape(part)}</td>'
-                f'<td class="shop">{cells[0]}</td><td class="shop">{cells[1]}</td></tr>'
-            )
-    return "\n".join(rows)
-
 
 def manifests(version: str, dist: Path, out: Path) -> None:
     fw = out / "firmware"
@@ -248,7 +213,7 @@ def page(lang: str, version: str, base: str) -> str:
         "lang": lang,
         "base": base,
         "version": version,
-        "bom_rows": bom_rows(lang),
+        "bom_rows": bom.html_rows(lang),
         "blueprint": BLUEPRINT,
         "cur_en": 'aria-current="page"' if lang == "en" else "",
         "cur_de": 'aria-current="page"' if lang == "de" else "",

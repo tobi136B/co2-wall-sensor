@@ -75,20 +75,22 @@ Technical drawing (A3, ISO first angle): [English PDF](docs/drawing/co2_wall_sen
 
 About 45 € in total. The links are suggestions, checked in October 2026; prices change often.
 
+<!-- bom:start (generated from hardware/bom.csv) -->
 | Qty | Part | AliExpress | Amazon.de |
 |----:|------|-----------:|----------:|
-| 1 | Sensirion **SCD41** breakout, blue **15 × 20 mm** board | [20.99 €](https://de.aliexpress.com/item/1005009740863220.html) | |
+| 1 | Sensirion **SCD41** breakout, blue **15 × 20 mm** board | [20.99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
 | 1 | **ESP32-C3 SuperMini** | [2.79 €](https://de.aliexpress.com/item/1005007479144456.html) | [8.99 € (2 pcs)](https://www.amazon.de/dp/B0DMNBWTFD) |
 | 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12.39 €](https://de.aliexpress.com/item/1005008772378337.html) | [16.31 €](https://www.amazon.de/dp/B081Q79X2F) |
-| 10 | Heat-set insert **M2 × 3**, outer diameter 3.2 mm (variant "M2 (OD3.2)", length 3 mm) | [link](https://de.aliexpress.com/item/1005008575446687.html) | [6.99 € (200 pcs, OD 3.0)](https://www.amazon.de/dp/B0DZHK4JRC) ¹ |
-| 10 | Button head screw **M2 × 4**, ISO 7380 | | [4.30 € (50 pcs)](https://www.amazon.de/dp/B0DGXPQ7TW) |
-| 1 | USB cable with **right-angle USB-C plug** (angled up/down) for the back port | | [7.69 €](https://www.amazon.de/dp/B01MSIE2L1) |
-| 1 | USB power module for the flush wall box (installation by a qualified electrician), or any USB charger | | [8.99 €](https://www.amazon.de/dp/B0HHF42X68) |
-| | Silicone wire AWG 30 | | [15.49 € (8 colours)](https://www.amazon.de/dp/B0DH2FBWH7) |
+| 10 | Heat-set insert **M2 × 3**, outer diameter 3.2 mm (variant "M2 (OD3.2)", length 3 mm) | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6.99 € (200 pcs, OD 3.0)](https://www.amazon.de/dp/B0DZHK4JRC) ¹ |
+| 10 | Button head screw **M2 × 4**, ISO 7380 |  | [4.30 € (50 pcs)](https://www.amazon.de/dp/B0DGXPQ7TW) |
+| 1 | USB cable with **right-angle USB-C plug** (angled up/down) for the back port |  | [7.69 €](https://www.amazon.de/dp/B01MSIE2L1) |
+| 1 | USB power module for the flush wall box (installation by a qualified electrician), or any USB charger |  | [8.99 €](https://www.amazon.de/dp/B0HHF42X68) |
+|  | Silicone wire AWG 30 |  | [15.49 € (8 colours)](https://www.amazon.de/dp/B0DH2FBWH7) |
+<!-- bom:end -->
 
 ¹ With inserts of 3.0 mm outer diameter set the Fusion parameter `INSERT_HOLE_D` to 2.8.
 The rails are sized for the common blue **15 × 20 mm** SCD41 breakout; other boards need new values for `SCD_W` and `SCD_L`.
-Machine-readable: [`hardware/bom.csv`](hardware/bom.csv)
+Machine-readable: [`hardware/bom.csv`](hardware/bom.csv). This file is the only place for parts, prices and shop links; the table above and the project page are generated from it.
 
 ## Quick start
 
