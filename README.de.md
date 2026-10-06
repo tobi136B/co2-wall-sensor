@@ -59,6 +59,7 @@ Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisie
 | Wandplatte | 82 × 82 × 7 mm, passt auf Hohlwanddosen Ø 68 mm mit 60 mm Schraubabstand |
 | Displayfenster | 41,8 × 31,6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 bis 5000 ppm, ±(50 ppm + 5 % vom Messwert) |
+| Raumgröße | ein Sensor pro Raum; in offenen Räumen bis etwa 500 m² ([FAQ](docs/de/faq.md#wie-groß-darf-der-raum-für-einen-sensor-sein)) |
 | Versorgung | 5 V über USB-C, ca. 0,5 W |
 | Kabelaustritt | hinten (Winkelstecker) oder unten (gerader Stecker), tauschbares Port-Modul |
 | Verbindungselemente | 10 Einschmelzmuttern M2 × 3 (AD 3,2), 10 Schrauben M2 × 4 ISO 7380 (+ je 2 für die Sicherungslasche) |

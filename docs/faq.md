@@ -5,6 +5,16 @@
 ### How accurate is the CO2 reading?
 The SCD41 is specified for ±(50 ppm + 5 % of reading) between 400 and 5000 ppm. Automatic self calibration assumes the device sees fresh air (about 420 ppm) at least once a week, which is normal in ventilated rooms. If the room is never aired properly, disable `automatic_self_calibration` and use the calibration button instead.
 
+### How large a room can one sensor monitor?
+**One sensor per room.** CO2 spreads evenly within a room in a few minutes, but walls and closed doors separate the air, so a sensor in the living room says little about the bedroom.
+
+The size of the room is rarely the limit. Building guidelines put one sensor per 500 m² of open floor space ([Arc/GBCI](https://arc.gbci.org/sites/default/files/Arc-CO2Guide.pdf)), the sensor manufacturer BAPI gives at most 725 m² in still air ([BAPI](https://www.bapihvac.com/application_note/air-quality-sensor-coverage-area-and-mounting/)). Every living room, bedroom, office or classroom is therefore covered by one device; only open spaces with several zones need more.
+
+Placement matters more than size:
+* **Height 1 to 1.5 m**, the breathing zone of seated people. The wall plate on a flush box at switch height (about 1.05 m) is ideal.
+* **At least 1 to 2 m away from people**, so nobody breathes directly at the sensor (not right beside the bed or the desk).
+* **Not next to windows, doors, radiators or ventilation outlets**, and not in direct sunlight.
+
 ### Which thresholds are sensible?
 The defaults are 1000 ppm (yellow) and 1400 ppm (red). Values below 1000 ppm are generally considered harmless, above 2000 ppm ventilation is clearly needed. Both thresholds can be changed in Home Assistant at any time.
 

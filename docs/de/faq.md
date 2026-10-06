@@ -5,6 +5,16 @@
 ### Wie genau ist der CO2-Wert?
 Der SCD41 ist mit ±(50 ppm + 5 % vom Messwert) zwischen 400 und 5000 ppm spezifiziert. Die automatische Selbstkalibrierung geht davon aus, dass das Gerät mindestens einmal pro Woche Frischluft (ca. 420 ppm) sieht, was in gelüfteten Räumen normal ist. Wird der Raum nie richtig gelüftet, `automatic_self_calibration` abschalten und stattdessen die Kalibriertaste nutzen.
 
+### Wie groß darf der Raum für einen Sensor sein?
+**Ein Sensor pro Raum.** CO2 verteilt sich innerhalb eines Raumes in wenigen Minuten gleichmäßig, aber Wände und geschlossene Türen trennen die Luft. Ein Sensor im Wohnzimmer sagt also wenig über das Schlafzimmer.
+
+Die Raumgröße ist selten die Grenze. Richtlinien für Gebäude rechnen mit einem Sensor pro 500 m² offener Fläche ([Arc/GBCI](https://arc.gbci.org/sites/default/files/Arc-CO2Guide.pdf)), der Sensorhersteller BAPI nennt höchstens 725 m² bei ruhiger Luft ([BAPI](https://www.bapihvac.com/application_note/air-quality-sensor-coverage-area-and-mounting/)). Jedes Wohnzimmer, Schlafzimmer, Büro oder Klassenzimmer deckt ein Gerät also ab; nur große offene Flächen mit mehreren Zonen brauchen mehr.
+
+Wichtiger als die Größe ist der Platz:
+* **Höhe 1 bis 1,5 m**, also im Atembereich sitzender Personen. Die Wandplatte auf einer Hohlwanddose in Schalterhöhe (ca. 1,05 m) ist ideal.
+* **Mindestens 1 bis 2 m Abstand zu Personen**, damit niemand den Sensor direkt anatmet (nicht direkt neben Bett oder Schreibtisch).
+* **Nicht neben Fenster, Tür, Heizkörper oder Lüftungsauslass** und nicht in direkte Sonne.
+
 ### Welche Schwellen sind sinnvoll?
 Standard sind 1000 ppm (Gelb) und 1400 ppm (Rot). Werte unter 1000 ppm gelten allgemein als unbedenklich, über 2000 ppm sollte dringend gelüftet werden. Beide Schwellen lassen sich jederzeit in Home Assistant ändern.
 

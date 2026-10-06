@@ -59,6 +59,7 @@ Every 30 seconds the SCD41 delivers a new reading. The ESP32-C3 updates the disp
 | Wall plate | 82 × 82 × 7 mm, fits flush wall boxes Ø 68 mm with 60 mm screw spacing |
 | Display window | 41.8 × 31.6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 to 5000 ppm, ±(50 ppm + 5 % of reading) |
+| Room size | one sensor per room; in open spaces up to about 500 m² ([FAQ](docs/faq.md#how-large-a-room-can-one-sensor-monitor)) |
 | Power | 5 V via USB-C, about 0.5 W |
 | Cable exit | back (right-angle plug) or bottom (straight plug), swappable port module |
 | Fasteners | 10 heat-set inserts M2 × 3 (OD 3.2), 10 screws M2 × 4 ISO 7380 (+2 each for the lock tab) |
