@@ -2,6 +2,18 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.5.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.4.0...v1.5.0) (2026-10-06)
+
+
+### Added
+
+* **cad:** printability for 0.4 mm nozzles and diamond vent mesh ([#9](https://github.com/tobi136B/co2-wall-sensor/issues/9)) ([80bae21](https://github.com/tobi136B/co2-wall-sensor/commit/80bae21d80c4b81d086d13308233caf516e13bbc))
+
+
+### Documentation
+
+* room size and placement of the sensor ([8ed4240](https://github.com/tobi136B/co2-wall-sensor/commit/8ed4240ff7e65f8ec842e42d2965d60d6d796678))
+
 ## [1.4.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.3.0...v1.4.0) (2026-10-05)
 
 
