@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{a_title}}</title>
+<meta name="description" content="{{a_description}}">
+<meta property="og:title" content="{{a_title}}">
+<meta property="og:description" content="{{a_description}}">
+<meta property="og:image" content="{{base}}img/exploded_view.png">
+<link rel="icon" href="{{base}}img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,700;125,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script type="importmap">
+  {"imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }}
+</script>
+<style>
+  :root {
+    --plastic: #eef0f1; --panel: #ffffff; --ink: #1d2226; --muted: #5d666e; --rule: #d5dadd;
+    --graphite: #2b3036; --link: #0b6e99; --accent: #ff7a1a; --accent-soft: #fff1e6;
+    --stage-top: #f7f8f9; --stage-bottom: #dfe3e6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --plastic: #171a1d; --panel: #20252a; --ink: #e9ecee; --muted: #a2abb3; --rule: #343b42;
+      --graphite: #0f1214; --link: #6cc4ec; --accent-soft: #3a2a1d;
+      --stage-top: #2a3036; --stage-bottom: #121518;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--plastic); color: var(--ink);
+    font: 16px/1.55 "Atkinson Hyperlegible", system-ui, sans-serif;
+    display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); overflow: hidden;
+  }
+  a { color: var(--link); text-underline-offset: 3px; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+  h1, h2 { font-family: "Archivo", system-ui, sans-serif; font-stretch: 112%; line-height: 1.15; margin: 0; }
+
+  header {
+    display: flex; align-items: center; gap: 18px; padding: 12px 20px; border-bottom: 1px solid var(--rule);
+    background: var(--panel);
+  }
+  header h1 { font-size: 1.15rem; font-weight: 800; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header nav { display: flex; gap: 14px; font-size: .95rem; white-space: nowrap; }
+  header nav a[aria-current] { color: var(--ink); text-decoration: none; font-weight: 700; }
+
+  .app { display: grid; grid-template-columns: minmax(0, 1fr) 400px; min-height: 0; }
+  .stage { position: relative; min-height: 0; overflow: hidden; background: radial-gradient(120% 90% at 50% 35%, var(--stage-top), var(--stage-bottom)); }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  .stage canvas:active { cursor: grabbing; }
+  .progress { position: absolute; left: 0; top: 0; height: 4px; background: var(--accent); width: 0; transition: width .6s ease; z-index: 2; }
+  .badge {
+    position: absolute; left: 18px; top: 18px; z-index: 2; pointer-events: none;
+    font-family: "Archivo", sans-serif; font-weight: 800; font-stretch: 125%; font-size: 3.4rem; line-height: 1;
+    color: var(--ink); opacity: .14;
+  }
+  .hint {
+    position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 2; pointer-events: none;
+    background: color-mix(in srgb, var(--panel) 85%, transparent); color: var(--muted); font-size: .85rem;
+    padding: 6px 14px; border-radius: 999px; transition: opacity .8s; width: max-content; max-width: calc(100% - 32px); text-align: center;
+  }
+  .tip {
+    position: absolute; z-index: 3; pointer-events: none; background: var(--graphite); color: #fff; font-size: .85rem;
+    padding: 4px 10px; border-radius: 6px; transform: translate(-50%, -140%); white-space: nowrap; opacity: 0; transition: opacity .15s;
+  }
+  .loading {
+    position: absolute; inset: 0; display: grid; place-items: center; z-index: 4; color: var(--muted);
+    background: radial-gradient(120% 90% at 50% 35%, var(--stage-top), var(--stage-bottom)); transition: opacity .6s;
+  }
+  .loading.done { opacity: 0; pointer-events: none; }
+
+  .panel { background: var(--panel); border-left: 1px solid var(--rule); display: grid; grid-template-rows: auto auto 1fr; min-height: 0; }
+  .current { padding: 22px 24px 16px; border-bottom: 1px solid var(--rule); }
+  .count { color: var(--accent); font-weight: 700; font-size: .9rem; letter-spacing: .04em; text-transform: uppercase; }
+  .current h2 { font-size: 1.6rem; font-weight: 700; margin: 4px 0 10px; }
+  .current p { margin: 0 0 12px; min-height: 4.6em; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .chips li { background: var(--accent-soft); color: var(--ink); border: 1px solid var(--accent); border-radius: 999px; padding: 2px 10px; font-size: .85rem; }
+
+  .controls { padding: 14px 24px; border-bottom: 1px solid var(--rule); display: grid; gap: 12px; }
+  .nav { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; }
+  .btn {
+    border: 0; border-radius: 999px; padding: 11px 18px; font-weight: 700; cursor: pointer;
+    background: var(--graphite); color: #fff; transition: transform .1s, opacity .2s;
+  }
+  @media (prefers-color-scheme: dark) { .btn { background: var(--ink); color: var(--plastic); } }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .35; cursor: default; }
+  .btn.quiet { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--rule); }
+  .btn.next { background: var(--accent); color: #1d2226; }
+  .row { display: flex; align-items: center; gap: 12px; font-size: .92rem; color: var(--muted); }
+  .row label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .row input[type=range] { flex: 1; accent-color: var(--accent); }
+  .row input[type=checkbox] { accent-color: var(--accent); width: 18px; height: 18px; }
+
+  .list { position: relative; overflow-y: auto; margin: 0; padding: 10px 12px 24px; list-style: none; counter-reset: s; }
+  .list li { counter-increment: s; }
+  .list button {
+    width: 100%; text-align: left; background: none; border: 0; border-radius: 10px; padding: 8px 12px 8px 46px;
+    position: relative; cursor: pointer; color: var(--muted); line-height: 1.35;
+  }
+  .list button::before {
+    content: counter(s); position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: .8rem; font-weight: 700;
+    box-shadow: inset 0 0 0 2px var(--rule); background: var(--panel);
+  }
+  .list button:hover { background: var(--plastic); }
+  .list .done button { color: var(--ink); }
+  .list .done button::before { background: var(--graphite); color: #fff; box-shadow: none; content: "✓"; }
+  .list .now button { background: var(--accent-soft); color: var(--ink); font-weight: 700; }
+  .list .now button::before { background: var(--accent); color: #1d2226; box-shadow: none; content: counter(s); }
+
+  @media (max-width: 900px) {
+    body { overflow-x: hidden; overflow-y: auto; grid-template-rows: auto auto; }
+    .app { grid-template-columns: 1fr; }
+    .stage { height: 58vh; min-height: 320px; }
+    .panel { border-left: 0; border-top: 1px solid var(--rule); }
+    .current p { min-height: 0; }
+    .list { max-height: none; }
+    .badge { font-size: 2.4rem; }
+  }
+  @media (max-width: 520px) { header nav .home { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .progress, .hint { transition: none; } }
+</style>
+</head>
+<body data-models="{{base}}models/" data-home="{{base}}{{home}}">
+<header>
+  <h1>{{a_title}}</h1>
+  <nav aria-label="{{t_language}}">
+    <a class="home" href="{{base}}{{home}}">{{a_back}}</a>
+    <a href="{{base}}assembly.html" {{cur_en}}>EN</a>
+    <a href="{{base}}de/assembly.html" {{cur_de}}>DE</a>
+  </nav>
+</header>
+<div class="app">
+  <div class="stage" id="stage">
+    <div class="progress" id="progress"></div>
+    <div class="badge" id="badge" aria-hidden="true">1</div>
+    <div class="tip" id="tip"></div>
+    <div class="hint" id="hint">{{a_hint}}</div>
+    <div class="loading" id="loading">{{a_loading}}</div>
+    <noscript><div class="loading">{{a_noscript}}</div></noscript>
+  </div>
+  <aside class="panel">
+    <div class="current" aria-live="polite">
+      <div class="count" id="count"></div>
+      <h2 id="step-title"></h2>
+      <p id="step-text"></p>
+      <ul class="chips" id="chips" aria-label="{{a_new_parts}}"></ul>
+    </div>
+    <div class="controls">
+      <div class="nav">
+        <button class="btn quiet" id="prev" aria-label="{{a_prev}}">←</button>
+        <button class="btn next" id="next">{{a_next}}</button>
+        <button class="btn quiet" id="play" aria-label="{{a_play}}" title="{{a_play}}">▶</button>
+      </div>
+      <div class="row">
+        <span>{{a_explode}}</span>
+        <input type="range" id="explode" min="0" max="1" step="0.01" value="0" aria-label="{{a_explode}}">
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="xray"> {{a_xray}}</label>
+        <span style="flex:1"></span>
+        <button class="btn quiet" id="view" style="padding:6px 14px">{{a_view}}</button>
+      </div>
+    </div>
+    <ol class="list" id="list"></ol>
+  </aside>
+</div>
+<script type="module" src="{{base}}assembly.js"></script>
+</body>
+</html>

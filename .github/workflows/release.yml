@@ -111,7 +111,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install pyyaml
+      - run: pip install pyyaml pillow matplotlib
       - uses: actions/download-artifact@v8
         with:
           name: release-dist

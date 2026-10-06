@@ -97,7 +97,7 @@ Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the onl
 ## Quick start
 
 1. **Print** the two ready plates [`co2_wall_sensor_device.3mf`](cad/3mf/co2_wall_sensor_device.3mf) and [`co2_wall_sensor_mounts.3mf`](cad/3mf/co2_wall_sensor_mounts.3mf) (every part already in its print orientation) or the single files from [`cad/stl`](cad/stl). Settings: [docs/assembly.md](docs/assembly.md).
-2. **Wire** the modules according to [docs/wiring.md](docs/wiring.md) and **assemble** them as described in [docs/assembly.md](docs/assembly.md).
+2. **Wire** the modules according to [docs/wiring.md](docs/wiring.md) and **assemble** them as described in [docs/assembly.md](docs/assembly.md). The [3D assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html) shows every step: turn the device, take it apart and see which part comes next.
 
    <img src="docs/images/wiring_en.png" width="80%" alt="Wiring diagram">
 
@@ -180,7 +180,9 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 ## Roadmap
 
 * [x] Sensor carrier profiles for different SCD41 boards ([#7](https://github.com/tobi136B/co2-wall-sensor/issues/7), v1.4)
-* [ ] Online configurator: sensor carrier STL from three measurements ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.6)
+* [x] Interactive 3D assembly guide ([open it](https://tobi136b.github.io/co2-wall-sensor/assembly.html), v1.6)
+* [ ] ESP32-C3 holder with a tolerance spring and clean cable routing with clips and channels (v1.7)
+* [ ] Online configurator: sensor carrier STL from three measurements ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.8)
 * [ ] Verify display layout and thermals on real hardware, add photos
 * [ ] Optional pressure sensor (BMP280) for live CO2 pressure compensation
 * [ ] Wall plate variant for walls without a flush box

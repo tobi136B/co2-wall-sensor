@@ -17,7 +17,7 @@
 
 - new: [inserts]
   from: [0, 0, 25]
-  camera: {eye: [-50, 60, 120], target: [0, 0, 12]}
+  camera: {eye: [-55, 65, 135], target: [0, 0, 12]}
   title:
     en: 10 heat-set inserts
     de: 10 Einschmelzmuttern
@@ -27,7 +27,7 @@
 
 - new: [display, display_screws]
   from: [0, 0, 45]
-  camera: {eye: [-40, 50, 120], target: [0, 8, 6]}
+  camera: {eye: [-45, 55, 140], target: [0, 6, 8]}
   title:
     en: Display
     de: Display
@@ -38,7 +38,7 @@
 - new: [carrier]
   from: [0, 0, 55]
   stage: carrier_out
-  camera: {eye: [-60, 30, -70], target: [0, -22, 50]}
+  camera: {eye: [-150, 50, 230], target: [0, -30, 32]}
   title:
     en: Sensor carrier
     de: Sensorträger
@@ -49,7 +49,7 @@
 - new: [scd41]
   from: [0, 30, 0]
   stage: carrier_out
-  camera: {eye: [-45, 10, -55], target: [0, -24, 45]}
+  camera: {eye: [-75, -55, -45], target: [0, -72, 62]}
   title:
     en: SCD41 into the rails
     de: SCD41 in die Schienen
@@ -60,7 +60,7 @@
 - new: [esp32, plug]
   from: [0, 35, 0]
   stage: carrier_out
-  camera: {eye: [-50, 45, 110], target: [10, -18, 60]}
+  camera: {eye: [-110, 40, 220], target: [5, -40, 45]}
   title:
     en: ESP32-C3 on the back
     de: ESP32-C3 auf der Rückseite
@@ -71,7 +71,7 @@
 - new: [carrier_screws]
   from: [0, 0, 20]
   stage: carrier_in
-  camera: {eye: [-60, 40, 120], target: [0, -18, 14]}
+  camera: {eye: [-60, 55, 150], target: [0, -14, 14]}
   title:
     en: Carrier into the housing
     de: Träger ins Gehäuse
@@ -82,7 +82,7 @@
 - new: [wires_display, wires_scd]
   draw: true
   stage: carrier_in
-  camera: {eye: [-25, 55, 105], target: [0, -4, 15]}
+  camera: {eye: [-30, 60, 135], target: [0, -4, 15]}
   title:
     en: Wiring
     de: Verdrahtung
@@ -93,7 +93,7 @@
 - new: [port]
   from: [0, -25, 20]
   stage: carrier_in
-  camera: {eye: [-40, -40, 100], target: [12, -30, 18]}
+  camera: {eye: [-70, -60, 170], target: [10, -20, 15]}
   title:
     en: Cable port module
     de: Kabelport-Modul
@@ -104,7 +104,7 @@
 - new: [cover, cover_screws]
   from: [0, 0, 50]
   stage: carrier_in
-  camera: {eye: [-70, 60, 140], target: [0, 0, 18]}
+  camera: {eye: [-80, 65, 165], target: [0, 0, 18]}
   title:
     en: Back cover
     de: Rückdeckel
@@ -115,7 +115,7 @@
 - new: [wall_plate]
   from: [0, 0, 60]
   stage: device_away
-  camera: {eye: [-90, 50, -130], target: [0, 0, 30]}
+  camera: {eye: [-150, 80, -190], target: [0, 5, -15]}
   title:
     en: Wall plate on the flush box
     de: Wandplatte auf die Hohlwanddose
@@ -126,7 +126,7 @@
 - new: []
   slide: true
   stage: device_slide
-  camera: {eye: [-90, 40, -140], target: [0, 0, 20]}
+  camera: {eye: [-150, 50, -120], target: [0, 5, 10]}
   title:
     en: Slide the device on
     de: Gerät aufsetzen
@@ -134,12 +134,12 @@
     en: Hold the device in front of the plate, put the rail into the hidden window and slide it 15 mm down. Done. To remove it, slide it up and pull it off.
     de: Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen.
 
-- new: [lock_tab, lock_screws]
+- new: [lock_inserts, lock_tab, lock_screws]
   from: [0, -30, 0]
-  camera: {eye: [-70, -70, -80], target: [-10, -38, 20]}
+  camera: {eye: [-90, -110, -120], target: [-8, -30, 15]}
   title:
     en: Optional lock tab
     de: Optionale Sicherungslasche
   text:
-    en: In an office, a school or with children, screw the small tab to the housing and the wall plate from below (2 screws M2 × 4). Then the device cannot be slid off the wall.
-    de: Im Büro, in der Schule oder bei Kindern die kleine Lasche von unten an Gehäuse und Wandplatte schrauben (2 Schrauben M2 × 4). Dann lässt sich das Gerät nicht mehr von der Wand schieben.
+    en: In an office, a school or with children, press one insert into the bottom of the housing and one into the wall plate, then screw the small tab on from below (2 screws M2 × 4). Then the device cannot be slid off the wall.
+    de: Im Büro, in der Schule oder bei Kindern je eine Mutter unten ins Gehäuse und in die Wandplatte einschmelzen, dann die kleine Lasche von unten anschrauben (2 Schrauben M2 × 4). Dann lässt sich das Gerät nicht mehr von der Wand schieben.

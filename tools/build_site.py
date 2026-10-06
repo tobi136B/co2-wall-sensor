@@ -16,6 +16,7 @@ import shutil
 from pathlib import Path
 from urllib.parse import quote
 
+import assembly_model
 import bom
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +80,8 @@ TEXT = {
         "t_dl_device": "Device plate (3MF)",
         "t_dl_mounts": "Wall plate and desk stand (3MF)",
         "t_dl_all": "All files of the release",
+        "t_guide": "3D assembly guide",
+        "t_guide_text": "Every step in 3D: turn the device, take it apart and see which part comes next.",
         "t_cap_exploded": "Housing, sensor carrier, cable port and back cover",
         "t_cap_back": "Cable to the back, into the wall box",
         "t_cap_bottom": "Cable to the bottom, on the wall surface",
@@ -148,6 +151,8 @@ TEXT = {
         "t_dl_device": "Druckplatte Gerät (3MF)",
         "t_dl_mounts": "Wandplatte und Tischständer (3MF)",
         "t_dl_all": "Alle Dateien des Releases",
+        "t_guide": "3D-Aufbauanleitung",
+        "t_guide_text": "Jeder Schritt in 3D: Gerät drehen, zerlegen und sehen, welches Teil als Nächstes kommt.",
         "t_cap_exploded": "Gehäuse, Sensorträger, Kabelport und Rückdeckel",
         "t_cap_back": "Kabel nach hinten, in die Hohlwanddose",
         "t_cap_bottom": "Kabel nach unten, auf Putz",
@@ -175,6 +180,64 @@ TEXT = {
         "doc_faq": f"{REPO}/blob/main/docs/de/faq.md",
     },
 }
+
+
+ASSEMBLY = {
+    "en": {
+        "a_title": "Assembly guide · CO2 Wall Sensor",
+        "a_description": "Interactive 3D assembly guide of the CO2 Wall Sensor: every step, every screw, every wire.",
+        "a_back": "Project page",
+        "a_hint": "Drag to turn, scroll to zoom, point at a part to see its name",
+        "a_loading": "Loading the 3D model …",
+        "a_noscript": "The 3D guide needs JavaScript. The written guide is in docs/assembly.md.",
+        "a_new_parts": "New in this step",
+        "a_prev": "Previous step",
+        "a_next": "Next",
+        "a_play": "Play all steps",
+        "a_explode": "Take apart",
+        "a_xray": "See through the housing",
+        "a_view": "Reset view",
+    },
+    "de": {
+        "a_title": "Aufbauanleitung · CO2-Wandsensor",
+        "a_description": "Interaktive 3D-Aufbauanleitung des CO2-Wandsensors: jeder Schritt, jede Schraube, jede Litze.",
+        "a_back": "Projektseite",
+        "a_hint": "Ziehen zum Drehen, Scrollen zum Zoomen, auf ein Teil zeigen für seinen Namen",
+        "a_loading": "3D-Modell wird geladen …",
+        "a_noscript": "Die 3D-Anleitung braucht JavaScript. Die schriftliche Anleitung steht in docs/de/aufbau.md.",
+        "a_new_parts": "Neu in diesem Schritt",
+        "a_prev": "Vorheriger Schritt",
+        "a_next": "Weiter",
+        "a_play": "Alle Schritte abspielen",
+        "a_explode": "Zerlegen",
+        "a_xray": "Gehäuse durchsichtig",
+        "a_view": "Ansicht zurücksetzen",
+    },
+}
+
+
+def fill(template: str, values: dict) -> str:
+    text = (ROOT / "site" / template).read_text(encoding="utf-8")
+    for key, value in values.items():
+        text = text.replace("{{" + key + "}}", str(value))
+    if "{{" in text:
+        raise SystemExit(f"unfilled placeholder in site/{template}")
+    return text
+
+
+def assembly_page(lang: str, base: str) -> str:
+    return fill(
+        "assembly.html",
+        {
+            **ASSEMBLY[lang],
+            "lang": lang,
+            "base": base,
+            "home": "index.html" if lang == "en" else "de/index.html",
+            "t_language": TEXT[lang]["t_language"],
+            "cur_en": 'aria-current="page"' if lang == "en" else "",
+            "cur_de": 'aria-current="page"' if lang == "de" else "",
+        },
+    )
 
 
 def manifests(version: str, dist: Path, out: Path) -> None:
@@ -219,12 +282,8 @@ def page(lang: str, version: str, base: str) -> str:
         "cur_de": 'aria-current="page"' if lang == "de" else "",
     }
     values["t_other_language"] = t["t_other_language"].replace("{base}", base)
-    text = (ROOT / "site" / "template.html").read_text(encoding="utf-8")
-    for key, value in values.items():
-        text = text.replace("{{" + key + "}}", str(value))
-    if "{{" in text:
-        raise SystemExit("unfilled placeholder in site/template.html")
-    return text
+    values["guide"] = f"{base}{'de/' if lang == 'de' else ''}assembly.html"
+    return fill("template.html", values)
 
 
 def main():
@@ -245,6 +304,10 @@ def main():
     shutil.copy2(ROOT / "site" / "favicon.svg", out / "img" / "favicon.svg")
     (out / "index.html").write_text(page("en", args.version, ""), encoding="utf-8")
     (out / "de" / "index.html").write_text(page("de", args.version, "../"), encoding="utf-8")
+    (out / "assembly.html").write_text(assembly_page("en", ""), encoding="utf-8")
+    (out / "de" / "assembly.html").write_text(assembly_page("de", "../"), encoding="utf-8")
+    shutil.copy2(ROOT / "site" / "assembly.js", out / "assembly.js")
+    assembly_model.write(out / "models")
     (out / ".nojekyll").write_text("", encoding="utf-8")
     manifests(args.version, args.dist, out)
     print(f"written: {out}")

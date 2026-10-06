@@ -47,6 +47,8 @@ jobs:
           python tools/check_repo.py
       - name: Printability check (wall thickness for a 0.4 mm nozzle)
         run: python tools/print_check.py
+      - name: Project page with the 3D assembly guide (every step refers to existing parts)
+        run: python tools/build_site.py --version ci --out _site
       - name: Check links in the documentation
         uses: lycheeverse/lychee-action@v2
         with:

@@ -4,6 +4,10 @@
 
 ![Exploded view](images/exploded_view.png)
 
+**Prefer it in 3D?** The [interactive assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html) walks through all 13 steps. Turn the device, take it apart with the slider, look through the housing and see which part comes next.
+
+[![3D assembly guide](images/assembly_guide_en.png)](https://tobi136b.github.io/co2-wall-sensor/assembly.html)
+
 ## 1. 3D printing
 
 Every part carries its name, the version and its print orientation as an engraved label on a hidden face.
