@@ -15,7 +15,7 @@ It covers a flush wall box or stands on your desk.**
 
 **English** | [Deutsch](README.de.md) | [Project page and browser installer](https://tobi136b.github.io/co2-wall-sensor/)
 
-<img src="docs/images/exploded.gif" width="88%" alt="Animated exploded view of the CO2 Wall Sensor">
+<img src="docs/images/hero_en.gif" width="88%" alt="The CO2 Wall Sensor turns, comes apart and assembles itself again, its display shows the air quality">
 
 </div>
 

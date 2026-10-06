@@ -1,0 +1,145 @@
+# Steps of the interactive 3D assembly guide (site/assembly.html).
+#
+#   new:     parts that appear in this step (ids of site/assembly.js)
+#   from:    where the new parts fly in from, offset in mm (x right seen from the back, y up, z towards the wall)
+#   camera:  eye and target in mm, model coordinates of the Fusion generator (front z = 0, wall towards +z)
+#   title / text: English and German
+
+- new: [housing]
+  from: [0, 0, 60]
+  camera: {eye: [-70, 70, 150], target: [0, 0, 10]}
+  title:
+    en: The housing
+    de: Das Gehäuse
+  text:
+    en: Printed front face down. You look at it from the back, the side that later faces the wall.
+    de: Mit der Front nach unten gedruckt. Du schaust von hinten darauf, auf die Seite, die später zur Wand zeigt.
+
+- new: [inserts]
+  from: [0, 0, 25]
+  camera: {eye: [-50, 60, 120], target: [0, 0, 12]}
+  title:
+    en: 10 heat-set inserts
+    de: 10 Einschmelzmuttern
+  text:
+    en: Press the M2 inserts in with the soldering iron (about 200 to 220 °C). 4 around the display bay, 4 for the back cover, 2 for the sensor carrier. The entry chamfer centres them.
+    de: Die M2-Muttern mit dem Lötkolben eindrücken (ca. 200 bis 220 °C). 4 rund um den Displayschacht, 4 für den Rückdeckel, 2 für den Sensorträger. Die Einführschräge zentriert sie.
+
+- new: [display, display_screws]
+  from: [0, 0, 45]
+  camera: {eye: [-40, 50, 120], target: [0, 8, 6]}
+  title:
+    en: Display
+    de: Display
+  text:
+    en: Glass first into the display bay, then 4 screws M2 × 4 through the corner holes of the display board.
+    de: Mit dem Glas voran in den Displayschacht legen, dann 4 Schrauben M2 × 4 durch die Ecklöcher der Displayplatine.
+
+- new: [carrier]
+  from: [0, 0, 55]
+  stage: carrier_out
+  camera: {eye: [-60, 30, -70], target: [0, -22, 50]}
+  title:
+    en: Sensor carrier
+    de: Sensorträger
+  text:
+    en: The carrier is the removable floor of the sensor chamber. Print the one that matches your SCD41 board, here the 13.5 × 21.75 mm version.
+    de: Der Träger ist der herausnehmbare Boden der Sensorkammer. Drucke den, der zu deiner SCD41-Platine passt, hier die Version 13,5 × 21,75 mm.
+
+- new: [scd41, wires_scd_stub]
+  from: [0, 30, 0]
+  stage: carrier_out
+  camera: {eye: [-45, 10, -55], target: [0, -24, 45]}
+  title:
+    en: SCD41 into the rails
+    de: SCD41 in die Schienen
+  text:
+    en: Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire notch. The spring tongue clicks over the upper edge.
+    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zur Kabelkerbe. Die Federzunge schnappt über die Oberkante.
+
+- new: [esp32, plug]
+  from: [0, 35, 0]
+  stage: carrier_out
+  camera: {eye: [-50, 45, 110], target: [10, -18, 60]}
+  title:
+    en: ESP32-C3 on the back
+    de: ESP32-C3 auf der Rückseite
+  text:
+    en: Plug the USB cable in first. Then slide the ESP32-C3 from above between the side guides until it rests on the end stops and slips under the two small lips.
+    de: Zuerst das USB-Kabel einstecken. Dann den ESP32-C3 von oben zwischen die Seitenführungen schieben, bis er auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht.
+
+- new: [carrier_screws]
+  from: [0, 0, 20]
+  stage: carrier_in
+  camera: {eye: [-60, 40, 120], target: [0, -18, 14]}
+  title:
+    en: Carrier into the housing
+    de: Träger ins Gehäuse
+  text:
+    en: Put the carrier onto the ledges in the chin and fix it with 2 screws M2 × 4. It closes the sensor chamber against the warm electronics.
+    de: Den Träger auf die Leisten im Kinn legen und mit 2 Schrauben M2 × 4 festschrauben. Er schließt die Sensorkammer gegen die warme Elektronik ab.
+
+- new: [wires_display, wires_scd]
+  draw: true
+  stage: carrier_in
+  camera: {eye: [-25, 55, 105], target: [0, -4, 15]}
+  title:
+    en: Wiring
+    de: Verdrahtung
+  text:
+    en: "Display: 8 wires from the connector across the back of the display to the ESP32-C3. SCD41: 4 wires through the notch in the carrier. Colours as in the wiring diagram. The wire path shown here is schematic."
+    de: "Display: 8 Litzen vom Stecker über die Rückseite des Displays zum ESP32-C3. SCD41: 4 Litzen durch die Kerbe im Träger. Farben wie im Verdrahtungsplan. Der gezeigte Kabelweg ist schematisch."
+
+- new: [port]
+  from: [0, -25, 20]
+  stage: carrier_in
+  camera: {eye: [-40, -40, 100], target: [12, -30, 18]}
+  title:
+    en: Cable port module
+    de: Kabelport-Modul
+  text:
+    en: Slide the module into the opening at the lower back edge. Back module for a right-angle plug into the wall box, bottom module for a cable on the wall.
+    de: Das Modul in die Öffnung an der unteren hinteren Kante schieben. Modul hinten für den Winkelstecker in die Wanddose, Modul unten für ein Kabel auf Putz.
+
+- new: [cover, cover_screws]
+  from: [0, 0, 50]
+  stage: carrier_in
+  camera: {eye: [-70, 60, 140], target: [0, 0, 18]}
+  title:
+    en: Back cover
+    de: Rückdeckel
+  text:
+    en: Put the cover into its seat and fix it with 4 screws M2 × 4. The heads sit below the surface, so the cover still slides onto the wall plate.
+    de: Den Deckel in seinen Sitz legen und mit 4 Schrauben M2 × 4 festschrauben. Die Köpfe liegen unter der Oberfläche, der Deckel gleitet trotzdem auf die Wandplatte.
+
+- new: [wall_plate]
+  from: [0, 0, 60]
+  stage: device_away
+  camera: {eye: [-90, 50, -130], target: [0, 0, 30]}
+  title:
+    en: Wall plate on the flush box
+    de: Wandplatte auf die Hohlwanddose
+  text:
+    en: Screw the wall plate to the two device screws of the flush box (60 mm apart). The slotted holes even out a slightly twisted box.
+    de: Die Wandplatte mit den beiden Geräteschrauben der Hohlwanddose festschrauben (60 mm Abstand). Die Langlöcher gleichen eine leicht verdrehte Dose aus.
+
+- new: []
+  slide: true
+  stage: device_slide
+  camera: {eye: [-90, 40, -140], target: [0, 0, 20]}
+  title:
+    en: Slide the device on
+    de: Gerät aufsetzen
+  text:
+    en: Hold the device in front of the plate, put the rail into the hidden window and slide it 15 mm down. Done. To remove it, slide it up and pull it off.
+    de: Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen.
+
+- new: [lock_tab, lock_screws]
+  from: [0, -30, 0]
+  camera: {eye: [-70, -70, -80], target: [-10, -38, 20]}
+  title:
+    en: Optional lock tab
+    de: Optionale Sicherungslasche
+  text:
+    en: In an office, a school or with children, screw the small tab to the housing and the wall plate from below (2 screws M2 × 4). Then the device cannot be slid off the wall.
+    de: Im Büro, in der Schule oder bei Kindern die kleine Lasche von unten an Gehäuse und Wandplatte schrauben (2 Schrauben M2 × 4). Dann lässt sich das Gerät nicht mehr von der Wand schieben.
