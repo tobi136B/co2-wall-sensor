@@ -248,7 +248,9 @@ def parts(p: dict) -> list[dict]:
         ),
         part("lock_tab", "Lock tab (optional)", "Sicherungslasche (optional)", ["lock"], [stl("lock_tab", PRINT_DARK)]),
         part("lock_screw_housing", "Screw M2 × 4 (housing)", "Schraube M2 × 4 (Gehäuse)", ["lock"], lock_screw_housing),
-        part("lock_screw_plate", "Screw M2 × 4 (wall plate)", "Schraube M2 × 4 (Wandplatte)", ["lock"], lock_screw_plate),
+        part(
+            "lock_screw_plate", "Screw M2 × 4 (wall plate)", "Schraube M2 × 4 (Wandplatte)", ["lock"], lock_screw_plate
+        ),
     ]
 
 
@@ -273,7 +275,7 @@ DISASSEMBLY = [
     {"lock_screw_housing": [0, -40, 0], "lock_screw_plate": [0, 0, -30]},
     {"lock_tab": [0, -22, 0]},
     {"wall_plate": [0, -15, 0], "lock_insert_plate": [0, -15, 0]},  # the device slides up off the rail
-    {"wall_plate": [0, 0, 150], "lock_insert_plate": [0, 0, 150]},
+    {"wall_plate": [0, 0, 110], "lock_insert_plate": [0, 0, 110]},
     {"cover_screws": [0, 0, 18]},
     {"cover": [0, 0, 60], "cover_screws": [0, 0, 60]},
     {"port": [0, 0, 45]},

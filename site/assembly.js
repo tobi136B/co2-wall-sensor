@@ -17,11 +17,9 @@ const UI = {
   de: { step: (i, n) => `Schritt ${i} von ${n}`, next: 'Weiter', restart: 'Von vorn', play: '▶', pause: '❚❚' },
 }[LANG];
 
-const FLY_TIME = 1.1;      // s, a new part flies into place
-const STAGGER = 0.16;      // s between parts of the same step
 const CAMERA_TIME = 1.3;   // s, camera move to the view of a step
 const DRAW_TIME = 1.8;     // s, wires are drawn on
-const AUTOPLAY = 5.5;      // s per step
+const AUTOPLAY_HOLD = 2.5; // s the finished step stays on screen while playing
 const ACCENT = new THREE.Color('#ff7a1a');
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -148,77 +146,151 @@ async function buildPart(spec) {
   group.visible = false;
   scene.add(group);
   return {
-    spec, group, explode: v3(spec.explode),
+    spec, group,
     glow: spec.meshes.some((m) => m.type === 'stl') ? 0.14 : 0.3,   // large printed parts glow less
-    base: new THREE.Vector3(), path: null, // base offset (stage plus fly-in), animated along path
+    base: new THREE.Vector3(),   // offset from the assembled position (stage and fly-in), without the explode
+    path: null,                  // {points, t0, duration}: travelled at constant speed with ease in and out
+    shown: false,
     wires: group.children.filter((c) => c.userData.wire),
     materials: group.children.filter((c) => c.material && !c.userData.wire && c.material.emissive).map((c) => c.material),
   };
 }
 
-// ----------------------------------------------------------------------------- state
-let data, parts = {}, current = -1, explode = 0, xray = false, playing = null;
-let anim = { t0: 0, camT0: 0, camFrom: null, camTo: null, draw: [] };
+// ----------------------------------------------------------------------------- motion
+// The same rules as tools/assembly_check.py, which replays every motion and proves that no part passes
+// through another one. Change both together.
+let data, parts = {}, current = -1, explode = 0, xray = false, playing = 0;
+let anim = { t0: 0, camT0: 0, camFrom: null, camTo: null, draw: [], end: 0 };
 const clock = new THREE.Clock();
 
 function introStep(id) {
   return data.steps.findIndex((s) => (s.new || []).includes(id));
 }
 
-function stageOffset(part, stage) {
-  const off = new THREE.Vector3();
-  const s = data.stages[stage] || {};
-  for (const g of part.spec.groups) if (s[g]) off.add(v3(s[g]));
-  return off;
+function stageWaypoints(part, stage) {
+  const s = data.stages[stage || ''] || {};
+  const g = part.spec.groups.find((name) => s[name]);
+  return g ? s[g].map(v3) : [];
 }
 
-function pathTo(part, end, startOffset = null, delay = 0) {
-  const from = startOffset ? end.clone().add(startOffset) : part.base.clone();
-  part.path = { points: [from, end], delay };
+function stageEnd(part, stage) {
+  const w = stageWaypoints(part, stage);
+  return w.length ? w[w.length - 1] : new THREE.Vector3();
+}
+
+function stagePath(part, a, b) {
+  // back along the waypoints of stage a, then out along those of stage b
+  const wa = stageWaypoints(part, a), wb = stageWaypoints(part, b);
+  if (a === b || (!wa.length && !wb.length)) return [stageEnd(part, b)];
+  const pts = [stageEnd(part, a), ...wa.slice(0, -1).reverse(), new THREE.Vector3(), ...wb];
+  return pts.filter((p, i) => i === 0 || p.distanceTo(pts[i - 1]) > 1e-9);
+}
+
+function pathLength(points) {
+  let l = 0;
+  for (let i = 1; i < points.length; i++) l += points[i].distanceTo(points[i - 1]);
+  return l;
+}
+
+function pathDuration(points) {
+  return points.length > 1 ? Math.max(data.timing.min_time, pathLength(points) / data.timing.speed) : 0;
+}
+
+function pointAt(points, u) {
+  let s = u * pathLength(points);
+  for (let i = 1; i < points.length; i++) {
+    const seg = points[i].distanceTo(points[i - 1]);
+    if (s <= seg) return points[i - 1].clone().lerp(points[i], seg ? s / seg : 1);
+    s -= seg;
+  }
+  return points[points.length - 1].clone();
 }
 
 function goTo(index, { instant = false } = {}) {
   index = Math.max(0, Math.min(data.steps.length - 1, index));
   const step = data.steps[index];
-  const forward = index === current + 1;
+  const prevStage = current >= 0 ? data.steps[current].stage || '' : step.stage || '';
   const stage = step.stage || '';
-  let k = 0;
+  const fresh = new Set(step.new || []);
+  const animate = !instant && !REDUCED;
+  // 1. the parts already in place follow their stage waypoints
+  let tStage = 0;
   for (const part of Object.values(parts)) {
     const intro = introStep(part.spec.id);
-    const visible = intro >= 0 && intro <= index;
-    const wasVisible = part.group.visible;
-    part.group.visible = visible;
-    if (!visible) continue;
-    const end = stageOffset(part, stage);
-    if (step.slide && part.spec.groups.includes('device')) {
-      part.path = { points: [part.base.clone(), v3(data.slide.engage), end], delay: 0 };
-    } else if (intro === index && (forward || !wasVisible) && step.from) {
-      pathTo(part, end, v3(step.from), STAGGER * k++);
-    } else {
-      pathTo(part, end);
-    }
-    if (instant || REDUCED) {
-      part.base.copy(end);
+    if (intro < 0 || intro >= index || !part.shown) continue;
+    const points = stagePath(part, prevStage, stage);
+    points[0] = part.base.clone();
+    part.path = { points, t0: 0, duration: pathDuration(points) };
+    tStage = Math.max(tStage, part.path.duration);
+  }
+  // 2. then the new parts fly in, one after the other
+  let start = tStage + data.timing.pause;
+  for (const part of Object.values(parts)) {
+    const id = part.spec.id;
+    const intro = introStep(id);
+    if (intro > index || intro < 0) {
+      part.shown = false;
+      part.path = null;
+      part.base.set(0, 0, 0);
+    } else if (intro < index && !part.shown) {
+      part.shown = true;   // jumped over its step: appears in place
+      part.base.copy(stageEnd(part, stage));
       part.path = null;
     }
   }
-  // wires: drawn on in their step, complete afterwards
+  for (const id of step.new || []) {
+    const part = parts[id];
+    const end = stageEnd(part, stage);
+    const off = (step.from_part || {})[id] || step.from;
+    const points = off && animate ? [end.clone().add(v3(off)), end] : [end];
+    part.path = { points, t0: start, duration: pathDuration(points) };
+    part.base.copy(points[0]);
+    part.shown = !animate;
+    start += part.path.duration + data.timing.pause;
+  }
+  if (!animate) {
+    for (const part of Object.values(parts)) {
+      if (part.path) part.base.copy(part.path.points[part.path.points.length - 1]);
+      part.path = null;
+      if (introStep(part.spec.id) >= 0 && introStep(part.spec.id) <= index) part.shown = true;
+    }
+  }
+  // 3. wires: drawn on in their step after everything else has moved, complete afterwards
   anim.draw = [];
   for (const part of Object.values(parts)) {
     if (!part.wires.length) continue;
-    const draw = step.draw && (step.new || []).includes(part.spec.id) && !instant && !REDUCED;
+    const draw = step.draw && fresh.has(part.spec.id) && animate;
     part.wires.forEach((w, i) => {
       const count = w.geometry.index.count;
       w.geometry.setDrawRange(0, draw ? 0 : count);
-      if (draw) anim.draw.push({ mesh: w, count, delay: 0.35 + i * 0.09 });
+      if (draw) anim.draw.push({ mesh: w, count, delay: start + i * 0.09 });
     });
   }
+  anim.end = animate ? start + (step.draw ? DRAW_TIME + 1.2 : 0) : 0;
   current = index;
   anim.t0 = clock.getElapsedTime();
-  flyCamera(step.camera, instant);
-  if (instant) camera.lookAt(controls.target);
+  flyCamera(step.camera, !animate);
+  if (!animate) camera.lookAt(controls.target);
   render();
   updatePanel();
+  if (playing) schedule();
+}
+
+// take apart: one move after the other, only the moves of the parts on screen
+function explodeOffsets() {
+  const out = new Map();
+  if (explode <= 0) return out;
+  const moves = data.explode.filter((m) => Object.keys(m).some((id) => parts[id] && parts[id].shown));
+  const n = moves.length;
+  moves.forEach((move, k) => {
+    const u = ease(clamp01(explode * n - k));
+    if (u <= 0) return;
+    for (const [id, v] of Object.entries(move)) {
+      if (!out.has(id)) out.set(id, new THREE.Vector3());
+      out.get(id).addScaledVector(v3(v), u);
+    }
+  });
+  return out;
 }
 
 function cameraFor(cam) {
@@ -245,55 +317,48 @@ function flyCamera(cam, instant) {
 controls.addEventListener('start', () => { anim.camFrom = null; hideHint(); });
 
 // ----------------------------------------------------------------------------- frame loop
-function along(points, t) {
-  if (points.length === 2) return points[0].clone().lerp(points[1], t);
-  // two legs: first onto the rail, then down the rail
-  const u = t * 2;
-  return u < 1 ? points[0].clone().lerp(points[1], ease(u)) : points[1].clone().lerp(points[2], ease(u - 1));
-}
-
 function tick() {
   const now = clock.getElapsedTime();
   const dt = now - anim.t0;
-  let busy = false;
+  const exploded = explodeOffsets();
   for (const part of Object.values(parts)) {
     if (part.path) {
-      const { points, delay } = part.path;
-      const duration = points.length === 3 ? FLY_TIME * 2 : FLY_TIME;
-      const t = clamp01((dt - delay) / duration);
-      part.base.copy(points.length === 3 ? along(points, t) : along(points, ease(t)));
-      if (t >= 1) part.path = null;
-      busy = true;
+      const { points, t0, duration } = part.path;
+      if (dt >= t0) {
+        part.shown = true;
+        const u = duration > 0 ? clamp01((dt - t0) / duration) : 1;
+        part.base.copy(pointAt(points, ease(u)));
+        if (u >= 1) part.path = null;
+      }
     }
-    part.group.position.copy(part.base).addScaledVector(part.explode, explode * 1.0);
-    // the parts of the current step light up
+    part.group.visible = part.shown;
+    part.group.position.copy(part.base);
+    if (exploded.has(part.spec.id)) part.group.position.add(exploded.get(part.spec.id));
+    // the parts of the current step light up while they arrive, then fade so the true colours stay visible
     const fresh = (data.steps[current].new || []).includes(part.spec.id);
-    // flashes while it arrives, then fades so the true colours stay visible
-    const glow = fresh ? part.glow * (0.6 + 0.4 * Math.sin(dt * 5)) * clamp01((4 - dt) / 1.2) : 0;
+    const since = part.path ? 0 : dt - (anim.end || 0);
+    const glow = fresh ? part.glow * (0.6 + 0.4 * Math.sin(now * 5)) * clamp01((3 - Math.max(0, since)) / 1.2) : 0;
     for (const m of part.materials) {
       m.emissive.copy(ACCENT);
       m.emissiveIntensity = glow;
     }
     for (const w of part.wires) {
-      w.material.opacity = 1 - clamp01(explode * 6);
-      w.visible = w.material.opacity > 0.01;
+      w.material.opacity = 1 - clamp01(explode * 12);
+      w.visible = part.shown && w.material.opacity > 0.01;
     }
   }
   for (const d of anim.draw) {
     const t = clamp01((dt - d.delay) / DRAW_TIME);
     d.mesh.geometry.setDrawRange(0, Math.floor(ease(t) * d.count / 3) * 3);
-    if (t < 1) busy = true;
   }
   if (anim.camFrom) {
     const t = ease(clamp01((now - anim.camT0) / CAMERA_TIME));
     camera.position.lerpVectors(anim.camFrom.eye, anim.camTo.eye, t);
     controls.target.lerpVectors(anim.camFrom.target, anim.camTo.target, t);
     if (t >= 1) anim.camFrom = null;
-    busy = true;
   }
   controls.update();
   renderer.render(scene, camera);
-  return busy;
 }
 
 let raf = 0;
@@ -337,9 +402,15 @@ function next() {
   goTo(current === data.steps.length - 1 ? 0 : current + 1);
 }
 
+function schedule() {
+  clearTimeout(playing);
+  playing = setTimeout(next, (Math.max(anim.end, CAMERA_TIME) + AUTOPLAY_HOLD) * 1000);
+}
+
 function setPlaying(on) {
-  clearInterval(playing);
-  playing = on ? setInterval(next, AUTOPLAY * 1000) : null;
+  clearTimeout(playing);
+  playing = 0;
+  if (on) schedule();
   $('play').textContent = on ? UI.pause : UI.play;
 }
 
@@ -431,7 +502,7 @@ async function main() {
     goTo(start, { instant: true });
   }
   $('loading').classList.add('done');
-  window.assemblyGuide = { goTo, setExplode: (v) => { explode = v; $('explode').value = v; }, setXray, parts, data };
+  window.assemblyGuide = { goTo, setExplode: (v) => { explode = v; $('explode').value = v; }, setXray, parts, data, camera, controls };
 }
 
 main().catch((err) => {

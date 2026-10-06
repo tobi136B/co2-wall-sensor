@@ -67,8 +67,8 @@
     en: ESP32-C3 on the back
     de: ESP32-C3 auf der Rückseite
   text:
-    en: Plug the USB cable in first. Then slide the ESP32-C3 from above between the side guides until it rests on the end stops and slips under the two small lips.
-    de: Zuerst das USB-Kabel einstecken. Dann den ESP32-C3 von oben zwischen die Seitenführungen schieben, bis er auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht.
+    en: Slide the ESP32-C3 from above between the side guides until it rests on the end stops and slips under the two small lips. Then plug the USB cable in from below, the carrier is open below the socket.
+    de: Den ESP32-C3 von oben zwischen die Seitenführungen schieben, bis er auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht. Dann das USB-Kabel von unten einstecken, der Träger ist unter der Buchse offen.
 
 - new: [carrier_screws]
   from: [0, 0, 20]

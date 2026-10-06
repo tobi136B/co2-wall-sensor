@@ -18,7 +18,6 @@ Usage:   python tools/assembly_check.py          (exit 1 on collisions)
 from __future__ import annotations
 
 import sys
-from itertools import combinations
 from pathlib import Path
 
 import numpy as np
@@ -41,7 +40,9 @@ def mesh_of(part: dict) -> trimesh.Trimesh | None:
             out.append(trimesh.load(ROOT / "cad" / "stl" / m["file"], force="mesh"))
         elif m["type"] == "box":
             a, b = np.array(m["min"], float), np.array(m["max"], float)
-            out.append(trimesh.creation.box(extents=b - a, transform=trimesh.transformations.translation_matrix((a + b) / 2)))
+            out.append(
+                trimesh.creation.box(extents=b - a, transform=trimesh.transformations.translation_matrix((a + b) / 2))
+            )
         elif m["type"] == "cyl":
             d = np.array(m["d"], float)
             d /= np.linalg.norm(d)
@@ -228,7 +229,10 @@ def check_explode(scene: Scene, index: int) -> list[str]:
     data = scene.data
     step = data["steps"][index]
     visible = {q["id"] for q in data["parts"] if 0 <= intro_step(data, q["id"]) <= index}
-    base = {pid: stage_path(data, part_by_id(data, pid), step.get("stage", ""), step.get("stage", ""))[-1] for pid in visible}
+    base = {
+        pid: stage_path(data, part_by_id(data, pid), step.get("stage", ""), step.get("stage", ""))[-1]
+        for pid in visible
+    }
     errors = set()
     done = {pid: np.zeros(3) for pid in visible}
     for k, move in enumerate(explode_moves(data, visible)):
@@ -261,8 +265,10 @@ def main() -> int:
         errors += check_explode(scene, i)
     for e in errors:
         print(f"::error::{e}")
-    print(f"assembly guide: {len(data['steps'])} steps, {len(data['explode'])} disassembly moves, "
-          f"{'FAIL' if errors else 'no collisions'}")
+    print(
+        f"assembly guide: {len(data['steps'])} steps, {len(data['explode'])} disassembly moves, "
+        f"{'FAIL' if errors else 'no collisions'}"
+    )
     return 1 if errors else 0
 
 
