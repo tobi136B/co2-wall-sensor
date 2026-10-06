@@ -26,6 +26,9 @@ substitutions:
   txt_status_good: "Gut"
   txt_status_moderate: "Mäßig"
   txt_status_ventilate: "Lüften!"
+  txt_co2_trend: "CO2 Trend"
+  txt_co2_forecast: "Lüften in"
+  txt_forecast_display: "lüften in ca. %d min"
   # Optionale Anpassungen (Standardwerte in common/base.yaml)
   # co2_yellow_default: "1000"
   # co2_red_default: "1400"

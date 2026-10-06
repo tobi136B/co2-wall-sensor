@@ -31,14 +31,20 @@ COLORS = {
     "line": (0x2A, 0x2E, 0x35),
 }
 TEXT = {
-    "en": {"good": "Good", "moderate": "Moderate", "ventilate": "Ventilate!", "sep": "."},
-    "de": {"good": "Gut", "moderate": "Mäßig", "ventilate": "Lüften!", "sep": ","},
+    "en": {
+        "good": "Good",
+        "moderate": "Moderate",
+        "ventilate": "Ventilate!",
+        "sep": ".",
+        "fc": "ventilate in ~{m} min",
+    },
+    "de": {"good": "Gut", "moderate": "Mäßig", "ventilate": "Lüften!", "sep": ",", "fc": "lüften in ca. {m} min"},
 }
-# (state, CO2, temperature, humidity, time, trend start)
+# (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red)
 STATES = [
-    ("good", 642, 21.4, 45, "08:15", 520),
-    ("moderate", 1180, 22.1, 51, "13:40", 780),
-    ("ventilate", 1620, 23.0, 58, "19:05", 980),
+    ("good", 642, 21.4, 45, "08:15", 760, "falling", None),
+    ("moderate", 1180, 22.1, 51, "13:40", 780, "rising", 44),
+    ("ventilate", 1620, 23.0, 58, "19:05", 980, "steady", None),
 ]
 
 
@@ -65,7 +71,22 @@ def text(d: ImageDraw.ImageDraw, xy, txt, f, fill, anchor="la"):
     d.text((s(xy[0]), s(xy[1])), txt, font=f, fill=fill, anchor=anchor)
 
 
-def screen(lang: str, state: str, co2: int, temp: float, hum: int, clock: str, start: int) -> Image.Image:
+def arrow(d: ImageDraw.ImageDraw, x_right: float, y_top: float, kind: str, fill) -> None:
+    """Trend arrow like mdi-arrow-top-right / -right / -bottom-right, 26 px box, right aligned."""
+    cx, cy, r = x_right - 13, y_top + 13, 8
+    dx, dy = {"rising": (1, -1), "steady": (1.414, 0), "falling": (1, 1)}[kind]
+    tip = (cx + dx * r * 0.75, cy + dy * r * 0.75)
+    tail = (cx - dx * r * 0.75, cy - dy * r * 0.75)
+    d.line([s(tail[0]), s(tail[1]), s(tip[0]), s(tip[1])], fill=fill, width=s(3))
+    # arrow head: two short strokes back from the tip
+    ang = math.atan2(dy, dx)
+    for a in (ang + 2.5, ang - 2.5):
+        d.line([s(tip[0]), s(tip[1]), s(tip[0] + 6 * math.cos(a)), s(tip[1] + 6 * math.sin(a))], fill=fill, width=s(3))
+
+
+def screen(
+    lang: str, state: str, co2: int, temp: float, hum: int, clock: str, start: int, trend: str, forecast
+) -> Image.Image:
     t = TEXT[lang]
     img = Image.new("RGB", (s(W), s(H)), (0, 0, 0))
     d = ImageDraw.Draw(img)
@@ -84,6 +105,8 @@ def screen(lang: str, state: str, co2: int, temp: float, hum: int, clock: str, s
     text(d, (W / 2 - 18, 84), f"{co2}", font(62, True), level, "mm")
     text(d, (W - 14, 74), "ppm", font(13), COLORS["muted"], "rd")
     text(d, (W - 14, 94), "CO2", font(13), COLORS["muted"], "rd")
+    arrow_col = {"rising": level, "steady": COLORS["muted"], "falling": COLORS["green"]}[trend]
+    arrow(d, W - 14, 100, trend, arrow_col)
 
     # trend: smooth synthetic 3 h curve towards the current value
     gx, gy, gw, gh = 10, 132, 300, 64
@@ -96,6 +119,8 @@ def screen(lang: str, state: str, co2: int, temp: float, hum: int, clock: str, s
     d.line([(s(x), s(y)) for x, y in pts], fill=level, width=s(2))
     d.line([s(10), s(199), s(W - 10), s(199)], fill=COLORS["line"], width=s(1))
     text(d, (12, 132), "3h", font(12), COLORS["muted"])
+    if forecast:
+        text(d, (W - 12, 196), t["fc"].format(m=forecast), font(12), COLORS["muted"], "rd")
 
     # footer: thermometer, temperature, humidity, drop
     d.rounded_rectangle([s(17), s(214), s(21), s(229)], radius=s(2), outline=COLORS["muted"], width=s(1))
