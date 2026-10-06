@@ -17,6 +17,7 @@ Usage:   python tools/assembly_check.py          (exit 1 on collisions)
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -28,6 +29,7 @@ import assembly_model  # noqa: E402
 import drawing  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
+HERO = ROOT / "cad" / "fusion" / "hero_motion.json"
 STEP_MM = 0.7  # largest distance a part moves between two samples (thinnest wall: 0.8 mm)
 # the display leaves through the window to the front, as in the README animation (kept on purpose)
 ALLOWED = {frozenset(("display", "housing")), frozenset(("display", "inserts"))}
@@ -250,6 +252,38 @@ def check_explode(scene: Scene, index: int) -> list[str]:
     return sorted(errors)
 
 
+def hero_offset(keys: list, t: float) -> np.ndarray:
+    """Offset at t of a keyframe track [[t, [x, y, z]], ...], eased between the keyframes (as in render_views.py)."""
+    if t <= keys[0][0]:
+        return np.array(keys[0][1], float)
+    for (t0, a), (t1, b) in zip(keys, keys[1:], strict=False):
+        if t <= t1:
+            u = ease((t - t0) / (t1 - t0)) if t1 > t0 else 1.0
+            return np.array(a, float) + (np.array(b, float) - np.array(a, float)) * u
+    return np.array(keys[-1][1], float)
+
+
+def check_hero(scene: Scene) -> list[str]:
+    """The README animation (cad/fusion/hero_motion.json) shows the parts of the Fusion design only."""
+    motion = json.loads(HERO.read_text(encoding="utf-8"))
+    ids, tracks = motion["ids"], motion["parts"]
+    fastest = max(
+        np.linalg.norm(np.array(b, float) - np.array(a, float)) / (t1 - t0)
+        for keys in tracks.values()
+        for (t0, a), (t1, b) in zip(keys, keys[1:], strict=False)
+        if t1 > t0
+    )
+    first: dict[tuple[str, str], float] = {}
+    for t in np.linspace(0, 1, int(np.ceil(fastest * 1.5 / STEP_MM)) + 1):  # eased peak speed is 1.5 x the mean
+        offsets = {pid: np.zeros(3) for pid in ids.values()}
+        for comp, keys in tracks.items():
+            offsets[ids[comp]] = hero_offset(keys, t)
+        for pair in scene.collisions(offsets):
+            first.setdefault(pair, t)
+    where = "README animation (cad/fusion/hero_motion.json)"
+    return [f"{where} from t = {t:.3f}: {a} hits {b}" for (a, b), t in first.items()]
+
+
 def main() -> int:
     data = assembly_model.model(drawing.load_parameters())
     scene = Scene(data)
@@ -263,6 +297,7 @@ def main() -> int:
         last_of_state[s.get("stage", "") or "assembled"] = i
     for i in sorted(set(last_of_state.values())):
         errors += check_explode(scene, i)
+    errors += check_hero(scene)
     for e in errors:
         print(f"::error::{e}")
     print(

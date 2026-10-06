@@ -2,7 +2,7 @@
 Renders for the documentation, run in Fusion after generate_enclosure.py (same open design).
 
     render_views(out_dir)              every still image of docs/images, 1600 x 1200, transparent
-    render_hero(out_dir, first, n)     frames of the README animation (tools/build_gif.py makes the GIFs)
+    render_hero(out_dir, first, n)     frames of the README animation (tools/build_gif.py makes the GIF)
 
 The camera is given as a viewing direction in model coordinates (front z = 0, wall towards +z,
 y up): the view is fitted to the visible parts and then zoomed. Reference parts are shown opaque.
@@ -135,89 +135,73 @@ def ease(t):
     return 0.5 - 0.5 * math.cos(math.pi * t)
 
 
-# ----------------------------------------------------------------------------- hero animation
-# parts leave one after another (front to back) and come back in reverse order
-HERO_ORDER = ['Dummy_LCD_2inch', 'BackCover', 'Dummy_PlugAngled', 'PortBack', 'Dummy_ESP32_C3', 'SensorCarrier',
-              'Dummy_SCD41', 'WallPlate', 'LockTab']
-HERO_TARGET = (0, -2, 30)
-HERO_TARGET_APART = (0, -6, 52)
-HERO_ELEVATION = math.radians(16)
-# active area of the display, seen from the front: (x, y) corners top left, top right, bottom right, bottom left
-ACTIVE_W, ACTIVE_H, LCD_Y, LIP = 40.8, 30.6, 10.1, 2.0
+# ----------------------------------------------------------------------------- README animation
+# The parts leave one after another along free paths (cad/fusion/hero_motion.json, checked for collisions by
+# tools/assembly_check.py). Frames are rendered for t = 0 (assembled) to 1 (apart); tools/build_gif.py plays
+# them forwards and backwards, so the device takes itself apart and assembles itself again.
+HERO_MOTION = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hero_motion.json')
+HERO_VIEW = (-0.90, 0.30, -0.32)        # viewing direction, as in the first README animation
+HERO_TARGET = ((0, 0, 14), (0, -8, 42))  # look-at point assembled and apart
+HERO_TURN = math.radians(16)            # the camera turns a little while the device opens
 
 
-def hero_state(i, count):
-    """Global explode progress, per-part progress and camera azimuth of frame i (seamless loop)."""
-    t = i / count
-    if t < 0.12:
-        g, out = 0.0, True
-    elif t < 0.42:
-        g, out = (t - 0.12) / 0.30, True
-    elif t < 0.58:
-        g, out = 1.0, True
-    elif t < 0.88:
-        g, out = 1.0 - (t - 0.58) / 0.30, False
-    else:
-        g, out = 0.0, False
-    n = len(HERO_ORDER)
-    stagger = 0.45
-    parts = {}
-    for k, name in enumerate(HERO_ORDER):
-        delay = stagger * (k if out else n - 1 - k) / (n - 1)
-        if out:
-            x = (g - delay) / (1 - stagger)
-        else:   # coming back: the last part out is the first one in
-            x = 1 - ((1 - g) - delay) / (1 - stagger)
-        parts[name] = ease(min(max(x, 0.0), 1.0))
-    # the camera swings to the side while the device is apart, so every part is visible
-    azimuth = math.radians(-32 - 40 * ease(g) + 6 * math.sin(2 * math.pi * t))
-    return parts, azimuth, ease(g)
+def _track(keys, t):
+    if t <= keys[0][0]:
+        return keys[0][1]
+    for (t0, a), (t1, b) in zip(keys, keys[1:]):
+        if t <= t1:
+            u = ease((t - t0) / (t1 - t0)) if t1 > t0 else 1.0
+            return [a[k] + (b[k] - a[k]) * u for k in range(3)]
+    return keys[-1][1]
 
 
-def _explode_parts(root, parts):
+def _place(root, tracks, t):
     for occ in root.occurrences:
-        dx, dy, dz = EXPLODE.get(occ.component.name, (0, 0, 0))
-        f = parts.get(occ.component.name, parts.get('Housing', 0.0))
+        keys = tracks.get(occ.component.name)
+        x, y, z = _track(keys, t) if keys else (0, 0, 0)
         m = adsk.core.Matrix3D.create()
-        m.translation = adsk.core.Vector3D.create(dx * f / 10, dy * f / 10, dz * f / 10)
+        m.translation = adsk.core.Vector3D.create(x / 10, y / 10, z / 10)
         occ.transform2 = m
 
 
-def render_hero(out_dir, first, n, count=96, distance=36.0):
-    """Frames of the README animation at viewport size, plus the screen corners of the display in each frame."""
+def render_hero(out_dir, first, n, count=90, width=1600, height=1000):
+    """Frames hero_XXX.png for t = i / (count - 1), rendered at twice the GIF size for clean edges."""
     import json
     os.makedirs(out_dir, exist_ok=True)
     app = adsk.core.Application.get()
     design = _design()
     root = design.rootComponent
+    with open(HERO_MOTION, encoding='utf-8') as f:
+        motion = json.load(f)
+    tracks = motion['parts']
     if first == 0:
         _prepare(design)
-    _show(root, set(EXPLODE))
+    _show(root, set(motion['ids']))
     vp = app.activeViewport
-    corners_model = [(ACTIVE_W / 2, LCD_Y + ACTIVE_H / 2), (-ACTIVE_W / 2, LCD_Y + ACTIVE_H / 2),
-                     (-ACTIVE_W / 2, LCD_Y - ACTIVE_H / 2), (ACTIVE_W / 2, LCD_Y - ACTIVE_H / 2)]
+    vp.visualStyle = adsk.core.VisualStyles.ShadedWithVisibleEdgesOnlyVisualStyle
+    dist = []
+    for t in (0.0, 1.0):   # camera distance that fits the assembled and the opened device
+        _place(root, tracks, t)
+        _camera(HERO_VIEW, HERO_TARGET[0], 1.0)
+        cam = vp.camera
+        dist.append(cam.eye.distanceTo(cam.target))
     for i in range(first, min(first + n, count)):
-        parts, az, g = hero_state(i, count)
-        _explode_parts(root, parts)
-        d = (math.sin(az) * math.cos(HERO_ELEVATION), math.sin(HERO_ELEVATION), -math.cos(az) * math.cos(HERO_ELEVATION))
-        # follow the parts: centre and distance grow while the device is apart
-        t = [(a + (b - a) * g) / 10 for a, b in zip(HERO_TARGET, HERO_TARGET_APART, strict=True)]
-        dist = distance * (1 + 0.28 * g)
+        t = i / (count - 1)
+        _place(root, tracks, t)
+        s = ease(min(1.0, t / 0.4))   # the wall plate and the cover travel furthest, and they leave first
+        a = HERO_TURN * ease(t)
+        dx, dy, dz = HERO_VIEW
+        d = (dx * math.cos(a) - dz * math.sin(a), dy, dx * math.sin(a) + dz * math.cos(a))
+        norm = math.sqrt(sum(v * v for v in d))
+        target = [(p + (q - p) * s) / 10 for p, q in zip(*HERO_TARGET)]
+        r = (dist[0] + (dist[1] - dist[0]) * s) * 1.04
         cam = vp.camera
         cam.isSmoothTransition = False
-        cam.target = adsk.core.Point3D.create(*t)
-        cam.eye = adsk.core.Point3D.create(*(t[k] + dist * d[k] for k in range(3)))
+        cam.target = adsk.core.Point3D.create(*target)
+        cam.eye = adsk.core.Point3D.create(*(target[k] + r * d[k] / norm for k in range(3)))
         cam.upVector = adsk.core.Vector3D.create(0, 1, 0)
         vp.camera = cam
         vp.refresh()
-        z = LIP + EXPLODE['Dummy_LCD_2inch'][2] * parts['Dummy_LCD_2inch']
-        cam = vp.camera
-        _save(os.path.join(out_dir, f'hero_{i:03d}.png'), vp.width, vp.height)
-        # camera and display corners in mm: tools/build_gif.py projects the display content onto the glass
-        with open(os.path.join(out_dir, f'hero_{i:03d}.json'), 'w', encoding='utf-8') as f:
-            json.dump({'eye': [v * 10 for v in cam.eye.asArray()], 'target': [v * 10 for v in cam.target.asArray()],
-                       'up': list(cam.upVector.asArray()), 'fov': cam.perspectiveAngle,
-                       'size': [vp.width, vp.height],
-                       'screen': [[x, y, z] for x, y in corners_model]}, f)
+        _save(os.path.join(out_dir, f'hero_{i:03d}.png'), width, height)
     if first + n >= count:
-        _explode(root, 0)
+        _place(root, tracks, 0.0)

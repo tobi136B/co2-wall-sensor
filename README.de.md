@@ -15,7 +15,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [English](README.md) | **Deutsch** | [Projektseite und Browser-Installer](https://tobi136b.github.io/co2-wall-sensor/de/)
 
-<img src="docs/images/hero_de.gif" width="88%" alt="Der CO2-Wandsensor dreht sich, zerlegt sich und baut sich wieder zusammen, das Display zeigt die Luftqualität">
+<img src="docs/images/exploded.gif" width="88%" alt="Der CO2-Wandsensor zerlegt sich Teil für Teil und baut sich wieder zusammen">
 
 </div>
 
