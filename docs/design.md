@@ -20,7 +20,7 @@ Cheap "CO2" sensors such as the SGP30 or CCS811 only estimate an equivalent CO2 
 Every electronic device heats itself up. An ESP32 with WiFi and an LCD backlight easily lift an internal sensor by several kelvin. Countermeasures:
 
 * **Separate sensor chamber** in the chin of the housing, closed towards the display bay by a divider and towards the ESP bay by the screwed sensor carrier. The carrier is a separate part, so the SCD41 is easy to mount and to replace.
-* **Air enters from below** through 13 slots in the bottom and 3 slots on each side. Warm air from the electronics rises upwards behind the display, away from the sensor.
+* **Air enters from below** through a diamond mesh in the bottom and on both sides of the sensor chamber. Warm air from the electronics rises upwards behind the display, away from the sensor.
 * **ESP32-C3 instead of a classic ESP32:** single core, no USB-UART chip, no charger. Less waste heat.
 * **Wire notch sealed with hot glue**, so no warm air is drawn from the ESP bay into the chamber.
 * **Night mode** dims the backlight, which also reduces heat.
@@ -72,6 +72,8 @@ The module is clamped between housing and back cover, a step in the bottom wall 
 * **Lead-in chamfer** on the rail, so the device finds the slot easily.
 * **Engraved labels** on hidden faces: part name, version and print orientation.
 * **One fit value** (`FIT`) for every sliding or plugged fit.
+* **Made for a 0.4 mm nozzle.** No wall is thinner than `MIN_WALL` (0.8 mm, two lines). Where a screw head recess would leave a thinner skin at the edge of a part, the recess is opened towards the edge; the housing wall closes it from outside. The CI measures the wall thickness of every STL file all over (`tools/print_check.py`) and fails below 0.8 mm.
+* **Diamond vent mesh** instead of slots: the 45° edges print on the vertical walls without support, the webs are 1 mm wide and the open area is about 40 % larger than with the old slots.
 
 ## Parameters in Fusion
 

@@ -90,7 +90,7 @@ SCD_H = 6.3             # height of the SCD41 above the board
 SCD_SENSOR_X, SCD_SENSOR_Y = -3.95, 0.0         # centre of the SCD41 from the board centre, seen from the front
 SCD_PAD_X = 9.1         # solder pad column from the board centre, seen from the front (0: pads not on a rail)
 SCD_LIP = 0.8           # rail lip in front of the board edge
-SCD_STOP = 0.6          # end stop below the board
+SCD_STOP = 0.8          # end stop below the board (2 lines of a 0.4 mm nozzle)
 # --- spring tongue: presses the SCD41 board against its end stop, takes up length tolerances ---
 SPRING_X = -1.0         # x of the tongue centre
 SPRING_W, SPRING_L = 4.0, 10.0  # width and free length of the tongue
@@ -118,6 +118,10 @@ STAND_GAP = 5.0         # air gap below the device, keeps the vents free
 # --- labels ---
 LABEL_H = 2.2           # text height of the embossed part labels
 LABEL_DEPTH = 0.4
+# --- printing ---
+MIN_WALL = 0.8          # thinnest wall anywhere: 2 lines of a 0.4 mm nozzle
+VENT_HOLE = 2.5         # vent mesh: diagonal of the diamond holes (45 degree edges print without support)
+VENT_WEB = 1.0          # vent mesh: width of the webs between the holes
 
 EXPORT = False          # True: write STL + STEP into ../../stl and ../../step
 USE_DOC_PARAMS = True   # True: take over the user parameters of the open design (changes made in Fusion)
@@ -135,12 +139,32 @@ SCD_BOARDS = {
 }
 
 
+def diamond_centres(u0, v0, u1, v1):
+    """Centres of a staggered diamond mesh that fits into the rectangle (webs VENT_WEB wide)."""
+    h = VENT_HOLE / 2
+    pitch = VENT_HOLE + VENT_WEB * math.sqrt(2)
+    out, row, v = [], 0, v0 + h
+    while v + h <= v1 + 1e-6:
+        u = u0 + h + (pitch / 2 if row % 2 else 0)
+        while u + h <= u1 + 1e-6:
+            out.append((u, v))
+            u += pitch
+        v += pitch / 2
+        row += 1
+    # centre the pattern in the rectangle
+    if out:
+        du = ((u0 + u1) - (min(c[0] for c in out) + max(c[0] for c in out))) / 2
+        dv = ((v0 + v1) - (min(c[1] for c in out) + max(c[1] for c in out))) / 2
+        out = [(u + du, v + dv) for u, v in out]
+    return out
+
+
 def derive():
     """Values that follow from the parameters. Called again after loading Fusion parameters."""
     global CLEARANCE, RAIL_CLEARANCE, COVER_Z, XL, XR, Y_TOP_IN, BAY_W, BAY_H, BAY_X0, BAY_X1, BAY_Y1, BAY_Y0
     global LCD_Y, Y_DIV_LOW, Y_CHIN_LOW, Y_CHIN_MID, C3_Y0, C3_Z0, PLUG_Z, SOCKET_TOP, B, COVER_SCREWS
     global CARRIER_SCREWS, LCD_HOLES, CABLE, PORT_X0, PORT_X1, PORT_Z0, PORT_Y1, BOOT_Y, SCD_Y0, SCD_ZT
-    global LOCK_Z, LOCK_POINTS, SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT
+    global LOCK_Z, LOCK_POINTS, SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT, VENT_BOTTOM, VENT_SIDE
     CLEARANCE = FIT
     RAIL_CLEARANCE = FIT
     COVER_Z = DEPTH - COVER_T
@@ -175,8 +199,14 @@ def derive():
     HOOK_B = SCD_TOP - SPRING_PRELOAD                # pressing face of the hook: from the carrier face (y = HOOK_B)
     HOOK_C = HOOK_B + SPRING_HOOK                    # ... at 45 degrees to the tip (y = HOOK_C)
     HOOK_A = HOOK_C + SPRING_HOOK                    # entry ramp back to the carrier face (y = HOOK_A)
-    TONGUE_TIP = HOOK_A + 0.3                        # free end of the tongue (it grows upwards from its root
+    TONGUE_TIP = HOOK_A + 0.1                        # free end of the tongue (it grows upwards from its root
     TONGUE_ROOT = TONGUE_TIP - SPRING_L              # when the carrier is printed on its lower edge)
+    # vent mesh, bottom (u = x, v = z) and sides (u = y, v = z): between front wall and carrier, clear of the bosses
+    z0, z1 = WALL + MIN_WALL, FLOOR_Z - MIN_WALL
+    xv = XR - B - BOSS_D / 2 - MIN_WALL
+    VENT_BOTTOM = diamond_centres(-xv, z0, xv, z1)
+    VENT_SIDE = diamond_centres(COVER_SCREWS[0][1] + BOSS_D / 2 + MIN_WALL, z0,
+                                CARRIER_SCREWS[0][1] - BOSS_D / 2 - MIN_WALL, FLOOR_Z - 1.5 - MIN_WALL)
     LOCK_Z = COVER_Z - 4.0                           # height of the lock insert in the bottom wall
     LOCK_POINTS = (LOCK_X - 3.0, LOCK_X + 3.0)       # x of the housing insert and of the wall plate insert
 
@@ -563,6 +593,47 @@ def screw_holes(comp, points, z_face, body, counterbore=True):
         cylinders(comp, points, HEAD_D, z_face - HEAD_H, z_face + 0.1, cut, 'M2HeadRecess', body)
 
 
+def open_head_recesses(comp, points, z_face, outline, body):
+    """Open a screw head recess towards the part edge where the wall beside it would be thinner than MIN_WALL.
+
+    The recess becomes U-shaped; the part around it (housing wall) closes it from outside.
+    outline = (x0, y0, x1, y1) of the part.
+    """
+    r = HEAD_D / 2
+    x0e, y0e, x1e, y1e = outline
+    for cx, cy in points:
+        x0, y0, x1, y1 = cx - r, cy - r, cx + r, cy + r
+        opened = False
+        if x0 - x0e < MIN_WALL:
+            x0, opened = x0e - 1, True
+        if x1e - x1 < MIN_WALL:
+            x1, opened = x1e + 1, True
+        if y0 - y0e < MIN_WALL:
+            y0, opened = y0e - 1, True
+        if y1e - y1 < MIN_WALL:
+            y1, opened = y1e + 1, True
+        if opened:
+            box(comp, x0, y0, z_face - HEAD_H, x1, y1, z_face + 0.1, adsk.fusion.FeatureOperations.CutFeatureOperation,
+                'OpenHeadRecess', body)
+
+
+def vent_mesh(comp, plane, centres, to3d, depth, body, name):
+    """Diamond mesh in a wall, centres (u, v) from diamond_centres(), to3d(u, v) -> model point.
+
+    v is the print direction (z of the housing, printed front face down): the 45 degree edges of the
+    diamonds print without support.
+    """
+    h = VENT_HOLE / 2
+    sk = comp.sketches.add(plane)
+    sk.name = name
+    lines = sk.sketchCurves.sketchLines
+    for u, v in centres:
+        pts = [sketch_pt(sk, *to3d(u + du, v + dv)) for du, dv in ((h, 0), (0, h), (-h, 0), (0, -h))]
+        for i in range(4):
+            lines.addByTwoPoints(pts[i], pts[(i + 1) % 4])
+    extrude(comp, sk, depth, adsk.fusion.FeatureOperations.CutFeatureOperation, name, body)
+
+
 # ----------------------------------------------------------------------------- parts
 def build_housing(root, ops):
     NEW, CUT, JOIN = ops
@@ -599,14 +670,11 @@ def build_housing(root, ops):
     for x0, x1 in ((XL, XL + 1.2), (XR - 1.2, XR)):
         box(comp, x0, Y_CHIN_LOW, FLOOR_Z - 1.5, x1, Y_DIV_LOW, FLOOR_Z, JOIN, 'CarrierLedge', body)
 
-    # vents: bottom and sides of the sensor chamber only, the front stays closed
-    bottom = plane_y(comp, -BODY / 2 + WALL / 2)
-    xs = [-21 + 3.5 * i for i in range(13)]
-    extrude(comp, rect_sketch(comp, bottom, [((x - 0.7, 0, 3.5), (x + 0.7, 0, FLOOR_Z - 2.0)) for x in xs],
-                              'BottomVents'), WALL + 1, CUT, 'BottomVents', body)
+    # vents: diamond mesh in the bottom and the sides of the sensor chamber only, the front stays closed
+    yb = -BODY / 2 + WALL / 2
+    vent_mesh(comp, plane_y(comp, yb), VENT_BOTTOM, lambda u, v: (u, yb, v), WALL + 1, body, 'BottomVents')
     for xp in (-BODY / 2 + WALL / 2, BODY / 2 - WALL / 2):
-        slots = [((0, Y_CHIN_MID + o - 0.7, 3.5), (0, Y_CHIN_MID + o + 0.7, FLOOR_Z - 2.0)) for o in (-7, -3.5, 0)]
-        extrude(comp, rect_sketch(comp, plane_x(comp, xp), slots, 'SideVents'), WALL + 1, CUT, 'SideVents', body)
+        vent_mesh(comp, plane_x(comp, xp), VENT_SIDE, lambda u, v, xp=xp: (xp, u, v), WALL + 1, body, 'SideVents')
 
     # cable port: stepped opening in the bottom wall, open towards the back, the port module fills it
     c = FIT / 2
@@ -696,8 +764,9 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     for sx in (-1, 1):
         xa, xb = sorted((C3_X + sx * (C3_W / 2 - 0.5), C3_X + sx * (C3_W / 2 + 0.2)))
         box(comp, xa, C3_Y0 - 0.05, top, xb, C3_Y0 + 1.2, C3_Z0, JOIN, 'C3GrooveFloor', body)
-        box(comp, xa, C3_Y0 - 0.05, C3_Z0 + C3_PCB + 0.1, xb, C3_Y0 + 1.2, C3_Z0 + C3_PCB + 0.8, JOIN, 'C3GrooveLip',
-            body)
+        la, lb = sorted((C3_X + sx * (C3_W / 2 - 0.6), C3_X + sx * (C3_W / 2 + 0.6)))
+        box(comp, la, C3_Y0 - 0.05, C3_Z0 + C3_PCB + 0.1, lb, C3_Y0 + 1.2, C3_Z0 + C3_PCB + 0.1 + MIN_WALL + 0.1, JOIN,
+            'C3GrooveLip', body)
 
     label(comp, body, top, XL + 4, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 4,
           f'CARRIER v{VERSION}\nSCD {profile or "custom"}\nPRINT: EDGE DOWN', name='Label', height=1.5)
@@ -711,6 +780,7 @@ def build_back_cover(root, ops):
     body = box(comp, XL + s, Y_CHIN_LOW + s, COVER_Z, XR - s, Y_TOP_IN - s, DEPTH, NEW, 'Cover').bodies.item(0)
     body.name = 'BackCover'
     screw_holes(comp, COVER_SCREWS, DEPTH, body)
+    open_head_recesses(comp, COVER_SCREWS, DEPTH, (XL + s, Y_CHIN_LOW + s, XR - s, Y_TOP_IN - s), body)
     # notch for the cable port module
     c = FIT / 2
     box(comp, PORT_X0 - c, Y_CHIN_LOW - 1, COVER_Z - 1, PORT_X1 + c, PORT_Y1 + c, DEPTH + 1, CUT, 'PortNotch', body)
@@ -806,6 +876,9 @@ def build_lock_tab(root, ops):
     py = _lock_plate_y()
     cylinders(comp, [(LOCK_POINTS[1], py)], SCREW_CLEAR_D, z_front - 1, DEPTH + 1, CUT, 'M2Clearance', body)
     cylinders(comp, [(LOCK_POINTS[1], py)], HEAD_D, z_front - 1, DEPTH - 1.3, CUT, 'M2HeadRecess', body)
+    if y_top - (py + HEAD_D / 2) < MIN_WALL:   # open the recess towards the top instead of leaving a thin skin
+        box(comp, LOCK_POINTS[1] - HEAD_D / 2, py, z_front - 1, LOCK_POINTS[1] + HEAD_D / 2, y_top + 1, DEPTH - 1.3, CUT,
+            'OpenHeadRecess', body)
     return comp
 
 
@@ -966,9 +1039,9 @@ PRINT_PARTS = {'Housing': 'housing', 'BackCover': 'back_cover',
 def check_scd_fit():
     """The SCD41 board with end stop and hook must fit the sensor chamber."""
     problems = []
-    if HOOK_A + 0.3 > Y_DIV_LOW - 0.2:
+    if TONGUE_TIP > Y_DIV_LOW - 0.2:
         problems.append(f'SCD_L {SCD_L:g} mm is too long for the chamber, at most about '
-                        f'{SCD_L - (HOOK_A + 0.3 - (Y_DIV_LOW - 0.2)):.1f} mm: mount the board the other way round')
+                        f'{SCD_L - (TONGUE_TIP - (Y_DIV_LOW - 0.2)):.1f} mm: mount the board the other way round')
     if SCD_W / 2 + 1.35 > XR - 6.0:
         problems.append(f'SCD_W {SCD_W:g} mm is too wide for the chamber')
     if SCD_ZT - SCD_PCB - SCD_H < WALL + 0.5:
