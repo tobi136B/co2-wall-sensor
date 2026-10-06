@@ -45,6 +45,8 @@ jobs:
           # on main the Shop links workflow updates the README tables itself
           if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then python tools/bom.py; fi
           python tools/check_repo.py
+      - name: Printability check (wall thickness for a 0.4 mm nozzle)
+        run: python tools/print_check.py
       - name: Check links in the documentation
         uses: lycheeverse/lychee-action@v2
         with:

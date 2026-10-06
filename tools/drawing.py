@@ -64,9 +64,9 @@ TEXT = {
         "detail": "Detail rail (2:1)",
         "front_closed": "Closed front\n(no vents)",
         "chamfer": "Chamfer {f} x 45°\naround display window",
-        "side_vents": "3x vent\n1.4 x {h} each side",
+        "side_vents": "{n} diamond vents\neach side",
         "split": "Parting line\nback cover",
-        "slots": "13 slots 1.4 wide, pitch 3.5 = {v}",
+        "slots": "vent mesh: {n} diamonds {d}, webs {w} = {v}",
         "airflow": "Air enters from below\nthrough the sensor\nchamber (SCD41)",
         "cover_screws": "4x Ø{c}\ncounterbore Ø{d} x {h}\nscrew M2 x 4 ISO 7380\ninsert M2 x 3 in housing",
         "cable_exit": "Cable port module\n(back: right-angle plug,\nboot hole Ø{d})",
@@ -119,9 +119,9 @@ TEXT = {
         "detail": "Detail Schiene (2:1)",
         "front_closed": "Front geschlossen\n(keine Lüftung)",
         "chamfer": "Fase {f} x 45°\num Displayfenster",
-        "side_vents": "3x Lüftung\n1,4 x {h} je Seite",
+        "side_vents": "{n} Rauten\nje Seite",
         "split": "Trennfuge\nRückdeckel",
-        "slots": "13 Schlitze 1,4 breit, Teilung 3,5 = {v}",
+        "slots": "Lüftungsgitter: {n} Rauten {d}, Stege {w} = {v}",
         "airflow": "Luft strömt von unten\ndurch die Sensorkammer\n(SCD41)",
         "cover_screws": "4x Ø{c}\nSenkung Ø{d} x {h}\nSchraube M2 x 4 ISO 7380\nEinschmelzmutter M2 x 3",
         "cable_exit": "Kabelport-Modul\n(hinten: Winkelstecker,\nTülle Ø{d})",
@@ -311,9 +311,9 @@ def sheet_device(sh: Sheet):
     ww, wh = p["ACTIVE_W"] + 1.0, p["ACTIVE_H"] + 1.0
     f, rf = p["WINDOW_CHAMFER"], p["R_FRONT"]
     y_top_in, lcd_y = p["Y_TOP_IN"], p["LCD_Y"]
-    y_chin_low, y_chin_mid = p["Y_CHIN_LOW"], p["Y_CHIN_MID"]
+    y_chin_low = p["Y_CHIN_LOW"]
     rail_y0, rail_l, rail_h = p["RAIL_Y0"], p["RAIL_L"], p["RAIL_H"]
-    vent_z0, vent_z1 = 3.5, p["FLOOR_Z"] - 2.0
+    hv = p["VENT_HOLE"] / 2
     pz0 = p["PORT_Z0"]
 
     # front view
@@ -350,31 +350,41 @@ def sheet_device(sh: Sheet):
     cover_z = D - p["COVER_T"]
     sh.line([(sx + cover_z, cy + W / 2), (sx + cover_z, cy - W / 2)], lw=0.2)
     sh.rect(sx + D, cy + rail_y0, rail_h, rail_l)
-    for o in (-7, -3.5, 0):
-        sh.rect(sx + vent_z0, cy + y_chin_mid + o - 0.7, vent_z1 - vent_z0, 1.4, lw=0.35)
+    for u, v in p["VENT_SIDE"]:
+        sh.poly([(sx + v + hv, cy + u), (sx + v, cy + u + hv), (sx + v - hv, cy + u), (sx + v, cy + u - hv)], lw=0.3)
     sh.line([(sx + pz0, cy - W / 2), (sx + pz0, cy - W / 2 + p["WALL"]), (sx + D, cy - W / 2 + p["WALL"])], lw=0.3)
     sh.dim_h(sx, sx + D, cy - W / 2, cy - W / 2 - 12)
     sh.dim_h(sx, sx + D + rail_h, cy + W / 2, cy + W / 2 + 8)
     sh.dim_v(cy + rail_y0, cy + rail_y0 + rail_l, sx + D + rail_h, sx + D + rail_h + 8)
     sh.dim_v(cy - W / 2, cy + rail_y0, sx + D + rail_h, sx + D + rail_h + 16)
-    sh.note(sx + vent_z0, cy + y_chin_mid - 3.5, sx - 18, cy - 20, t["side_vents"].format(h=sh.num(vent_z1 - vent_z0)))
+    su, sv = p["VENT_SIDE"][0]
+    sh.note(sx + sv, cy + su, sx - 18, cy - 20, t["side_vents"].format(n=len(p["VENT_SIDE"])))
     sh.note(sx + cover_z, cy + W / 2 - 6, sx + cover_z + 6, cy + W / 2 + 16, t["split"])
 
     # view from below (first angle: above the front view)
     uy = cy + W / 2 + 58
     sh.text(cx - W / 2 - 4, uy - D / 2, t["below"], size=9, weight="bold", ha="right", va="center")
     sh.rect(cx - W / 2, uy - D, W, D, 1.0)
-    xs = [-21 + 3.5 * i for i in range(13)]
-    for x in xs:
-        sh.rect(cx + x - 0.7, uy - vent_z1, 1.4, vent_z1 - vent_z0, lw=0.35)
+    for u, v in p["VENT_BOTTOM"]:
+        sh.poly([(cx + u + hv, uy - v), (cx + u, uy - v + hv), (cx + u - hv, uy - v), (cx + u, uy - v - hv)], lw=0.3)
+    us = [c[0] for c in p["VENT_BOTTOM"]]
+    vs = [c[1] for c in p["VENT_BOTTOM"]]
     sh.rect(cx - p["RAIL_HEAD"] / 2, uy - D - rail_h, p["RAIL_HEAD"], rail_h, lw=0.4)
     # seen from below the model +x axis points to the left, like in the front view
     bx0, bx1 = cx - p["PORT_X1"], cx - p["PORT_X0"]
     sh.rect(bx0, uy - D, bx1 - bx0, D - pz0, lw=0.4)
     lx = cx - p["LOCK_POINTS"][0]
     sh.circle(lx, uy - p["LOCK_Z"], p["INSERT_HOLE_D"])
-    sh.dim_h(cx + xs[0] - 0.7, cx + xs[-1] + 0.7, uy, uy + 6, txt=t["slots"].format(v=sh.num(xs[-1] - xs[0] + 1.4)))
-    sh.dim_v(uy - vent_z0, uy - vent_z1, cx + W / 2, cx + W / 2 + 8, txt=sh.num(vent_z1 - vent_z0))
+    sh.dim_h(
+        cx + min(us) - hv,
+        cx + max(us) + hv,
+        uy,
+        uy + 6,
+        txt=t["slots"].format(
+            n=len(us), d=sh.num(2 * hv), w=sh.num(p["VENT_WEB"]), v=sh.num(max(us) - min(us) + 2 * hv)
+        ),
+    )
+    sh.dim_v(uy - min(vs) + hv, uy - max(vs) - hv, cx + W / 2, cx + W / 2 + 8, txt=sh.num(max(vs) - min(vs) + 2 * hv))
     sh.dim_h(bx0, bx1, uy - D, uy - D - rail_h - 6, txt=sh.num(bx1 - bx0))
     sh.note(bx0 + 1, uy - D + 1, cx - W / 2 - 30, uy - D - 14, t["bottom_ko"].format(w=sh.num(bx1 - bx0)))
     sh.note(lx, uy - p["LOCK_Z"], cx - W / 2 - 30, uy + 4, t["lock"])

@@ -20,7 +20,7 @@ Günstige „CO2“-Sensoren wie SGP30 oder CCS811 schätzen nur einen CO2-Äqui
 Jedes elektronische Gerät heizt sich selbst auf. Ein ESP32 mit WLAN und ein Display-Hintergrundlicht heben einen eingebauten Sensor schnell um mehrere Kelvin an. Gegenmaßnahmen:
 
 * **Eigene Sensorkammer** im Kinn des Gehäuses, zum Display durch eine Trennwand und zum ESP durch den verschraubten Sensorträger abgeschlossen. Der Träger ist ein eigenes Teil, dadurch lässt sich der SCD41 leicht einbauen und tauschen.
-* **Luft kommt von unten** durch 13 Schlitze im Boden und je 3 Schlitze an den Seiten. Warme Luft der Elektronik steigt hinter dem Display nach oben, weg vom Sensor.
+* **Luft kommt von unten** durch ein Rautengitter im Boden und an beiden Seiten der Sensorkammer. Warme Luft der Elektronik steigt hinter dem Display nach oben, weg vom Sensor.
 * **ESP32-C3 statt klassischem ESP32:** ein Kern, kein USB-UART-Chip, kein Laderegler. Weniger Abwärme.
 * **Litzenkerbe mit Heißkleber abgedichtet**, damit keine warme Luft vom ESP in die Kammer gezogen wird.
 * **Nachtmodus** dimmt das Hintergrundlicht und reduziert dabei auch die Wärme.
@@ -72,6 +72,10 @@ Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt, eine Stufe in der Unt
 * **Einführschräge an der Schiene**, damit das Gerät die Nut leicht findet.
 * **Eingeprägte Beschriftung** auf verdeckten Flächen: Teilname, Version und Drucklage.
 * **Ein Passungswert** (`FIT`) für alle Schiebe- und Steckpassungen.
+* **Ausgelegt für eine 0,4 mm Düse.** Keine Wand ist dünner als `MIN_WALL` (0,8 mm, zwei Linien). Wo eine Senkung für einen Schraubenkopf am Rand eines Teils eine dünnere Haut lassen würde, ist die Senkung zum Rand hin offen; die Gehäusewand schließt sie von außen. Die CI misst die Wandstärke jeder STL-Datei flächendeckend (`tools/print_check.py`) und schlägt unter 0,8 mm fehl.
+* **Rautengitter** statt Schlitzen: Die 45° Kanten drucken an den senkrechten Wänden ohne Stützmaterial, die Stege sind 1 mm breit und die offene Fläche ist rund 40 % größer als mit den alten Schlitzen.
+
+  <img src="../images/vent_mesh.png" width="60%" alt="Rautengitter im Boden des Gehäuses">
 
 ## Parameter in Fusion
 
