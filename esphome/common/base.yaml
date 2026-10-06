@@ -21,6 +21,7 @@ substitutions:
   temperature_offset: "2.0"     # self-heating compensation, verify against a reference after 24 h
   altitude: "300m"              # altitude above sea level for CO2 pressure compensation
   night_dim_percent: "8%"
+  trend_rising: "100"           # ppm per hour: from here the display shows a rising arrow
   day_brightness_percent: "80%"
 
 esphome:
@@ -118,6 +119,50 @@ sensor:
   - platform: uptime
     name: "${txt_uptime}"
     entity_category: diagnostic
+
+  # CO2 trend: slope of a linear fit over the last 15 minutes, in ppm per hour
+  - platform: template
+    id: co2_trend
+    name: "${txt_co2_trend}"
+    icon: mdi:chart-line-variant
+    unit_of_measurement: "ppm/h"
+    accuracy_decimals: 0
+    state_class: measurement
+    update_interval: 60s
+    lambda: |-
+      static float samples[15];
+      static int count = 0, head = 0;
+      if (!id(co2).has_state()) return {};
+      samples[head] = id(co2).state;
+      head = (head + 1) % 15;
+      if (count < 15) count++;
+      if (count < 5) return {};
+      // least squares slope, x in minutes (oldest sample first)
+      float sx = 0, sy = 0, sxx = 0, sxy = 0;
+      for (int i = 0; i < count; i++) {
+        const float x = i;
+        const float y = samples[(head - count + i + 15) % 15];
+        sx += x; sy += y; sxx += x * x; sxy += x * y;
+      }
+      const float n = count;
+      const float slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+      return slope * 60.0f;
+
+  # minutes until the red threshold is reached at the current trend (only while rising)
+  - platform: template
+    id: co2_forecast
+    name: "${txt_co2_forecast}"
+    icon: mdi:timer-sand
+    unit_of_measurement: min
+    accuracy_decimals: 0
+    update_interval: 60s
+    lambda: |-
+      if (!id(co2).has_state() || !id(co2_trend).has_state()) return NAN;
+      const float c = id(co2).state, red = id(threshold_red).state, trend = id(co2_trend).state;
+      if (c >= red) return 0;
+      if (trend < ${trend_rising}) return NAN;
+      const float minutes = (red - c) / trend * 60.0f;
+      return minutes > 240 ? NAN : minutes;
 
 text_sensor:
   - platform: template
@@ -223,7 +268,7 @@ font:
   - file: "gfonts://Inter@400"
     id: font_small
     size: 15
-    glyphs: " !%,-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÖÜß°"
+    glyphs: " !%,-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÖÜß°~"
   - file:
       type: web
       url: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/master/fonts/materialdesignicons-webfont.ttf"
@@ -234,6 +279,15 @@ font:
       - "\U000F058E" # mdi-water-percent
       - "\U000F05A9" # mdi-wifi
       - "\U000F05AA" # mdi-wifi-off
+  - file:
+      type: web
+      url: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/master/fonts/materialdesignicons-webfont.ttf"
+    id: icons_trend
+    size: 26
+    glyphs:
+      - "\U000F005C" # mdi-arrow-top-right
+      - "\U000F0054" # mdi-arrow-right
+      - "\U000F0043" # mdi-arrow-bottom-right
 
 graph:
   - id: co2_graph
@@ -302,10 +356,25 @@ display:
       it.print(W - 14, 74, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, "ppm");
       it.print(W - 14, 94, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, "CO2");
 
+      // trend arrow below the unit: rising, steady or falling over the last 15 minutes
+      if (id(co2_trend).has_state()) {
+        const float tr = id(co2_trend).state;
+        const char *arrow = "\U000F0054";
+        Color col = id(col_muted);
+        if (tr >= ${trend_rising})       { arrow = "\U000F005C"; col = level; }
+        else if (tr <= -${trend_rising}) { arrow = "\U000F0043"; col = id(col_green); }
+        it.print(W - 14, 100, id(icons_trend), col, TextAlign::TOP_RIGHT, arrow);
+      }
+
       // trend of the last 3 hours
       it.line(10, 199, W - 10, 199, id(col_line));
       it.graph(10, 132, id(co2_graph), level);
       it.print(12, 132, id(font_small), id(col_muted), TextAlign::TOP_LEFT, "3h");
+      // forecast: when the red threshold will be reached (bottom right: a rising curve is high on the right)
+      if (id(co2_forecast).has_state() && !std::isnan(id(co2_forecast).state) && id(co2_forecast).state > 0) {
+        it.printf(W - 12, 196, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, "${txt_forecast_display}",
+                  (int) id(co2_forecast).state);
+      }
 
       // footer: temperature and humidity
       if (id(temperature).has_state()) {
