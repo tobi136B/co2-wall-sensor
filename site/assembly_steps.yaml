@@ -1,7 +1,8 @@
 # Steps of the interactive 3D assembly guide (site/assembly.html).
 #
 #   new:     parts that appear in this step (ids of site/assembly.js)
-#   from:    where the new parts fly in from, offset in mm (x right seen from the back, y up, z towards the wall)
+#   from:    where the new parts fly in from, offset in mm (x left seen from the front, y up, z towards the wall)
+#   from_part: the same for single parts that come from another side
 #   camera:  eye and target in mm, model coordinates of the Fusion generator (front z = 0, wall towards +z)
 #   title / text: English and German
 
@@ -59,6 +60,7 @@
 
 - new: [esp32, plug]
   from: [0, 35, 0]
+  from_part: {plug: [0, -15, 0]}
   stage: carrier_out
   camera: {eye: [-110, 40, 220], target: [5, -40, 45]}
   title:
@@ -91,7 +93,7 @@
     de: "Display: 8 Litzen vom Stecker über die Rückseite des Displays zum ESP32-C3. SCD41: 4 Litzen durch die Kerbe im Träger. Farben wie im Verdrahtungsplan. Der gezeigte Kabelweg ist schematisch."
 
 - new: [port]
-  from: [0, -25, 20]
+  from: [0, 0, 45]
   stage: carrier_in
   camera: {eye: [-70, -60, 170], target: [10, -20, 15]}
   title:
@@ -124,7 +126,6 @@
     de: Die Wandplatte mit den beiden Geräteschrauben der Hohlwanddose festschrauben (60 mm Abstand). Die Langlöcher gleichen eine leicht verdrehte Dose aus.
 
 - new: []
-  slide: true
   stage: device_slide
   camera: {eye: [-150, 50, -120], target: [0, 5, 10]}
   title:
@@ -134,8 +135,9 @@
     en: Hold the device in front of the plate, put the rail into the hidden window and slide it 15 mm down. Done. To remove it, slide it up and pull it off.
     de: Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen.
 
-- new: [lock_inserts, lock_tab, lock_screws]
+- new: [lock_insert_housing, lock_insert_plate, lock_tab, lock_screw_housing, lock_screw_plate]
   from: [0, -30, 0]
+  from_part: {lock_insert_plate: [0, 0, -20], lock_screw_plate: [0, 0, -25]}
   camera: {eye: [-90, -110, -120], target: [-8, -30, 15]}
   title:
     en: Optional lock tab

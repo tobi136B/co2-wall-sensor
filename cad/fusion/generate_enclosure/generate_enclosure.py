@@ -45,7 +45,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '1.5'          # enclosure version, engraved into every part
+VERSION = '1.6'          # enclosure version, engraved into every part
 
 # ===================== PARAMETERS =====================
 # --- device ---
@@ -111,7 +111,7 @@ PLATE = 82.0
 PLATE_T = 7.0
 BOX_RIM_D, BOX_RIM_T = 78.0, 1.5
 BOX_SCREW_SPACING = 60.0
-LOCK_X = -10.5          # position of the optional lock tab
+LOCK_X = -19.0          # position of the optional lock tab (its housing insert sits where the carrier has only its floor)
 # --- desk stand ---
 TILT = 12.0             # device leans back by this angle
 STAND_GAP = 5.0         # air gap below the device, keeps the vents free
@@ -164,7 +164,8 @@ def derive():
     global CLEARANCE, RAIL_CLEARANCE, COVER_Z, XL, XR, Y_TOP_IN, BAY_W, BAY_H, BAY_X0, BAY_X1, BAY_Y1, BAY_Y0
     global LCD_Y, Y_DIV_LOW, Y_CHIN_LOW, Y_CHIN_MID, C3_Y0, C3_Z0, PLUG_Z, SOCKET_TOP, B, COVER_SCREWS
     global CARRIER_SCREWS, LCD_HOLES, CABLE, PORT_X0, PORT_X1, PORT_Z0, PORT_Y1, BOOT_Y, SCD_Y0, SCD_ZT
-    global LOCK_Z, LOCK_POINTS, SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT, VENT_BOTTOM, VENT_SIDE
+    global LOCK_Z, LOCK_BOSS_Y1, LOCK_POINTS, SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT
+    global VENT_BOTTOM, VENT_SIDE
     CLEARANCE = FIT
     RAIL_CLEARANCE = FIT
     COVER_Z = DEPTH - COVER_T
@@ -208,6 +209,7 @@ def derive():
     VENT_SIDE = diamond_centres(COVER_SCREWS[0][1] + BOSS_D / 2 + MIN_WALL, z0,
                                 CARRIER_SCREWS[0][1] - BOSS_D / 2 - MIN_WALL, FLOOR_Z - 1.5 - MIN_WALL)
     LOCK_Z = COVER_Z - 4.0                           # height of the lock insert in the bottom wall
+    LOCK_BOSS_Y1 = Y_CHIN_LOW + 3.0                  # inner face of the lock insert boss
     LOCK_POINTS = (LOCK_X - 3.0, LOCK_X + 3.0)       # x of the housing insert and of the wall plate insert
 
 
@@ -684,9 +686,12 @@ def build_housing(root, ops):
     box(comp, PORT_X0 - PORT_STEP - c, y_step - c, PORT_Z0 - c, PORT_X1 + PORT_STEP + c, Y_CHIN_LOW + 0.01, DEPTH + 1,
         CUT, 'PortStep', body)
 
-    # optional lock: insert in a boss behind the bottom wall, screw comes from the lock tab below
+    # optional lock: insert in a boss behind the bottom wall, screw comes from the lock tab below.
+    # The boss is a block down to the floor level: the carrier has a matching notch, so it can be lifted
+    # straight out of the back past the boss (tools/assembly_check.py tests every assembly path).
     lx = LOCK_POINTS[0]
-    cylinders_y(comp, [(lx, LOCK_Z)], BOSS_D, Y_CHIN_LOW - 0.01, Y_CHIN_LOW + 3.0, JOIN, 'LockBoss', body)
+    box(comp, lx - BOSS_D / 2, Y_CHIN_LOW - 0.01, FLOOR_Z, lx + BOSS_D / 2, LOCK_BOSS_Y1, LOCK_Z + BOSS_D / 2, JOIN,
+        'LockBoss', body)
     cut_y = adsk.fusion.FeatureOperations.CutFeatureOperation
     cylinders_y(comp, [(lx, LOCK_Z)], INSERT_HOLE_D, -BODY / 2 - 0.1, -BODY / 2 + INSERT_HOLE_L, cut_y,
                 'LockInsertHole', body)
@@ -748,6 +753,10 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
         FLOOR_Z + FLOOR_T + 1, CUT, 'TongueThinning', body)
     hook = [(HOOK_B, FLOOR_Z + 0.01), (HOOK_C, FLOOR_Z - SPRING_HOOK), (HOOK_A, FLOOR_Z + 0.01)]
     prism_x(comp, hook, SPRING_X - hw, SPRING_X + hw, JOIN, 'TongueHook', body)
+    # notch for the boss of the lock insert in the housing, so the carrier lifts straight out of the back
+    lx, r = LOCK_POINTS[0], BOSS_D / 2 + CLEARANCE
+    box(comp, lx - r, y_lo - 0.1, FLOOR_Z - 0.5, lx + r, LOCK_BOSS_Y1 + CLEARANCE, FLOOR_Z + FLOOR_T + 0.5, CUT,
+        'LockBossNotch', body)
     # cable notch for the SCD41 wires (seal with a drop of hot glue)
     box(comp, -SCD_W / 2 - 6, y_hi - 4, FLOOR_Z - 0.5, -SCD_W / 2 - 2, y_hi + 0.1, FLOOR_Z + FLOOR_T + 0.5,
         CUT, 'ScdCableNotch', body)
@@ -822,6 +831,14 @@ def build_port(root, ops, variant):
     return comp
 
 
+def boot_travel(comp, z1, body):
+    """Slot for the boot of the right-angle plug: it sticks out of the back and travels the 15 mm of the rail
+    while the device is slid on, so the cable passage must be that much longer upwards."""
+    r = (BOOT_D - 0.6) / 2 + 0.5
+    cut = adsk.fusion.FeatureOperations.CutFeatureOperation
+    box(comp, C3_X - r, BOOT_Y - r, DEPTH - 1, C3_X + r, BOOT_Y + r + RAIL_TRAVEL + 0.5, z1, cut, 'BootTravel', body)
+
+
 def build_wall_plate(root, ops, cable):
     NEW, CUT, JOIN = ops
     comp = new_component(root, 'WallPlate')
@@ -835,6 +852,7 @@ def build_wall_plate(root, ops, cable):
     cylinders(comp, [(0, 0)], BOX_RIM_D, z_wall - BOX_RIM_T, z_wall + 1, CUT, 'BoxRimRecess', body)
     dovetail_slot(comp, body)
     box(comp, cable[0], cable[2] - 1, DEPTH - 1, cable[1], cable[3] + 1, z_wall + 1, CUT, 'CablePassage', body)
+    boot_travel(comp, z_wall + 1, body)
     a = BOX_SCREW_SPACING / 2
     slots = [((-a - 2, -1.75, 0), (-a + 2, 1.75, 0)), ((a - 2, -1.75, 0), (a + 2, 1.75, 0))]
     extrude(comp, rect_sketch(comp, plane_z(comp, DEPTH + PLATE_T / 2), slots, 'ScrewSlots'), PLATE_T + 1, CUT,
@@ -903,6 +921,7 @@ def build_desk_stand(root, ops, cable):
             -1.5, 1.5, JOIN, 'SupportRib', body)
     dovetail_slot(comp, body)
     box(comp, cable[0], cable[2] - 1, DEPTH - 1, cable[1], cable[3] + 1, DEPTH + 8, CUT, 'CablePassage', body)
+    boot_travel(comp, DEPTH + 8, body)
     prism_x(comp, [(y_table(z_back - 8) + 1, z_back - 8), (y_table(z_back) + 1, z_back + 1),
                    (y_table(z_back) - 5, z_back + 1), (y_table(z_back - 8) - 5, z_back - 8)], -4, 4, CUT,
             'CableNotch', body)
