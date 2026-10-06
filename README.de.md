@@ -179,8 +179,8 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 
 ## Ausblick
 
-* [ ] Sensorträger-Profile für verschiedene SCD41-Platinen ([#7](https://github.com/tobi136B/co2-wall-sensor/issues/7), v1.4)
-* [ ] Online-Konfigurator: Sensorträger als STL aus drei Maßen ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.5)
+* [x] Sensorträger-Profile für verschiedene SCD41-Platinen ([#7](https://github.com/tobi136B/co2-wall-sensor/issues/7), v1.4)
+* [ ] Online-Konfigurator: Sensorträger als STL aus drei Maßen ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.6)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 * [ ] Optionaler Drucksensor (BMP280) für die CO2-Druckkompensation in Echtzeit
 * [ ] Wandplatte für Wände ohne Hohlwanddose

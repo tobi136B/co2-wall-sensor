@@ -75,6 +75,8 @@ Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt, eine Stufe in der Unt
 * **Ausgelegt für eine 0,4 mm Düse.** Keine Wand ist dünner als `MIN_WALL` (0,8 mm, zwei Linien). Wo eine Senkung für einen Schraubenkopf am Rand eines Teils eine dünnere Haut lassen würde, ist die Senkung zum Rand hin offen; die Gehäusewand schließt sie von außen. Die CI misst die Wandstärke jeder STL-Datei flächendeckend (`tools/print_check.py`) und schlägt unter 0,8 mm fehl.
 * **Rautengitter** statt Schlitzen: Die 45° Kanten drucken an den senkrechten Wänden ohne Stützmaterial, die Stege sind 1 mm breit und die offene Fläche ist rund 40 % größer als mit den alten Schlitzen.
 
+  <img src="../images/vent_mesh.png" width="60%" alt="Rautengitter im Boden des Gehäuses">
+
 ## Parameter in Fusion
 
 Jeder Wert des Parameterblocks wird ein Fusion-Benutzerparameter (*Ändern > Parameter ändern*), mit seiner Erklärung als Kommentar. Zum Ändern die Werte dort anpassen und das Skript erneut starten: Es liest die Parameter der offenen Konstruktion und baut alle Teile damit neu, inklusive Kollisionsprüfung. Das Modell entsteht per Skript und hat keine von Hand aufgebaute Zeitleiste, ein geänderter Wert wirkt also beim Skriptlauf und nicht sofort in der Zeitleiste.

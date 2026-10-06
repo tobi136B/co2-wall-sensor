@@ -45,7 +45,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '1.4'          # enclosure version, engraved into every part
+VERSION = '1.5'          # enclosure version, engraved into every part
 
 # ===================== PARAMETERS =====================
 # --- device ---
