@@ -16,7 +16,7 @@ Placement matters more than size:
 * **Not next to windows, doors, radiators or ventilation outlets**, and not in direct sunlight.
 
 ### What is the hole in the bottom of the housing for?
-It takes a heat-set insert for the optional lock tab. The tab is screwed to the housing and to the wall plate from below, so the device cannot simply be slid off the wall (office, school, children). Without the lock tab the hole stays empty; it is only visible from below. See [assembly](assembly.md#6-wall-mounting-on-the-flush-box).
+It takes a heat-set insert for the optional lock tab. The tab is screwed to the housing and to the wall plate from below, so the device cannot simply be slid off the wall (office, school, children). Without the lock tab the hole stays empty; it is only visible from below. See [assembly](assembly.md#6-wall-mounting-on-a-flush-wall-box).
 
 ### Which thresholds are sensible?
 The defaults are 1000 ppm (yellow) and 1400 ppm (red). Values below 1000 ppm are generally considered harmless, above 2000 ppm ventilation is clearly needed. Both thresholds can be changed in Home Assistant at any time.
