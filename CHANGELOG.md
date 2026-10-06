@@ -2,6 +2,14 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.6.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.5.0...v1.6.0) (2026-10-06)
+
+
+### Added
+
+* **firmware:** CO2 trend arrow and ventilation forecast ([#11](https://github.com/tobi136B/co2-wall-sensor/issues/11)) ([b7deac4](https://github.com/tobi136B/co2-wall-sensor/commit/b7deac44cd859aff8ef96658c97d00f933d838d5))
+* interactive 3D assembly guide and new README animation ([#13](https://github.com/tobi136B/co2-wall-sensor/issues/13)) ([0c56e3d](https://github.com/tobi136B/co2-wall-sensor/commit/0c56e3df885308c8588ff31f40f612a8a9c0e9aa))
+
 ## [1.5.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.4.0...v1.5.0) (2026-10-06)
 
 
