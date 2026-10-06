@@ -140,6 +140,7 @@ def ease(t):
 HERO_ORDER = ['Dummy_LCD_2inch', 'BackCover', 'Dummy_PlugAngled', 'PortBack', 'Dummy_ESP32_C3', 'SensorCarrier',
               'Dummy_SCD41', 'WallPlate', 'LockTab']
 HERO_TARGET = (0, -2, 30)
+HERO_TARGET_APART = (0, -6, 52)
 HERO_ELEVATION = math.radians(16)
 # active area of the display, seen from the front: (x, y) corners top left, top right, bottom right, bottom left
 ACTIVE_W, ACTIVE_H, LCD_Y, LIP = 40.8, 30.6, 10.1, 2.0
@@ -168,8 +169,9 @@ def hero_state(i, count):
         else:   # coming back: the last part out is the first one in
             x = 1 - ((1 - g) - delay) / (1 - stagger)
         parts[name] = ease(min(max(x, 0.0), 1.0))
-    azimuth = math.radians(-32 + 14 * math.sin(2 * math.pi * t))
-    return parts, azimuth
+    # the camera swings to the side while the device is apart, so every part is visible
+    azimuth = math.radians(-32 - 40 * ease(g) + 6 * math.sin(2 * math.pi * t))
+    return parts, azimuth, ease(g)
 
 
 def _explode_parts(root, parts):
@@ -195,14 +197,16 @@ def render_hero(out_dir, first, n, count=96, distance=36.0):
     corners_model = [(ACTIVE_W / 2, LCD_Y + ACTIVE_H / 2), (-ACTIVE_W / 2, LCD_Y + ACTIVE_H / 2),
                      (-ACTIVE_W / 2, LCD_Y - ACTIVE_H / 2), (ACTIVE_W / 2, LCD_Y - ACTIVE_H / 2)]
     for i in range(first, min(first + n, count)):
-        parts, az = hero_state(i, count)
+        parts, az, g = hero_state(i, count)
         _explode_parts(root, parts)
         d = (math.sin(az) * math.cos(HERO_ELEVATION), math.sin(HERO_ELEVATION), -math.cos(az) * math.cos(HERO_ELEVATION))
-        t = [v / 10 for v in HERO_TARGET]
+        # follow the parts: centre and distance grow while the device is apart
+        t = [(a + (b - a) * g) / 10 for a, b in zip(HERO_TARGET, HERO_TARGET_APART, strict=True)]
+        dist = distance * (1 + 0.28 * g)
         cam = vp.camera
         cam.isSmoothTransition = False
         cam.target = adsk.core.Point3D.create(*t)
-        cam.eye = adsk.core.Point3D.create(*(t[k] + distance * d[k] for k in range(3)))
+        cam.eye = adsk.core.Point3D.create(*(t[k] + dist * d[k] for k in range(3)))
         cam.upVector = adsk.core.Vector3D.create(0, 1, 0)
         vp.camera = cam
         vp.refresh()

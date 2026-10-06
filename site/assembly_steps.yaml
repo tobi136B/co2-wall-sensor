@@ -46,7 +46,7 @@
     en: The carrier is the removable floor of the sensor chamber. Print the one that matches your SCD41 board, here the 13.5 × 21.75 mm version.
     de: Der Träger ist der herausnehmbare Boden der Sensorkammer. Drucke den, der zu deiner SCD41-Platine passt, hier die Version 13,5 × 21,75 mm.
 
-- new: [scd41, wires_scd_stub]
+- new: [scd41]
   from: [0, 30, 0]
   stage: carrier_out
   camera: {eye: [-45, 10, -55], target: [0, -24, 45]}
