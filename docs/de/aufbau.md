@@ -4,6 +4,10 @@
 
 ![Explosionsansicht](../images/exploded_view.png)
 
+**Lieber in 3D?** Die [interaktive Aufbauanleitung](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html) geht alle 13 Schritte durch. Gerät drehen, mit dem Schieberegler zerlegen, durch das Gehäuse schauen und sehen, welches Teil als Nächstes kommt.
+
+[![3D-Aufbauanleitung](../images/assembly_guide_de.png)](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html)
+
 ## 1. 3D-Druck
 
 Jedes Teil trägt auf einer verdeckten Fläche seinen Namen, die Version und die Drucklage als eingeprägte Beschriftung.
