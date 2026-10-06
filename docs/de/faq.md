@@ -15,6 +15,9 @@ Wichtiger als die Größe ist der Platz:
 * **Mindestens 1 bis 2 m Abstand zu Personen**, damit niemand den Sensor direkt anatmet (nicht direkt neben Bett oder Schreibtisch).
 * **Nicht neben Fenster, Tür, Heizkörper oder Lüftungsauslass** und nicht in direkte Sonne.
 
+### Wofür ist das Loch unten im Gehäuse?
+Dort kommt eine Einschmelzmutter für die optionale Sicherungslasche hinein. Die Lasche wird von unten an Gehäuse und Wandplatte geschraubt, damit niemand das Gerät einfach von der Wand schieben kann (Büro, Schule, Kinder). Ohne Lasche bleibt das Loch leer; es ist nur von unten sichtbar. Siehe [Aufbau](aufbau.md#6-wandmontage-auf-der-hohlwanddose).
+
 ### Welche Schwellen sind sinnvoll?
 Standard sind 1000 ppm (Gelb) und 1400 ppm (Rot). Werte unter 1000 ppm gelten allgemein als unbedenklich, über 2000 ppm sollte dringend gelüftet werden. Beide Schwellen lassen sich jederzeit in Home Assistant ändern.
 
