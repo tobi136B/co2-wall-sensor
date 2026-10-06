@@ -79,16 +79,18 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
+        id: python
         with:
           python-version: "3.12"
+      # the build directory stores absolute tool paths: a new Python patch release on the runner needs a new cache
       - name: Cache PlatformIO and ESPHome build
         uses: actions/cache@v6
         with:
           path: |
             ~/.platformio
             esphome/.esphome
-          key: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.id }}-${{ hashFiles('esphome/**/*.yaml') }}
-          restore-keys: esphome-${{ env.ESPHOME_VERSION }}-${{ matrix.id }}-
+          key: esphome-${{ env.ESPHOME_VERSION }}-py${{ steps.python.outputs.python-version }}-${{ matrix.id }}-${{ hashFiles('esphome/**/*.yaml') }}
+          restore-keys: esphome-${{ env.ESPHOME_VERSION }}-py${{ steps.python.outputs.python-version }}-${{ matrix.id }}-
       - name: Install ESPHome
         run: pip install "esphome==${ESPHOME_VERSION}"
       - name: Create CI secrets (no real credentials, only used by the own-build configs)
