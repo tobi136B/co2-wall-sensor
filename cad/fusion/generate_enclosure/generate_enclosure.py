@@ -60,7 +60,7 @@ WINDOW_CHAMFER = 0.8    # chamfer around the display window
 FIT = 0.3               # fit clearance per side for all sliding and plugged parts
 TOP_BAND = 5.0          # solid band above the display bay, holds two cover inserts
 # --- fasteners: one insert type, one screw type ---
-INSERT_HOLE_D = 3.0     # hole for M2 x 3 heat-set insert (outer diameter 3.2)
+INSERT_HOLE_D = 2.9     # hole for M2 x 3 heat-set inserts, takes both outer diameters 3.0 and 3.2
 INSERT_HOLE_L = 3.4     # hole depth (insert length 3.0 + 0.4)
 INSERT_LEAD = 0.4       # entry chamfer, centres the insert while pressing
 BOSS_D = 5.0            # boss around an insert
@@ -83,15 +83,21 @@ C3_W, C3_H, C3_PCB = 18.2, 22.71, 0.74
 C3_USB_OUT = 1.5        # the USB-C socket sticks out this far over the lower board edge
 C3_USB_W, C3_USB_H = 9.0, 3.5   # USB-C socket: width, height above the board
 C3_PARTS_H = 2.2        # tallest part on the board besides the socket (the two buttons)
-C3_X = 13.0
+C3_X = 14.5             # far enough from the rail, so the plug body passes the wall plate beside it
 # tolerances of the ESP32-C3 holder: boards of other batches fit without a new print
 C3_PLAY = 0.3           # side play in the guides, taken up by crush ribs
 C3_RIB = 0.4            # how far the crush ribs reach into the guide
 C3_PCB_MAX = 1.2        # thickest board the guides take
-BOOT_PLAY = 1.0         # the cable boot may sit this much higher or lower (socket and plug tolerances)
+BOOT_PLAY = 1.5         # the plug body may sit this much higher (0.5 lower), socket and plug tolerances
 PLUG_SPACE = 12.5       # free space below the mouth of the USB-C socket for the plug
 PLUG_W, PLUG_H = 12.0, 7.0      # overmould of a straight USB-C plug
-BOOT_D = 7.0            # hole for the cable boot of a right-angle plug
+# right-angle USB-C plug with a round body, measured (cable angled up/down, B0DGTQD4Y5)
+PLUG_BODY_D, PLUG_BODY_L = 8.0, 18.23   # round body: diameter, length along the cable
+PLUG_REACH = 13.9       # from the axis of the body to the tip of the USB-C plug (17.9 from the far side)
+PLUG_TIP = 6.6          # length of the USB-C plug that goes into the socket
+PLUG_CAP = 4.0          # the body reaches this far in front of the centre of the USB-C plug
+PLUG_BOOT_D, PLUG_BOOT_L = 6.57, 6.55   # cable boot behind the body
+BOOT_D = 8.6            # hole for the round body of the right-angle plug
 # SCD41 board as mounted: W across the rails, L in the slide direction. Defaults: profile '14x22'.
 # Offsets are seen from the front of the device: right and up are positive (right is -x in the model).
 SCD_W, SCD_L, SCD_PCB = 21.75, 13.51, 1.53      # SCD41 breakout board
@@ -202,7 +208,7 @@ def derive():
     PORT_X0, PORT_X1 = C3_X - PORT_W / 2, C3_X + PORT_W / 2
     PORT_Z0 = PLUG_Z - PLUG_H / 2 - 1.2              # lower end of the port opening in the bottom wall
     PORT_Y1 = Y_CHIN_LOW + PORT_TOP                  # upper end of the port opening in the back cover
-    BOOT_Y = C3_MOUTH - 5.5                          # cable boot of the right-angle plug
+    BOOT_Y = C3_MOUTH - (PLUG_REACH - PLUG_TIP)      # axis of the round body of the right-angle plug
     # SCD41: slides in from the top, stands on the end stop, the hook of the spring tongue presses on its top edge
     SCD_Y0 = Y_CHIN_LOW + 0.2 + SCD_STOP + 0.15      # lower edge of the SCD41 board
     SCD_TOP = SCD_Y0 + SCD_L                         # upper edge
@@ -767,6 +773,10 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     lx, r = LOCK_POINTS[0], BOSS_D / 2 + CLEARANCE
     box(comp, lx - r, y_lo - 0.1, FLOOR_Z - 0.5, lx + r, LOCK_BOSS_Y1 + CLEARANCE, FLOOR_Z + FLOOR_T + 0.5, CUT,
         'LockBossNotch', body)
+    # shallow pocket for the round body of the right-angle plug, the floor stays closed (sensor chamber)
+    r = PLUG_BODY_D / 2 + 0.5
+    box(comp, C3_X - r, BOOT_Y - r - 0.5, FLOOR_Z + FLOOR_T - 1.0, C3_X + r, min(BOOT_Y + r + BOOT_PLAY, C3_Y0 - 1.3),
+        FLOOR_Z + FLOOR_T + 1.0, CUT, 'PlugPocket', body)
     # cable notch for the SCD41 wires (seal with a drop of hot glue)
     box(comp, -SCD_W / 2 - 6, y_hi - 4, FLOOR_Z - 0.5, -SCD_W / 2 - 2, y_hi + 0.1, FLOOR_Z + FLOOR_T + 0.5,
         CUT, 'ScdCableNotch', body)
@@ -840,13 +850,11 @@ def build_port(root, ops, variant):
     box(comp, x0, PORT_Y1 - 0.5, COVER_Z - 0.8, x1, PORT_Y1 + 1.0, COVER_Z, JOIN, 'CoverLip', body)
     if variant == 'back':
         # boot hole, open to the +x side so the cable can be laid in (the back cover closes it)
-        # oblong by BOOT_PLAY up and down: plugs and sockets of other makes put the boot a little higher or lower
-        ends = [(C3_X, BOOT_Y - BOOT_PLAY), (C3_X, BOOT_Y + BOOT_PLAY)]
-        cylinders(comp, ends, BOOT_D, COVER_Z - 1, DEPTH + 1, CUT, 'BootHole', body)
-        box(comp, C3_X - BOOT_D / 2, BOOT_Y - BOOT_PLAY, COVER_Z - 1, C3_X + BOOT_D / 2, BOOT_Y + BOOT_PLAY, DEPTH + 1,
-            CUT, 'BootHoleMiddle', body)
-        box(comp, C3_X, BOOT_Y - BOOT_D / 2 - BOOT_PLAY, COVER_Z - 1, x1 + 1, BOOT_Y + BOOT_D / 2 + BOOT_PLAY,
-            DEPTH + 1, CUT, 'BootSlot', body)
+        # oblong: plugs and sockets of other makes put the body a little higher (BOOT_PLAY) or lower (0.5)
+        lo, hi = BOOT_Y - 0.5, BOOT_Y + BOOT_PLAY
+        cylinders(comp, [(C3_X, lo), (C3_X, hi)], BOOT_D, COVER_Z - 1, DEPTH + 1, CUT, 'BootHole', body)
+        box(comp, C3_X - BOOT_D / 2, lo, COVER_Z - 1, C3_X + BOOT_D / 2, hi, DEPTH + 1, CUT, 'BootHoleMiddle', body)
+        box(comp, C3_X, lo - BOOT_D / 2, COVER_Z - 1, x1 + 1, hi + BOOT_D / 2, DEPTH + 1, CUT, 'BootSlot', body)
     else:
         g = 0.1
         box(comp, C3_X - PLUG_W / 2 - g, -BODY / 2 - 1, PLUG_Z - PLUG_H / 2 - g, C3_X + PLUG_W / 2 + g,
@@ -858,7 +866,7 @@ def boot_travel(comp, z1, body):
     """Slot for the boot of the right-angle plug: it sticks out of the back and travels the 15 mm of the rail
     while the device is slid on, so the cable passage must be that much longer upwards (plus BOOT_PLAY)."""
     r = (BOOT_D - 0.6) / 2 + 0.5
-    y0, y1 = BOOT_Y - r - BOOT_PLAY, BOOT_Y + r + BOOT_PLAY + RAIL_TRAVEL + 0.5
+    y0, y1 = BOOT_Y - r - 0.5, BOOT_Y + r + BOOT_PLAY + RAIL_TRAVEL + 0.5
     cut = adsk.fusion.FeatureOperations.CutFeatureOperation
     box(comp, C3_X - r, y0, DEPTH - 1, C3_X + r, y1, z1, cut, 'BootTravel', body)
 
@@ -981,9 +989,12 @@ def build_dummies(root, ops):
                 C3_Z0 + C3_PCB + C3_PARTS_H, NEW, 'Parts').bodies.item(0)
     parts.isLightBulbOn = False   # only for the interference check, it would hide the board in the pictures
     angled = new_component(root, 'Dummy_PlugAngled')
-    pb = box(angled, C3_X - PLUG_W / 2, C3_MOUTH - 11.0, PLUG_Z - PLUG_H / 2, C3_X + PLUG_W / 2, C3_MOUTH - 0.5,
-             COVER_Z - 0.2, NEW, 'Body').bodies.item(0)
-    cylinders(angled, [(C3_X, BOOT_Y)], BOOT_D - 0.6, COVER_Z - 0.21, DEPTH + 5, ops[2], 'Boot', pb)
+    z0 = PLUG_Z - PLUG_CAP
+    pb = box(angled, C3_X - 4.0, BOOT_Y, PLUG_Z - 2.5, C3_X + 4.0, C3_MOUTH - 0.3, PLUG_Z + 2.5, NEW,
+             'Collar').bodies.item(0)
+    cylinders(angled, [(C3_X, BOOT_Y)], PLUG_BODY_D, z0, z0 + PLUG_BODY_L, ops[2], 'Body', pb)
+    cylinders(angled, [(C3_X, BOOT_Y)], PLUG_BOOT_D, z0 + PLUG_BODY_L - 0.01, z0 + PLUG_BODY_L + PLUG_BOOT_L, ops[2],
+              'Boot', pb)
     straight = new_component(root, 'Dummy_PlugStraight')
     box(straight, C3_X - PLUG_W / 2, -BODY / 2 - 12, PLUG_Z - PLUG_H / 2, C3_X + PLUG_W / 2, C3_MOUTH - 0.5,
         PLUG_Z + PLUG_H / 2, NEW, 'Overmould')

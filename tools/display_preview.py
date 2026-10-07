@@ -37,8 +37,22 @@ TEXT = {
         "ventilate": "Ventilate!",
         "sep": ".",
         "fc": "ventilate in ~{m} min",
+        "hum": "HUMIDITY",
+        "cool": "Open the window: cooler outside",
+        "dry": "Airing dries the air",
+        "warm": "Keep it shut: warmer outside",
     },
-    "de": {"good": "Gut", "moderate": "Mäßig", "ventilate": "Lüften!", "sep": ",", "fc": "lüften in ca. {m} min"},
+    "de": {
+        "good": "Gut",
+        "moderate": "Mäßig",
+        "ventilate": "Lüften!",
+        "sep": ",",
+        "fc": "lüften in ca. {m} min",
+        "hum": "FEUCHTE",
+        "cool": "Fenster auf: außen kühler",
+        "dry": "Lüften trocknet die Luft",
+        "warm": "Fenster zu: außen wärmer",
+    },
 }
 # (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red)
 STATES = [
@@ -84,8 +98,21 @@ def arrow(d: ImageDraw.ImageDraw, x_right: float, y_top: float, kind: str, fill)
         d.line([s(tip[0]), s(tip[1]), s(tip[0] + 6 * math.cos(a)), s(tip[1] + 6 * math.sin(a))], fill=fill, width=s(3))
 
 
+HINT_COLORS = {"cool": (90, 190, 255), "dry": (90, 190, 255), "warm": (255, 170, 60)}
+
+
 def screen(
-    lang: str, state: str, co2: int, temp: float, hum: int, clock: str, start: int, trend: str, forecast
+    lang: str,
+    state: str,
+    co2: int,
+    temp: float,
+    hum: int,
+    clock: str,
+    start: int,
+    trend: str,
+    forecast,
+    outdoor: float | None = None,
+    hint: str | None = None,
 ) -> Image.Image:
     t = TEXT[lang]
     img = Image.new("RGB", (s(W), s(H)), (0, 0, 0))
@@ -121,16 +148,23 @@ def screen(
     text(d, (12, 132), "3h", font(12), COLORS["muted"])
     if forecast:
         text(d, (W - 12, 196), t["fc"].format(m=forecast), font(12), COLORS["muted"], "rd")
+    if hint:  # only when opening the window really helps (or would make it worse)
+        text(d, (12, 196), t[hint], font(12, True), HINT_COLORS[hint], "ld")
 
-    # footer: thermometer, temperature, humidity, drop
-    d.rounded_rectangle([s(17), s(214), s(21), s(229)], radius=s(2), outline=COLORS["muted"], width=s(1))
-    d.ellipse([s(15), s(226), s(23), s(234)], fill=COLORS["muted"])
-    temp_txt = f"{temp:.1f}".replace(".", t["sep"]) + " °C"
-    text(d, (42, 225), temp_txt, font(20, True), COLORS["text"], "lm")
-    text(d, (W - 14, 225), f"{hum} %", font(20, True), COLORS["text"], "rm")
-    cx, cy = W - 86, 228
-    d.polygon([(s(cx), s(cy - 11)), (s(cx - 5), s(cy - 2)), (s(cx + 5), s(cy - 2))], fill=COLORS["muted"])
-    d.ellipse([s(cx - 5), s(cy - 7), s(cx + 5), s(cy + 3)], fill=COLORS["muted"])
+    # footer: three columns with a small label above each value, like an instrument panel
+    def column(x, label, value, colour, anchor):
+        text(d, (x, 210), label, font(10, True), COLORS["muted"], anchor[0] + "m")
+        text(d, (x, 228), value, font(19, True), colour, anchor[0] + "m")
+
+    def celsius(v):
+        return f"{v:.1f}".replace(".", t["sep"]) + " °C"
+
+    column(14, "IN", celsius(temp), COLORS["text"], "l")
+    if outdoor is not None:  # outdoor temperature from Home Assistant
+        column(116, "OUT", celsius(outdoor), (175, 182, 190), "l")
+        for x in (106, 214):
+            d.line([s(x), s(205), s(x), s(234)], fill=COLORS["line"], width=s(1))
+    column(W - 14, t["hum"], f"{hum} %", COLORS["text"], "r")
     return img
 
 
