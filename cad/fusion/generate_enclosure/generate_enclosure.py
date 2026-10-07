@@ -977,8 +977,9 @@ def build_dummies(root, ops):
     box(esp, C3_X - C3_USB_W / 2, C3_MOUTH, C3_Z0 + C3_PCB, C3_X + C3_USB_W / 2, C3_Y0 + 7.0, SOCKET_TOP, NEW,
         'UsbCSocket')
     # envelope of the parts on the board (buttons, chip, antenna), so nothing may come closer than they reach
-    box(esp, C3_X - C3_W / 2 + 1.5, C3_Y0 + 7.5, C3_Z0 + C3_PCB, C3_X + C3_W / 2 - 1.5, C3_Y0 + C3_H - 0.5,
-        C3_Z0 + C3_PCB + C3_PARTS_H, NEW, 'Parts')
+    parts = box(esp, C3_X - C3_W / 2 + 1.5, C3_Y0 + 7.5, C3_Z0 + C3_PCB, C3_X + C3_W / 2 - 1.5, C3_Y0 + C3_H - 0.5,
+                C3_Z0 + C3_PCB + C3_PARTS_H, NEW, 'Parts').bodies.item(0)
+    parts.isLightBulbOn = False   # only for the interference check, it would hide the board in the pictures
     angled = new_component(root, 'Dummy_PlugAngled')
     pb = box(angled, C3_X - PLUG_W / 2, C3_MOUTH - 11.0, PLUG_Z - PLUG_H / 2, C3_X + PLUG_W / 2, C3_MOUTH - 0.5,
              COVER_Z - 0.2, NEW, 'Body').bodies.item(0)

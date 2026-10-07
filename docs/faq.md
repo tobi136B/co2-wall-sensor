@@ -54,6 +54,18 @@ The bottom port takes plugs with an overmould of up to 12 × 7 mm. For bulkier p
 ### My SCD41 board looks different.
 Measure it and compare it with the known profiles. Only the small sensor carrier depends on the board, everything else stays the same. See [measure your sensor](measure-sensor.md).
 
+### My ESP32-C3 SuperMini is a little different.
+The holder is designed for boards from other batches. Crush ribs in the side guides centre the board, the guides take boards up to 1.2 mm thick, and the upper end is open, so the length does not matter. The cable boot has 1 mm of play up and down. Measured board: 18.2 × 22.71 × 0.74 mm, USB-C socket 9.0 mm wide, 3.5 mm high, 1.5 mm over the lower edge.
+
+| Dimension | fits without a new print |
+|-----------|--------------------------|
+| Width | 18.0 to 18.6 mm |
+| Thickness | up to 1.2 mm |
+| Length | any, the holder is open at the top |
+| USB-C socket over the lower edge | 0.5 to 2.5 mm |
+
+Outside these ranges change `C3_W`, `C3_PCB` or `C3_USB_OUT` in the generator and print a new sensor carrier.
+
 ### How do I change a dimension?
 Open the generated design in Fusion, go to *Modify > Change Parameters*, change the value and run the script again. It takes over all parameters of the open design, rebuilds every part and checks for interference. With `EXPORT = True` it also writes new STL and STEP files. See [design notes](design.md#parameters-in-fusion).
 

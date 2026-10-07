@@ -164,6 +164,8 @@ class Scene:
     def __init__(self, data: dict):
         self.data = data
         self.meshes = {q["id"]: m for q in data["parts"] if (m := mesh_of(q)) is not None}
+        # the desk stand is not part of the guide, it is checked on its own (check_desk_stand)
+        self.meshes["desk_stand"] = trimesh.load(ROOT / "cad" / "stl" / "desk_stand.stl", force="mesh")
         self.exact = self._manager(self.meshes)
         self.shrunk = self._manager({pid: eroded(m) for pid, m in self.meshes.items()})
         self.touching = self._pairs(self.exact)
@@ -284,6 +286,19 @@ def check_hero(scene: Scene) -> list[str]:
     return [f"{where} from t = {t:.3f}: {a} hits {b}" for (a, b), t in first.items()]
 
 
+def check_desk_stand(scene: Scene) -> list[str]:
+    """The device slides 15 mm down onto the desk stand, as onto the wall plate."""
+    device = [q["id"] for q in scene.data["parts"] if "device" in q["groups"] and not q["id"].startswith("wires")]
+    travel = scene.data["stages"]["device_away"]["device"][0][1]
+    errors = set()
+    for dy in np.linspace(travel, 0, int(np.ceil(travel / STEP_MM)) + 1):
+        offsets = {pid: np.array([0, dy, 0]) for pid in device}
+        offsets["desk_stand"] = np.zeros(3)
+        for a, b in scene.collisions(offsets):
+            errors.add(f"desk stand, sliding the device on: {a} hits {b}")
+    return sorted(errors)
+
+
 def main() -> int:
     data = assembly_model.model(drawing.load_parameters())
     scene = Scene(data)
@@ -298,6 +313,7 @@ def main() -> int:
     for i in sorted(set(last_of_state.values())):
         errors += check_explode(scene, i)
     errors += check_hero(scene)
+    errors += check_desk_stand(scene)
     for e in errors:
         print(f"::error::{e}")
     print(

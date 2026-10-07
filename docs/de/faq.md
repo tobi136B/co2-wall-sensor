@@ -54,6 +54,18 @@ Der Port unten nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dicke
 ### Meine SCD41-Platine sieht anders aus.
 Ausmessen und mit den bekannten Profilen vergleichen. Nur der kleine Sensorträger hängt von der Platine ab, alles andere bleibt gleich. Siehe [Sensor ausmessen](sensor-ausmessen.md).
 
+### Mein ESP32-C3 SuperMini ist etwas anders.
+Der Halter ist für Platinen aus anderen Lieferungen ausgelegt. Quetschrippen in den Seitenführungen zentrieren die Platine, die Führungen nehmen Platinen bis 1,2 mm Dicke, und oben ist der Halter offen, die Länge spielt also keine Rolle. Die Kabeltülle hat 1 mm Spiel nach oben und unten. Gemessene Platine: 18,2 × 22,71 × 0,74 mm, USB-C-Buchse 9,0 mm breit, 3,5 mm hoch, 1,5 mm über der Unterkante.
+
+| Maß | passt ohne neuen Druck |
+|-----|------------------------|
+| Breite | 18,0 bis 18,6 mm |
+| Dicke | bis 1,2 mm |
+| Länge | beliebig, der Halter ist oben offen |
+| Überstand der USB-C-Buchse | 0,5 bis 2,5 mm |
+
+Außerhalb davon `C3_W`, `C3_PCB` oder `C3_USB_OUT` im Generator ändern und einen neuen Sensorträger drucken.
+
 ### Wie ändere ich ein Maß?
 Die erzeugte Konstruktion in Fusion öffnen, *Ändern > Parameter ändern*, Wert anpassen und das Skript erneut starten. Es übernimmt alle Parameter der offenen Konstruktion, baut alle Teile neu und prüft auf Kollisionen. Mit `EXPORT = True` schreibt es auch neue STL- und STEP-Dateien. Siehe [Designnotizen](design.md#parameter-in-fusion).
 

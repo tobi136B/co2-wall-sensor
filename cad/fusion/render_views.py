@@ -33,12 +33,6 @@ VIEWS = {
     'vent_mesh': ({'Housing', 'BackCover', 'PortBack'}, (-0.25, -0.85, -0.46), (0, -34, 8), 0.8, False),
 }
 
-# exploded view: offsets in mm (x, y, z) per component, the device flies apart along z
-EXPLODE = {
-    'Dummy_LCD_2inch': (0, 0, -45), 'Housing': (0, 0, 0), 'Dummy_SCD41': (0, -4, 22), 'SensorCarrier': (0, -4, 38),
-    'Dummy_ESP32_C3': (0, -4, 54), 'PortBack': (0, -18, 64), 'Dummy_PlugAngled': (0, -30, 72),
-    'BackCover': (0, 0, 84), 'WallPlate': (0, 0, 116), 'LockTab': (0, -22, 116),
-}
 EXPLODE_VIEW = ((-0.90, 0.30, -0.32), (0, -5, 40), 1.0)
 
 
@@ -103,32 +97,29 @@ def _save(path, width=1600, height=1200):
     adsk.core.Application.get().activeViewport.saveAsImageFileWithOptions(opt)
 
 
-def _explode(root, f):
-    """Move the parts to f (0 = assembled, 1 = fully exploded)."""
-    for occ in root.occurrences:
-        dx, dy, dz = EXPLODE.get(occ.component.name, (0, 0, 0))
-        m = adsk.core.Matrix3D.create()
-        m.translation = adsk.core.Vector3D.create(dx * f / 10, dy * f / 10, dz * f / 10)
-        occ.transform2 = m
-
-
 def render_views(out_dir, names=None):
     os.makedirs(out_dir, exist_ok=True)
     design = _design()
     root = design.rootComponent
     _prepare(design)
-    _explode(root, 0)
+    _place(root, {}, 0.0)
+    adsk.core.Application.get().activeViewport.visualStyle = \
+        adsk.core.VisualStyles.ShadedWithVisibleEdgesOnlyVisualStyle
     for name, (visible, direction, target, zoom, tilted) in VIEWS.items():
         if names and name not in names:
             continue
         _show(root, visible)
         _camera(direction, target, zoom, tilted)
         _save(os.path.join(out_dir, name + '.png'))
-    _show(root, set(EXPLODE))
-    _explode(root, 1)
+    # exploded view: the last frame of the README animation, every part on its collision-free path
+    import json
+    with open(HERO_MOTION, encoding='utf-8') as f:
+        motion = json.load(f)
+    _show(root, set(motion['ids']))
+    _place(root, motion['parts'], 1.0)
     _camera(*EXPLODE_VIEW)
     _save(os.path.join(out_dir, 'exploded_view.png'))
-    _explode(root, 0)
+    _place(root, motion['parts'], 0.0)
 
 
 def ease(t):

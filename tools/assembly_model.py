@@ -56,7 +56,7 @@ WIRE = {
 }
 
 INSERT_D, INSERT_L = 3.2, 3.0
-SCREW_HEAD_D, SCREW_HEAD_H, SCREW_D, SCREW_L = 3.8, 1.3, 2.0, 4.0
+SCREW_HEAD_D, SCREW_HEAD_H, SCREW_D, SCREW_L = 3.5, 1.1, 2.0, 4.0  # ISO 7380 M2 x 4
 
 
 def box(x0, y0, z0, x1, y1, z1, color, mat="plastic"):
