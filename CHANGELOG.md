@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.7.1](https://github.com/tobi136B/co2-wall-sensor/compare/v1.7.0...v1.7.1) (2026-10-07)
+
+
+### Fixed
+
+* **cad:** measured right-angle plug and inserts of both diameters ([#16](https://github.com/tobi136B/co2-wall-sensor/issues/16)) ([be7c70b](https://github.com/tobi136B/co2-wall-sensor/commit/be7c70b7b6148175292aeee8a550067edc6a8dce))
+
 ## [1.7.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.6.0...v1.7.0) (2026-10-07)
 
 
