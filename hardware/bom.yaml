@@ -21,7 +21,7 @@
   details: "13.5 x 21.75 mm or 15 x 20 mm board (one sensor carrier each), CO2 400-5000 ppm, temperature, humidity, I2C, 3.3 V"
   used_for: sensor chamber
   aliexpress:
-    price: "20.99"
+    price: "21.19"
     link: https://de.aliexpress.com/item/1005009740863220.html
 
 - name: "**ESP32-C3 SuperMini**"
@@ -33,8 +33,8 @@
     price: "2.79"
     link: https://de.aliexpress.com/item/1005007479144456.html
   amazon:
-    price: "8.99 (2 pcs)"
-    link: https://www.amazon.de/dp/B0DMNBWTFD
+    price: "4.30 (2 pcs: 8.59 €)"
+    link: https://www.amazon.de/dp/B0HDCHXHMT
 
 - name: "**Waveshare 2inch LCD Module** (ST7789V, 240 × 320)"
   name_de: "**Waveshare 2inch LCD Module** (ST7789V, 240 × 320)"
@@ -42,7 +42,7 @@
   details: "ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm"
   used_for: display
   aliexpress:
-    price: "12.39"
+    price: "12.49"
     link: https://de.aliexpress.com/item/1005008772378337.html
   amazon:
     price: "16.31"
@@ -54,6 +54,7 @@
   details: "outer diameter 3.0 or 3.2 mm, length 3 mm; the hole of 2.9 x 3.4 mm takes both"
   used_for: "display 4, back cover 4, sensor carrier 2"
   aliexpress:
+    price: "2.39 (50 pcs, OD 3.2)"
     link: https://de.aliexpress.com/item/1005008575446687.html
   amazon:
     price: "6.99 (200 pcs, OD 3.0)"
@@ -62,29 +63,29 @@
 - name: "Button head screw **M2 × 4**, ISO 7380"
   name_de: "Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380"
   qty: 10
-  details: "ISO 7380, hex socket 1.3 mm"
+  details: "ISO 7380, head 3.5 x 1.1 mm, hex socket 1.3 mm, black"
   used_for: "display 4, back cover 4, sensor carrier 2"
   amazon:
-    price: "4.30 (50 pcs)"
-    link: https://www.amazon.de/dp/B0DGXPQ7TW
+    price: "4.79 (60 pcs)"
+    link: https://www.amazon.de/dp/B0FVT11R5L
 
 - name: "USB cable with **right-angle USB-C plug** (angled up/down) for the back port"
   name_de: "USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten"
   qty: 1
-  details: "USB-C end angled up/down, for the back cable port; for the bottom port any straight cable with an overmould up to 12 x 7 mm"
+  details: "USB-A to USB-C, 0.3 m, USB-C end angled 90 degrees with a round body of 8 x 18.2 mm (deleyCON); for the bottom port any straight cable with an overmould up to 12 x 7 mm"
   used_for: power
   amazon:
-    price: "7.69"
-    link: https://www.amazon.de/dp/B01MSIE2L1
+    price: "5.90 (0.3 m)"
+    link: https://www.amazon.de/dp/B0DGTQD4Y5
 
 - name: "USB power module for the flush wall box (installation by a qualified electrician), or any USB charger"
   name_de: USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät
   qty: 1
-  details: "230 V to 5 V, USB-A; installation only by a qualified electrician; alternatively any USB charger"
+  details: "230 V to 5 V 2.1 A, USB-A output; installation only by a qualified electrician; alternatively any USB charger"
   used_for: power
   amazon:
-    price: "8.99"
-    link: https://www.amazon.de/dp/B0HHF42X68
+    price: "4.80 (2 pcs: 9.59 €)"
+    link: https://www.amazon.de/dp/B0GVWPHKJM
 
 - name: Silicone wire AWG 30
   name_de: Silikonlitze AWG 30

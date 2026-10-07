@@ -30,6 +30,11 @@ HEADER = {
     "de": "| Anz. | Teil | AliExpress | Amazon.de |\n|----:|------|-----------:|----------:|",
 }
 WORDS_DE = {"pcs": "Stk.", "colours": "Farben", "OD": "AD"}
+# shown in a shop column without an offer, so no cell stays empty
+ONLY = {
+    "en": {"aliexpress": "Amazon only", "amazon": "AliExpress only"},
+    "de": {"aliexpress": "nur Amazon", "amazon": "nur AliExpress"},
+}
 
 
 def load() -> list[dict]:
@@ -77,7 +82,7 @@ def markdown_table(lang: str) -> str:
                 label, note = price_label(r[shop].get("price"), lang)
                 cells.append(f"[{label}]({r[shop]['link']}){note}")
             else:
-                cells.append("")
+                cells.append(f"*{ONLY[lang][shop]}*")
         lines.append(f"| {r.get('qty', '')} | {part_name(r, lang)} | {cells[0]} | {cells[1]} |")
     return "\n".join(lines)
 
@@ -93,7 +98,7 @@ def html_rows(lang: str) -> str:
                 link = html.escape(r[shop]["link"])
                 cells.append(f'<a href="{link}" rel="nofollow noopener">{html.escape(label)}</a>')
             else:
-                cells.append("")
+                cells.append(f'<span class="only">{ONLY[lang][shop]}</span>')
         out.append(
             f'          <tr><td class="qty">{r.get("qty", "")}</td><td>{part}</td>'
             f'<td class="shop">{cells[0]}</td><td class="shop">{cells[1]}</td></tr>'
