@@ -39,16 +39,7 @@ Jedes Teil trägt auf einer verdeckten Fläche seinen Namen, die Version und die
 
 Die einzigen anderen Schrauben sind die beiden, die der Hohlwanddose beiliegen. Im Gerät ist nichts geklebt.
 
-## 3. Vormontage
-
-1. **Einschmelzmuttern eindrücken** mit dem Lötkolben (ca. 200 bis 220 °C, wenn vorhanden mit M2-Spitze). Jedes Loch hat eine kleine Einführschräge, die die Mutter zentriert. Unter Eigengewicht einsinken lassen und bündig aufhören.
-   * 4 in die Displaydome rund um den Displayschacht. Die Front dahinter ist nur 1,1 mm dick, also mit wenig Temperatur und wenig Druck arbeiten.
-   * 4 für den Rückdeckel: 2 in den unteren Ecken, 2 im massiven Band über dem Display.
-   * 2 für den Sensorträger in die kurzen Dome im Kinn.
-   * Optionale Sicherung: 1 von außen in die Unterseite des Gehäuses, 1 vorne in die Wandplatte unterhalb des Geräts.
-2. **Elektronik zuerst auf dem Tisch testen.** Nach [verdrahtung.md](verdrahtung.md) verdrahten, Firmware flashen und das Display prüfen, bevor alles eingebaut wird.
-
-## 4. Kabelaustritt wählen
+## 3. Kabelaustritt wählen
 
 Das Kabel verlässt das Gerät durch ein kleines, tauschbares **Kabelport-Modul** an der unteren hinteren Kante. Beide Versionen drucken und vor Ort entscheiden:
 
@@ -63,42 +54,149 @@ Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt. Eine Stufe in der Unt
 
 **Zugentlastung:** Beim Modul hinten geht der runde Körper des Winkelsteckers durch ein Langloch, sein Kragen sitzt unter dem Modul. Zug am Kabel endet am Modul und nicht an der USB-Buchse.
 
-## 5. Zusammenbau
+## 4. Schritt für Schritt
 
-![Innenansicht](../images/interior.png)
+**Bevor du anfängst, leg dir bereit:** Lötkolben mit feiner Spitze, Innensechskant 1,3 mm, kleiner Schlitzschraubendreher, Heißkleber, Seitenschneider. Alle 13 Schritte gibt es auch in der [3D-Aufbauanleitung](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html), dort kannst du jeden Schritt drehen und das Gerät zerlegen.
 
-1. **Display:** mit dem Glas voran in den Displayschacht legen und mit 4 × M2 × 4 verschrauben.
-2. **SCD41:** vier Litzen von ca. 8 cm an GND, VDD, SCL und SDA löten. Die Platine **von oben** in die beiden Schienen auf der Frontseite des Sensorträgers schieben, Sensor zeigt vom Träger weg, Lötpunkte zur Kabelkerbe. Nach unten schieben, bis sie auf den Anschlägen steht: Der Haken der Federzunge schnappt über die Oberkante und hält die Platine spielfrei. Die Litzen durch die Kerbe an der Oberkante führen. Zum Herausnehmen die Zunge mit einem kleinen Schraubendreher nach hinten drücken.
+<!-- steps:start (generated from site/assembly_steps.yaml) -->
 
-   <img src="../images/sensor_carrier_front.png" width="70%" alt="SCD41 in den Schienen">
-3. **ESP32-C3:** die Litzen von Display und SCD41 anlöten ([Verdrahtung](verdrahtung.md)). Den ESP32-C3 von oben zwischen die Seitenführungen auf der Rückseite des Trägers schieben, bis die Unterkante auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht.
+### Schritt 1 von 13: Das Gehäuse
 
-   Dann das USB-Kabel von unten einstecken, der Träger ist unter der Buchse offen:
-   * Modul hinten: das Kabel seitlich in den Schlitz des Moduls legen,
-   * Modul unten: den Stecker vorher von außen durch das Modul schieben.
+<img src="../images/steps/step_01.png" width="60%" alt="Das Gehäuse">
 
-   <img src="../images/sensor_carrier_back.png" width="70%" alt="ESP32-C3 auf der Rückseite des Trägers">
-4. **Sensorträger:** auf die Leisten im Kinn legen und mit 2 × M2 × 4 verschrauben. Er schließt die Sensorkammer gegen die warme Elektronik ab. Die Kabelkerbe mit einem Tropfen Heißkleber abdichten.
-5. **Kabelport-Modul:** von hinten in die Öffnung an der unteren hinteren Kante schieben.
-6. **Rückdeckel:** in den Sitz legen und mit 4 × M2 × 4 verschrauben. Die Linsenköpfe sitzen in Senkungen unter der Oberfläche, der Deckel gleitet weiterhin auf die Wandplatte.
+**Du brauchst:** Gedrucktes Gehäuse
 
-## 6. Wandmontage auf der Hohlwanddose
+Mit der Front nach unten gedruckt. Du schaust von hinten darauf, auf die Seite, die später zur Wand zeigt. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-1))
 
-1. **Strom in die Dose bringen:** entweder ein Unterputz-USB-Netzteil (Arbeiten an 230 V nur durch eine Elektrofachkraft) oder ein USB-Kabel, das in der Wand zu einer Steckdose läuft.
-2. **Wandplatte** mit den beiden Geräteschrauben der Dose befestigen (60 mm Abstand, waagrecht). Die Langlöcher gleichen eine leicht verdrehte Dose aus.
-3. USB-Kabel durch den Kabeldurchlass führen und ins Gerät stecken.
-4. **Gerät aufsetzen:** vor die Platte halten, die Schiene in das verdeckte Einsetzfenster stecken und **15 mm nach unten schieben**. Fertig.
-5. **Optionale Sicherung:** die Sicherungslasche unter das Gerät halten, nach oben ins Gehäuse und nach hinten in die Wandplatte schrauben (2 × M2 × 4).
+> **Tipp:** Kein Stützmaterial nötig. Den Rand (Brim) entfernen und prüfen, dass die vier Deckelsitze in den Ecken sauber sind.
 
-   <img src="../images/lock_tab.png" width="60%" alt="Sicherungslasche unter dem Gerät">
+### Schritt 2 von 13: 10 Einschmelzmuttern
 
-Zum Abnehmen die Lasche lösen (falls montiert), das Gerät 15 mm nach oben schieben und abziehen.
+<img src="../images/steps/step_02.png" width="60%" alt="10 Einschmelzmuttern">
 
-## 7. Tischständer
+**Du brauchst:** 10 Einschmelzmuttern M2 × 3, Lötkolben auf 200 bis 220 °C
+
+Die M2-Muttern mit dem Lötkolben eindrücken (ca. 200 bis 220 °C). 4 rund um den Displayschacht, 4 für den Rückdeckel, 2 für den Sensorträger. Die Einführschräge zentriert sie. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-2))
+
+> **Tipp:** Mutter auf das Loch setzen, mit dem Lötkolben antippen und unter Eigengewicht einsinken lassen, bis sie bündig ist. Nicht drücken. Hinter den 4 Displaydomen ist die Front nur 1,1 mm dick: wenig Hitze, kein Druck.
+
+### Schritt 3 von 13: Display
+
+<img src="../images/steps/step_03.png" width="60%" alt="Display">
+
+**Du brauchst:** Display, 4 Schrauben M2 × 4, Innensechskant 1,3 mm
+
+Mit dem Glas voran in den Displayschacht legen, dann 4 Schrauben M2 × 4 durch die Ecklöcher der Displayplatine. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-3))
+
+> **Tipp:** Die Elektronik vorher auf dem Tisch testen: alles verdrahten, Firmware flashen und das Display prüfen. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen.
+
+### Schritt 4 von 13: Sensorträger
+
+<img src="../images/steps/step_04.png" width="60%" alt="Sensorträger">
+
+**Du brauchst:** Sensorträger für deine SCD41-Platine
+
+Der Träger ist der herausnehmbare Boden der Sensorkammer. Drucke den, der zu deiner SCD41-Platine passt, hier die Version 13,5 × 21,75 mm. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-4))
+
+> **Tipp:** Unsicher, welche Platine du hast? Siehe [Sensor ausmessen](sensor-ausmessen.md).
+
+### Schritt 5 von 13: SCD41 in die Schienen
+
+<img src="../images/steps/step_05.png" width="60%" alt="SCD41 in die Schienen">
+
+**Du brauchst:** SCD41, 4 Litzen von ca. 8 cm, Lötkolben
+
+Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zur Kabelkerbe. Die Federzunge schnappt über die Oberkante. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-5))
+
+> **Tipp:** Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken.
+
+### Schritt 6 von 13: ESP32-C3 auf der Rückseite
+
+<img src="../images/steps/step_06.png" width="60%" alt="ESP32-C3 auf der Rückseite">
+
+**Du brauchst:** ESP32-C3 SuperMini, USB-Kabel mit Winkelstecker
+
+Den ESP32-C3 von oben zwischen die Seitenführungen schieben, bis er auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht. Dann das USB-Kabel von unten einstecken, der Träger ist unter der Buchse offen. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-6))
+
+> **Tipp:** Modul hinten: das Kabel vorher seitlich in den Schlitz des Moduls legen. Modul unten: den geraden Stecker vorher von außen durch das Modul schieben.
+
+### Schritt 7 von 13: Träger ins Gehäuse
+
+<img src="../images/steps/step_07.png" width="60%" alt="Träger ins Gehäuse">
+
+**Du brauchst:** 2 Schrauben M2 × 4, ein Tropfen Heißkleber
+
+Den Träger auf die Leisten im Kinn legen und mit 2 Schrauben M2 × 4 festschrauben. Er schließt die Sensorkammer gegen die warme Elektronik ab. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-7))
+
+> **Tipp:** Die Kabelkerbe mit einem Tropfen Heißkleber abdichten. Dann bleibt die Sensorkammer von der warmen Elektronik getrennt.
+
+### Schritt 8 von 13: Verdrahtung
+
+<img src="../images/steps/step_08.png" width="60%" alt="Verdrahtung">
+
+**Du brauchst:** Silikonlitze AWG 30, Lötkolben, den [Verdrahtungsplan](verdrahtung.md)
+
+Display: 8 Litzen vom Stecker über die Rückseite des Displays zum ESP32-C3. SCD41: 4 Litzen durch die Kerbe im Träger. Farben wie im Verdrahtungsplan. Der gezeigte Kabelweg ist schematisch. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-8))
+
+> **Tipp:** Die Litzen kurz halten und flach über die Rückseite des Displays legen, damit der Deckel schließt, ohne auf sie zu drücken.
+
+### Schritt 9 von 13: Kabelport-Modul
+
+<img src="../images/steps/step_09.png" width="60%" alt="Kabelport-Modul">
+
+**Du brauchst:** Kabelport-Modul: hinten (Winkelstecker) oder unten (gerader Stecker)
+
+Das Modul in die Öffnung an der unteren hinteren Kante schieben. Modul hinten für den Winkelstecker in die Wanddose, Modul unten für ein Kabel auf Putz. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-9))
+
+> **Tipp:** Beide Module drucken und vor Ort entscheiden. Später wechseln kostet vier Schrauben.
+
+### Schritt 10 von 13: Rückdeckel
+
+<img src="../images/steps/step_10.png" width="60%" alt="Rückdeckel">
+
+**Du brauchst:** Rückdeckel, 4 Schrauben M2 × 4
+
+Den Deckel in seinen Sitz legen und mit 4 Schrauben M2 × 4 festschrauben. Die Köpfe liegen unter der Oberfläche, der Deckel gleitet trotzdem auf die Wandplatte. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-10))
+
+> **Tipp:** Hinten darf nichts überstehen: Die Köpfe liegen versenkt, sonst lässt sich das Gerät nicht auf die Wandplatte schieben.
+
+### Schritt 11 von 13: Wandplatte auf die Hohlwanddose
+
+<img src="../images/steps/step_11.png" width="60%" alt="Wandplatte auf die Hohlwanddose">
+
+**Du brauchst:** Wandplatte, die 2 Schrauben der Hohlwanddose
+
+Die Wandplatte mit den beiden Geräteschrauben der Hohlwanddose festschrauben (60 mm Abstand). Die Langlöcher gleichen eine leicht verdrehte Dose aus. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-11))
+
+> **Tipp:** Strom in der Dose: ein Unterputz-USB-Netzteil (Arbeiten an 230 V nur durch eine Elektrofachkraft) oder ein USB-Kabel in der Wand. Das Kabel durch den Durchlass der Platte führen.
+
+### Schritt 12 von 13: Gerät aufsetzen
+
+<img src="../images/steps/step_12.png" width="60%" alt="Gerät aufsetzen">
+
+**Du brauchst:** Nichts
+
+Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-12))
+
+> **Tipp:** Das Kabel ins Gerät stecken, bevor du es auf die Schiene setzt.
+
+### Schritt 13 von 13: Optionale Sicherungslasche
+
+<img src="../images/steps/step_13.png" width="60%" alt="Optionale Sicherungslasche">
+
+**Du brauchst:** Sicherungslasche, 2 Einschmelzmuttern und 2 Schrauben M2 × 4
+
+Im Büro, in der Schule oder bei Kindern je eine Mutter unten ins Gehäuse und in die Wandplatte einschmelzen, dann die kleine Lasche von unten anschrauben (2 Schrauben M2 × 4). Dann lässt sich das Gerät nicht mehr von der Wand schieben. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-13))
+
+> **Tipp:** Nur wo nötig. Zum Abnehmen später zuerst die Lasche abschrauben.
+
+<!-- steps:end -->
+
+## 5. Tischständer
 
 Das Modul hinten mit Winkelstecker verwenden. Gerät von oben auf die Schiene setzen und nach unten schieben. Das Gerät lehnt 12° nach hinten, 5 mm Luftspalt unten halten die Lüftung frei. Das Kabel läuft durch die Kerbe hinten am Fuß hinaus.
 
-## 8. Inbetriebnahme
+## 6. Inbetriebnahme
 
 **Der einfache Weg:** Firmware auf der [Projektseite](https://tobi136b.github.io/co2-wall-sensor/) direkt aus dem Browser flashen, im selben Fenster das WLAN eintragen und das Gerät in Home Assistant übernehmen. Firmware-Updates erscheinen danach in Home Assistant.
 
@@ -111,4 +209,6 @@ Das Modul hinten mit Winkelstecker verwenden. Gerät von oben auf die Schiene se
 **Danach in beiden Fällen:**
 
 1. **Kalibrierung:** Gerät 15 Minuten neben ein offenes Fenster legen, dann in Home Assistant *SCD41 kalibrieren (Frischluft 420 ppm)* drücken. Die automatische Selbstkalibrierung ist zusätzlich aktiv.
-2. **Temperatur:** nach 24 Stunden mit einem Referenzthermometer vergleichen und `temperature_offset` in der Gerätedatei anpassen (nach dem Übernehmen im ESPHome Dashboard, wenn du über den Browser geflasht hast).
+2. **Temperatur:** nach 24 Stunden mit einem Referenzthermometer vergleichen und den Unterschied in Home Assistant als *Temperaturkorrektur* eintragen. Die Luftfeuchte wird damit mitkorrigiert.
+3. **Höhe:** *Höhe über dem Meer* für deinen Ort einstellen, das macht den CO2-Wert genauer.
+4. **Nacht und Außenwerte:** Nachtzeit, Dimmen oder Ausschalten, Fensterhinweis und Außenfühler stellst du alles in Home Assistant ein, siehe [Home Assistant](../../README.de.md#home-assistant).

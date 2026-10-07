@@ -25,7 +25,9 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 * **Im Browser flashen.** ESP32-C3 per USB anschließen, auf der [Projektseite](https://tobi136b.github.io/co2-wall-sensor/de/) auf *Installieren* klicken, WLAN eintragen. Home Assistant findet das Gerät und bietet neue Versionen als Firmware-Update an.
 * **Echte CO2-Messung** mit dem Sensirion SCD41 (photoakustisch, NDIR), dazu Temperatur und Luftfeuchte.
-* **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Temperatur und Luftfeuchte.
+* **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Innen- und Außentemperatur sowie Luftfeuchte.
+* **Fensterhinweis.** Das Display zeigt, wann Lüften den Raum kühlt oder die Luft trocknet. Dafür reicht ein Außensensor oder einfach die Wettervorhersage aus Home Assistant.
+* **Alles in Home Assistant einstellbar.** Nachtzeiten (dimmen oder aus), Nachthelligkeit, Warnung in der Nacht, Temperaturkorrektur, Höhe und Schwellen für den Hinweis, ganz ohne neu zu flashen.
 * **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (verdeckt eine Standard-Hohlwanddose Ø 68 mm) oder den **Tischständer**. Eine optionale Sicherungslasche schraubt es an der Wand fest.
 * **Kabel von hinten oder unten**, entschieden nach dem Druck mit einem kleinen, tauschbaren **Kabelport-Modul**, das gleichzeitig als Zugentlastung dient.
 * **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. Der SCD41 gleitet in Schienen, der ESP32-C3 sitzt in Führungen.
@@ -115,13 +117,31 @@ Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Sho
 | Entität | Typ | Zweck |
 |---------|-----|-------|
 | CO2, Temperatur, Luftfeuchtigkeit | Sensor | Messwerte alle 30 s |
+| CO2 Trend, Lüften in | Sensor | ppm pro Stunde, Minuten bis Rot |
 | Luftqualität | Text | Gut, Mäßig, Lüften! |
+| Außentemperatur, Außenfeuchte | Sensor | aus Home Assistant, siehe [Außenwerte](#außenwerte) |
+| Fensterhinweis | Text | Fenster auf, Lüften trocknet, Fenster zu, Keiner |
 | CO2 Schwelle Gelb / Rot | Zahl | Ampelgrenzen (Standard 1000 / 1400 ppm) |
-| Display Helligkeit | Licht | dimmen oder ausschalten |
-| Nachtmodus (22 bis 6 Uhr dimmen) | Schalter | automatisches Dimmen in der Nacht |
+| Display Helligkeit | Licht | von Hand dimmen oder ausschalten |
+| Nachtmodus, Nacht ab, Nacht bis | Schalter, Uhrzeit | Nachtzeit (Standard 22 bis 6 Uhr) |
+| Display in der Nacht, Nachthelligkeit | Auswahl, Zahl | dimmen (Standard 8 %) oder aus |
+| Rote Warnung auch nachts | Schalter | das Display geht an, solange der CO2-Wert rot ist |
+| Fensterhinweis auf dem Display, Außenwert auf dem Display | Schalter | ein- oder ausblenden |
+| Fensterhinweis ab Innentemperatur, Fensterhinweis: draußen kühler um | Zahl | Standard 24 °C und 3 °C |
+| Temperaturkorrektur | Zahl | Eigenerwärmung an deiner Wand: mit einem Referenzthermometer vergleichen |
+| Höhe über dem Meer | Zahl | Druckausgleich für den CO2-Wert (Standard 300 m) |
 | SCD41 kalibrieren (Frischluft 420 ppm) | Taste | Zwangskalibrierung an der frischen Luft |
 | Firmware | Update | neue Versionen (Firmware des Browser-Installers) |
 | WLAN Signal, Laufzeit, Neustart | Diagnose | |
+
+Alle Einstellungen bleiben nach einem Stromausfall erhalten. Selbst bauen muss man nichts: Die Firmware aus dem Browser-Installer hat alle Einstellungen.
+
+### Außenwerte
+
+Das Display zeigt die Außentemperatur unter **OUT**, der Fensterhinweis vergleicht drinnen und draußen.
+
+* **Ohne Einrichtung** nimmt das Gerät `weather.forecast_home`, die Wetter-Entität, die Home Assistant für den eigenen Standort anlegt (Integration *Meteorologisk institutt (Met.no)*).
+* **Ein echter Außenfühler hat Vorrang.** Wie gewohnt anlernen (Zigbee, Homematic IP, Shelly, ...), unter *Einstellungen > Geräte & Dienste > Entitäten* öffnen, auf das Zahnrad klicken und die **Entitäts-ID** auf `sensor.outdoor_temperature` ändern (Luftfeuchte: `sensor.outdoor_humidity`). Wenige Sekunden später zeigt ihn das Display. Keine neue Firmware nötig.
 
 **Lüftungserinnerung:** Ein fertiger Blueprint schickt eine Nachricht aufs Handy, wenn der CO2-Wert hoch bleibt, und noch einmal, wenn die Luft wieder gut ist.
 

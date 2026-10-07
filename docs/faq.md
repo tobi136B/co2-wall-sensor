@@ -16,7 +16,7 @@ Placement matters more than size:
 * **Not next to windows, doors, radiators or ventilation outlets**, and not in direct sunlight.
 
 ### What is the hole in the bottom of the housing for?
-It takes a heat-set insert for the optional lock tab. The tab is screwed to the housing and to the wall plate from below, so the device cannot simply be slid off the wall (office, school, children). Without the lock tab the hole stays empty; it is only visible from below. See [assembly](assembly.md#6-wall-mounting-on-a-flush-wall-box).
+It takes a heat-set insert for the optional lock tab. The tab is screwed to the housing and to the wall plate from below, so the device cannot simply be slid off the wall (office, school, children). Without the lock tab the hole stays empty; it is only visible from below. See [assembly](assembly.md#step-13-of-13-optional-lock-tab).
 
 ### Which thresholds are sensible?
 The defaults are 1000 ppm (yellow) and 1400 ppm (red). Values below 1000 ppm are generally considered harmless, above 2000 ppm ventilation is clearly needed. Both thresholds can be changed in Home Assistant at any time.
@@ -46,7 +46,7 @@ No. The firmware only checks the release manifest on the project page for update
 Generic M2 × 3 heat-set inserts with 3.2 mm outer diameter (the common "M2 x 3 x 3.2" packs) and M2 × 4 button head screws ISO 7380, 10 of each (12 with the optional lock tab). Inserts with a different outer diameter work if you change `INSERT_HOLE_D`.
 
 ### Cable from below or from the back?
-Both. Print the two cable port modules and use the one you need: back with a right-angle plug for the flush wall box and the desk stand, bottom with a straight plug for a surface mounted cable. Swapping later takes four screws. See [assembly](assembly.md#4-choose-the-cable-exit).
+Both. Print the two cable port modules and use the one you need: back with a right-angle plug for the flush wall box and the desk stand, bottom with a straight plug for a surface mounted cable. Swapping later takes four screws. See [assembly](assembly.md#3-choose-the-cable-exit).
 
 ### My straight USB-C plug does not fit.
 The bottom port takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or use the back port with a right-angle plug.

@@ -45,6 +45,7 @@ jobs:
           # on main the Shop links workflow updates the README tables itself
           if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then python tools/bom.py; fi
           python tools/check_repo.py
+          python tools/assembly_docs.py --check
       - name: Printability check (wall thickness for a 0.4 mm nozzle)
         run: python tools/print_check.py
       - name: Collision check (every assembly path, the take-apart slider and the README animation)

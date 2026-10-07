@@ -18,11 +18,14 @@ substitutions:
   # Defaults, can be overridden in the device file
   co2_yellow_default: "1000"
   co2_red_default: "1400"
-  temperature_offset: "2.0"     # self-heating compensation, verify against a reference after 24 h
-  altitude: "300m"              # altitude above sea level for CO2 pressure compensation
-  night_dim_percent: "8%"
+  temperature_offset: "2.0"     # self-heating compensation, fine-tune it in Home Assistant (temperature correction)
+  altitude: "300"               # altitude above sea level in m (start value, set it in Home Assistant)
   trend_rising: "100"           # ppm per hour: from here the display shows a rising arrow
-  day_brightness_percent: "80%"
+  day_brightness: "80"          # percent
+  # outdoor values: a real sensor (rename its entity ID in Home Assistant) wins over the weather forecast
+  outdoor_temperature_entity: sensor.outdoor_temperature
+  outdoor_humidity_entity: sensor.outdoor_humidity
+  weather_entity: weather.forecast_home
 
 esphome:
   name: ${name}
@@ -35,7 +38,7 @@ esphome:
     then:
       - light.turn_on:
           id: backlight
-          brightness: ${day_brightness_percent}
+          brightness: ${day_brightness}%
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -49,29 +52,37 @@ logger:
 time:
   - platform: homeassistant
     id: ha_time
-    on_time:
-      - hours: 22
-        minutes: 0
-        seconds: 0
-        then:
-          - if:
-              condition:
-                switch.is_on: night_mode
-              then:
-                - light.turn_on:
-                    id: backlight
-                    brightness: ${night_dim_percent}
-      - hours: 6
-        minutes: 0
-        seconds: 0
-        then:
-          - if:
-              condition:
-                switch.is_on: night_mode
-              then:
-                - light.turn_on:
-                    id: backlight
-                    brightness: ${day_brightness_percent}
+
+# night schedule: applied only when day and night change, so a manual change in Home Assistant stays
+interval:
+  - interval: 20s
+    then:
+      - lambda: |-
+          static int last = -1;   // 0 day, 1 night dimmed, 2 night off, 3 night off but red warning
+          auto now = id(ha_time).now();
+          if (!now.is_valid()) return;
+          const int m = now.hour * 60 + now.minute;
+          const int s = id(night_start).hour * 60 + id(night_start).minute;
+          const int e = id(night_end).hour * 60 + id(night_end).minute;
+          bool night = s < e ? (m >= s && m < e) : (m >= s || m < e);
+          if (!id(night_mode).state || s == e) night = false;
+          const bool red = id(co2).has_state() && id(co2).state >= id(threshold_red).state;
+          int state = 0;
+          if (night) {
+            if (id(night_display).active_index() == 1) state = (red && id(night_warning).state) ? 3 : 2;
+            else state = 1;
+          }
+          if (state == last) return;
+          last = state;
+          if (state == 2) {
+            auto call = id(backlight).turn_off();
+            call.perform();
+          } else {
+            auto call = id(backlight).turn_on();
+            call.set_brightness(state == 0 ? ${day_brightness} / 100.0f
+                                           : id(night_brightness).state / 100.0f);
+            call.perform();
+          }
 
 # ----------------------------------------------------------------------------- buses
 i2c:
@@ -93,7 +104,7 @@ sensor:
     update_interval: 30s
     measurement_mode: periodic
     automatic_self_calibration: true
-    altitude_compensation: ${altitude}
+    ambient_pressure_compensation_source: air_pressure
     temperature_offset: ${temperature_offset}
     co2:
       id: co2
@@ -106,10 +117,74 @@ sensor:
       id: temperature
       name: "${txt_temperature}"
       accuracy_decimals: 1
+      filters:
+        - lambda: return x + id(temp_correction).state;
     humidity:
       id: humidity
       name: "${txt_humidity}"
       accuracy_decimals: 0
+      filters:
+        # same amount of water at the corrected temperature: relative humidity changes with it
+        - lambda: |-
+            const float c = id(temp_correction).state;
+            if (c == 0 || !id(temperature).has_state()) return x;
+            const float t1 = id(temperature).state, t0 = t1 - c;
+            auto es = [](float t) { return 6.112f * expf(17.62f * t / (243.12f + t)); };
+            return x * es(t0) / es(t1);
+
+  # air pressure from the altitude set in Home Assistant, for the CO2 pressure compensation
+  - platform: template
+    id: air_pressure
+    internal: true
+    unit_of_measurement: hPa
+    update_interval: 60s
+    lambda: return 1013.25f * powf(1.0f - 2.25577e-5f * id(altitude_m).state, 5.25588f);
+
+  # outdoor values from Home Assistant: a real sensor first, the weather forecast otherwise
+  - platform: homeassistant
+    id: outdoor_temp_sensor
+    entity_id: ${outdoor_temperature_entity}
+    internal: true
+  - platform: homeassistant
+    id: outdoor_hum_sensor
+    entity_id: ${outdoor_humidity_entity}
+    internal: true
+  - platform: homeassistant
+    id: weather_temp
+    entity_id: ${weather_entity}
+    attribute: temperature
+    internal: true
+  - platform: homeassistant
+    id: weather_hum
+    entity_id: ${weather_entity}
+    attribute: humidity
+    internal: true
+  - platform: template
+    id: outdoor_temperature
+    name: "${txt_outdoor_temperature}"
+    icon: mdi:home-thermometer-outline
+    unit_of_measurement: "°C"
+    device_class: temperature
+    accuracy_decimals: 1
+    update_interval: 60s
+    lambda: |-
+      if (id(outdoor_temp_sensor).has_state() && !std::isnan(id(outdoor_temp_sensor).state))
+        return id(outdoor_temp_sensor).state;
+      if (id(weather_temp).has_state()) return id(weather_temp).state;
+      return NAN;
+  - platform: template
+    id: outdoor_humidity
+    name: "${txt_outdoor_humidity}"
+    icon: mdi:water-percent
+    unit_of_measurement: "%"
+    device_class: humidity
+    accuracy_decimals: 0
+    update_interval: 60s
+    lambda: |-
+      if (id(outdoor_hum_sensor).has_state() && !std::isnan(id(outdoor_hum_sensor).state))
+        return id(outdoor_hum_sensor).state;
+      if (id(weather_hum).has_state()) return id(weather_hum).state;
+      return NAN;
 
   - platform: wifi_signal
     name: "${txt_wifi_signal}"
@@ -165,6 +240,22 @@ sensor:
       return minutes > 240 ? NAN : minutes;
 
 text_sensor:
+  # window hint: only when opening the window really helps (or would make it worse)
+  - platform: template
+    id: window_hint
+    name: "${txt_window_hint}"
+    icon: mdi:window-open-variant
+    update_interval: 60s
+    lambda: |-
+      const float ti = id(temperature).state, hi = id(humidity).state;
+      const float to = id(outdoor_temperature).state, ho = id(outdoor_humidity).state;
+      if (std::isnan(ti) || std::isnan(to)) return {"${txt_hint_none}"};
+      if (ti >= id(hint_temp).state && to <= ti - id(hint_delta).state) return {"${txt_hint_cool}"};
+      // absolute humidity in g/m3: airing dries the room when the outdoor air holds clearly less water
+      auto ah = [](float t, float rh) { return 216.7f * rh / 100.0f * 6.112f * expf(17.62f * t / (243.12f + t)) / (273.15f + t); };
+      if (!std::isnan(hi) && !std::isnan(ho) && hi >= 60 && ah(to, ho) <= ah(ti, hi) - 2.0f) return {"${txt_hint_dry}"};
+      if (ti >= id(hint_temp).state && to >= ti + 1.0f) return {"${txt_hint_warm}"};
+      return {"${txt_hint_none}"};
   - platform: template
     id: air_quality
     name: "${txt_air_quality}"
@@ -204,11 +295,124 @@ number:
     optimistic: true
     entity_category: config
 
+  - platform: template
+    id: night_brightness
+    name: "${txt_night_brightness}"
+    icon: mdi:brightness-4
+    unit_of_measurement: "%"
+    min_value: 1
+    max_value: 50
+    step: 1
+    initial_value: 8
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: temp_correction
+    name: "${txt_temp_correction}"
+    icon: mdi:thermometer-lines
+    unit_of_measurement: "°C"
+    min_value: -5
+    max_value: 5
+    step: 0.1
+    initial_value: 0
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: altitude_m
+    name: "${txt_altitude}"
+    icon: mdi:image-filter-hdr
+    unit_of_measurement: m
+    min_value: 0
+    max_value: 3000
+    step: 10
+    initial_value: ${altitude}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: hint_temp
+    name: "${txt_hint_temp}"
+    icon: mdi:window-open-variant
+    unit_of_measurement: "°C"
+    min_value: 18
+    max_value: 30
+    step: 0.5
+    initial_value: 24
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: hint_delta
+    name: "${txt_hint_delta}"
+    icon: mdi:window-open-variant
+    unit_of_measurement: "°C"
+    min_value: 1
+    max_value: 10
+    step: 0.5
+    initial_value: 3
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+datetime:
+  - platform: template
+    id: night_start
+    type: time
+    name: "${txt_night_start}"
+    optimistic: true
+    restore_value: true
+    initial_value: "22:00"
+    entity_category: config
+  - platform: template
+    id: night_end
+    type: time
+    name: "${txt_night_end}"
+    optimistic: true
+    restore_value: true
+    initial_value: "06:00"
+    entity_category: config
+
+select:
+  - platform: template
+    id: night_display
+    name: "${txt_night_display}"
+    icon: mdi:monitor-shimmer
+    options:
+      - "${txt_opt_dim}"
+      - "${txt_opt_off}"
+    initial_option: "${txt_opt_dim}"
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
 switch:
   - platform: template
     id: night_mode
     name: "${txt_night_mode}"
     icon: mdi:weather-night
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: night_warning
+    name: "${txt_night_warning}"
+    icon: mdi:alarm-light-outline
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: show_hint
+    name: "${txt_show_hint}"
+    icon: mdi:window-open-variant
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: show_outdoor
+    name: "${txt_show_outdoor}"
+    icon: mdi:home-thermometer-outline
     optimistic: true
     restore_mode: RESTORE_DEFAULT_ON
     entity_category: config
@@ -254,6 +458,12 @@ color:
     hex: "7A7F87"
   - id: col_line
     hex: "2A2E35"
+  - id: col_out
+    hex: "AFB6BE"
+  - id: col_cool
+    hex: "5ABEFF"
+  - id: col_warm
+    hex: "FFAA3C"
 
 font:
   - file: "gfonts://Inter@700"
@@ -264,9 +474,21 @@ font:
     id: font_medium
     size: 24
     glyphs: " %,-.0123456789:C°"
+  - file: "gfonts://Inter@600"
+    id: font_value
+    size: 21
+    glyphs: " %,-.0123456789:C°"
+  - file: "gfonts://Inter@700"
+    id: font_label
+    size: 11
+    glyphs: " ABCDEFGHIJKLMNOPQRSTUVWXYZ"
   # Superset of all status texts in English and German
   - file: "gfonts://Inter@400"
     id: font_small
+    size: 15
+    glyphs: " !%,-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÖÜß°~"
+  - file: "gfonts://Inter@700"
+    id: font_hint
     size: 15
     glyphs: " !%,-.0123456789:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzäöüÄÖÜß°~"
   - file:
@@ -376,14 +598,29 @@ display:
                   (int) id(co2_forecast).state);
       }
 
-      // footer: temperature and humidity
-      if (id(temperature).has_state()) {
-        it.print(14, 225, id(icons), id(col_muted), TextAlign::CENTER_LEFT, "\U000F050F");
-        it.print(42, 225, id(font_medium), id(col_text), TextAlign::CENTER_LEFT,
-                 (fmt(id(temperature).state, 1) + " °C").c_str());
+      // window hint above the footer, left (the forecast stays on the right)
+      if (id(show_hint).state && id(window_hint).has_state()) {
+        const std::string h = id(window_hint).state;
+        Color hc = id(col_cool);
+        if (h == "${txt_hint_warm}") hc = id(col_warm);
+        if (h != "${txt_hint_none}") it.print(12, 196, id(font_hint), hc, TextAlign::BOTTOM_LEFT, h.c_str());
       }
-      if (id(humidity).has_state()) {
-        it.print(W - 14, 225, id(font_medium), id(col_text), TextAlign::CENTER_RIGHT,
-                 (fmt(id(humidity).state, 0) + " %").c_str());
-        it.print(W - 76, 225, id(icons), id(col_muted), TextAlign::CENTER_RIGHT, "\U000F058E");
+
+      // footer like an instrument panel: IN, OUT and humidity with a small label above each value
+      const bool out = id(show_outdoor).state && !std::isnan(id(outdoor_temperature).state);
+      auto column = [&](int x, TextAlign a1, TextAlign a2, const char *label, const std::string &value, Color c) {
+        it.print(x, 210, id(font_label), id(col_muted), a1, label);
+        it.print(x, 228, id(font_value), c, a2, value.c_str());
+      };
+      if (id(temperature).has_state())
+        column(14, TextAlign::CENTER_LEFT, TextAlign::CENTER_LEFT, "IN", fmt(id(temperature).state, 1) + " °C",
+               id(col_text));
+      if (out) {
+        column(116, TextAlign::CENTER_LEFT, TextAlign::CENTER_LEFT, "OUT", fmt(id(outdoor_temperature).state, 1) + " °C",
+               id(col_out));
+        it.line(106, 205, 106, 234, id(col_line));
+        it.line(214, 205, 214, 234, id(col_line));
       }
+      if (id(humidity).has_state())
+        column(W - 14, TextAlign::CENTER_RIGHT, TextAlign::CENTER_RIGHT, "${txt_label_hum}",
+               fmt(id(humidity).state, 0) + " %", id(col_text));

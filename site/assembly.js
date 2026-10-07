@@ -13,8 +13,8 @@ import { toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
 const LANG = document.documentElement.lang === 'de' ? 'de' : 'en';
 const BASE = document.body.dataset.models;
 const UI = {
-  en: { step: (i, n) => `Step ${i} of ${n}`, next: 'Next', restart: 'Start over', play: '▶', pause: '❚❚' },
-  de: { step: (i, n) => `Schritt ${i} von ${n}`, next: 'Weiter', restart: 'Von vorn', play: '▶', pause: '❚❚' },
+  en: { step: (i, n) => `Step ${i} of ${n}`, next: 'Next', restart: 'Start over', play: '▶', pause: '❚❚', need: 'You need', tip: 'Tip' },
+  de: { step: (i, n) => `Schritt ${i} von ${n}`, next: 'Weiter', restart: 'Von vorn', play: '▶', pause: '❚❚', need: 'Du brauchst', tip: 'Tipp' },
 }[LANG];
 
 const CAMERA_TIME = 1.3;   // s, camera move to the view of a step
@@ -378,6 +378,10 @@ function updatePanel() {
   $('count').textContent = UI.step(current + 1, n);
   $('step-title').textContent = step.title[LANG];
   $('step-text').textContent = step.text[LANG];
+  const plain = (s) => (s || '').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');   // markdown links to plain text
+  $('step-need').replaceChildren(Object.assign(document.createElement('b'), { textContent: UI.need + ': ' }),
+    plain(step.need && step.need[LANG]));
+  $('step-tip').textContent = step.tip ? `${UI.tip}: ${plain(step.tip[LANG])}` : '';
   $('badge').textContent = current + 1;
   $('progress').style.width = `${((current + 1) / n) * 100}%`;
   $('chips').replaceChildren(...(step.new || []).map((id) => {
