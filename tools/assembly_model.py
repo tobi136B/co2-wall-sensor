@@ -144,6 +144,7 @@ def parts(p: dict) -> list[dict]:
     sx, sy = -p["SCD_SENSOR_X"], p["SCD_Y0"] + p["SCD_L"] / 2 + p["SCD_SENSOR_Y"]
     c3x, c3y, c3z = p["C3_X"], p["C3_Y0"], p["C3_Z0"]
     c3top = c3z + p["C3_PCB"]
+    mouth, usb_w = p["C3_MOUTH"], p["C3_USB_W"] / 2
     lock_y = -p["PLATE"] / 2 + 2.0 + p["INSERT_HOLE_D"] / 2 + 0.2
     lx0, lx1 = p["LOCK_POINTS"]
 
@@ -171,7 +172,10 @@ def parts(p: dict) -> list[dict]:
         scd.append(cyl((-p["SCD_PAD_X"], y, p["SCD_ZT"] - 0.02), (0, 0, 1), 0.08, 1.6, GOLD, "brass"))
     esp = [
         box(c3x - p["C3_W"] / 2, c3y, c3z, c3x + p["C3_W"] / 2, c3y + p["C3_H"], c3top, PCB_BLUE),
-        box(c3x - 4.45, c3y - 0.5, c3top, c3x + 4.45, c3y + 7.0, p["SOCKET_TOP"], STEEL, "metal"),
+        box(c3x - usb_w, mouth, c3top, c3x + usb_w, c3y + 7.0, p["SOCKET_TOP"], STEEL, "metal"),
+        # the two buttons next to the socket, the tallest parts on the board
+        box(c3x - 8.0, c3y + 2.5, c3top, c3x - 5.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
+        box(c3x + 5.0, c3y + 2.5, c3top, c3x + 8.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
         box(c3x - 2.5, c3y + 10, c3top, c3x + 2.5, c3y + 15, c3top + 0.8, "#15171a"),
         box(c3x - 6.5, c3y + p["C3_H"] - 4.5, c3top, c3x + 1.5, c3y + p["C3_H"] - 1.2, c3top + 0.5, "#e8e4da"),
     ]
@@ -182,10 +186,10 @@ def parts(p: dict) -> list[dict]:
     plug = [
         box(
             c3x - p["PLUG_W"] / 2,
-            c3y - 11.5,
+            mouth - 11.0,
             p["PLUG_Z"] - p["PLUG_H"] / 2,
             c3x + p["PLUG_W"] / 2,
-            c3y - 1.0,
+            mouth - 0.5,
             p["COVER_Z"] - 0.2,
             RUBBER,
         ),
