@@ -37,7 +37,7 @@ TEXT = {
         "ventilate": "Ventilate!",
         "sep": ".",
         "fc": "ventilate in ~{m} min",
-        "out": "outside",
+        "hum": "HUMIDITY",
         "cool": "Open the window: cooler outside",
         "dry": "Airing dries the air",
         "warm": "Keep it shut: warmer outside",
@@ -48,7 +48,7 @@ TEXT = {
         "ventilate": "Lüften!",
         "sep": ",",
         "fc": "lüften in ca. {m} min",
-        "out": "außen",
+        "hum": "FEUCHTE",
         "cool": "Fenster auf: außen kühler",
         "dry": "Lüften trocknet die Luft",
         "warm": "Fenster zu: außen wärmer",
@@ -151,19 +151,20 @@ def screen(
     if hint:  # only when opening the window really helps (or would make it worse)
         text(d, (12, 196), t[hint], font(12, True), HINT_COLORS[hint], "ld")
 
-    # footer: thermometer, temperature, humidity, drop
-    d.rounded_rectangle([s(17), s(214), s(21), s(229)], radius=s(2), outline=COLORS["muted"], width=s(1))
-    d.ellipse([s(15), s(226), s(23), s(234)], fill=COLORS["muted"])
-    temp_txt = f"{temp:.1f}".replace(".", t["sep"]) + " °C"
-    size = 18 if outdoor is not None else 20  # a little smaller when the outdoor value shares the row
-    text(d, (34 if outdoor is not None else 42, 225), temp_txt, font(size, True), COLORS["text"], "lm")
-    text(d, (W - 14, 225), f"{hum} %", font(20, True), COLORS["text"], "rm")
-    if outdoor is not None:  # outdoor temperature from Home Assistant, small between the two indoor values
-        value = f"{outdoor:.1f}".replace(".", t["sep"]) + "°"
-        text(d, (165, 226), f"{t['out']} {value}", font(13, True), COLORS["muted"], "mm")
-    cx, cy = W - 86, 228
-    d.polygon([(s(cx), s(cy - 11)), (s(cx - 5), s(cy - 2)), (s(cx + 5), s(cy - 2))], fill=COLORS["muted"])
-    d.ellipse([s(cx - 5), s(cy - 7), s(cx + 5), s(cy + 3)], fill=COLORS["muted"])
+    # footer: three columns with a small label above each value, like an instrument panel
+    def column(x, label, value, colour, anchor):
+        text(d, (x, 210), label, font(10, True), COLORS["muted"], anchor[0] + "m")
+        text(d, (x, 228), value, font(19, True), colour, anchor[0] + "m")
+
+    def celsius(v):
+        return f"{v:.1f}".replace(".", t["sep"]) + " °C"
+
+    column(14, "IN", celsius(temp), COLORS["text"], "l")
+    if outdoor is not None:  # outdoor temperature from Home Assistant
+        column(116, "OUT", celsius(outdoor), (175, 182, 190), "l")
+        for x in (106, 214):
+            d.line([s(x), s(205), s(x), s(234)], fill=COLORS["line"], width=s(1))
+    column(W - 14, t["hum"], f"{hum} %", COLORS["text"], "r")
     return img
 
 
