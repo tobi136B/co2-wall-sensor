@@ -69,7 +69,7 @@ TEXT = {
         "slots": "vent mesh: {n} diamonds {d}, webs {w} = {v}",
         "airflow": "Air enters from below\nthrough the sensor\nchamber (SCD41)",
         "cover_screws": "4x Ø{c}\ncounterbore Ø{d} x {h}\nscrew M2 x 4 ISO 7380\ninsert M2 x 3 in housing",
-        "cable_exit": "Cable port module\n(back: right-angle plug,\nboot hole Ø{d})",
+        "cable_exit": "Cable port module\n(back: right-angle plug,\nboot slot {d} × {l})",
         "bottom_ko": "Cable port module {w} wide, swappable:\nPortBack or PortBottom (straight plug)",
         "lock": "Optional lock: insert M2 x 3\nfor the lock tab",
         "fasteners": "Fasteners (one screw type only)\n"
@@ -124,7 +124,7 @@ TEXT = {
         "slots": "Lüftungsgitter: {n} Rauten {d}, Stege {w} = {v}",
         "airflow": "Luft strömt von unten\ndurch die Sensorkammer\n(SCD41)",
         "cover_screws": "4x Ø{c}\nSenkung Ø{d} x {h}\nSchraube M2 x 4 ISO 7380\nEinschmelzmutter M2 x 3",
-        "cable_exit": "Kabelport-Modul\n(hinten: Winkelstecker,\nTülle Ø{d})",
+        "cable_exit": "Kabelport-Modul\n(hinten: Winkelstecker,\nLangloch Tülle {d} × {l})",
         "bottom_ko": "Kabelport-Modul {w} breit, tauschbar:\nPortBack oder PortBottom (gerader Stecker)",
         "lock": "Optionale Sicherung: Mutter\nM2 x 3 für die Lasche",
         "fasteners": "Verbindungselemente (nur eine Schraubensorte)\n"
@@ -401,7 +401,9 @@ def sheet_device(sh: Sheet):
     sh.rect(rx - p["RAIL_FOOT"] / 2, ry + rail_y0, p["RAIL_FOOT"], rail_l, lw=LW_DIM, ls=DASHED)
     kx0, kx1, ky0, ky1 = p["PORT_X0"], p["PORT_X1"], -W / 2 + p["WALL"], p["PORT_Y1"]
     sh.rect(rx + kx0, ry + ky0, kx1 - kx0, ky1 - ky0, lw=0.4)
-    sh.circle(rx + p["C3_X"], ry + p["BOOT_Y"], p["BOOT_D"], lw=0.35)
+    # boot hole: oblong by BOOT_PLAY up and down
+    bd, bp = p["BOOT_D"], p["BOOT_PLAY"]
+    sh.rect(rx + p["C3_X"] - bd / 2, ry + p["BOOT_Y"] - bp - bd / 2, bd, 2 * bp + bd, bd / 2, lw=0.35)
     screws = p["COVER_SCREWS"]
     for bx, by in screws:
         sh.circle(rx + bx, ry + by, p["SCREW_CLEAR_D"])
@@ -419,7 +421,8 @@ def sheet_device(sh: Sheet):
         ry - 14,
         t["cover_screws"].format(c=sh.num(p["SCREW_CLEAR_D"]), d=sh.num(p["HEAD_D"]), h=sh.num(p["HEAD_H"])),
     )
-    sh.note(rx + kx1, ry + ky1, rx + W / 2 + 12, ry + 10, t["cable_exit"].format(d=sh.num(p["BOOT_D"])))
+    boot = t["cable_exit"].format(d=sh.num(bd), l=sh.num(bd + 2 * bp))
+    sh.note(rx + kx1, ry + ky1, rx + W / 2 + 12, ry + 10, boot)
     sh.note(rx - p["RAIL_HEAD"] / 2, ry + rail_y0 + 2, rx - W / 2 - 4, ry - 16, t["dovetail"])
 
     # detail of the rail
