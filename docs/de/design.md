@@ -59,7 +59,7 @@ Der Rückdeckel wird an vier Punkten gehalten: zwei Dome in den unteren Ecken un
 
 Der ESP32-C3 sitzt mit der USB-C-Buchse **nach unten**, darunter sind 13 mm frei. Das Kabel verlässt das Gerät durch ein kleines L-förmiges **Kabelport-Modul** an der unteren hinteren Kante:
 
-* **PortBack:** Loch für die Tülle eines Winkelsteckers. Das Kabel geht direkt in die Hohlwanddose oder durch den Tischständer. Der Steckerkörper sitzt hinter dem Modul und wirkt so als Zugentlastung.
+* **PortBack:** Langloch für den runden Körper eines Winkelsteckers (gemessen: Ø 8 × 18,2 mm), 1,5 mm Spiel nach oben und 0,5 mm nach unten für andere Fabrikate. Das Kabel geht direkt in die Hohlwanddose oder durch den Tischständer. Der Kragen des Steckers sitzt unter dem Modul und wirkt so als Zugentlastung.
 * **PortBottom:** Öffnung für einen geraden Stecker, wenn das Kabel auf Putz läuft.
 
 Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt, eine Stufe in der Unterseite und eine Lippe unter dem Deckel halten es. Beide Versionen brauchen je 2 g Filament, man druckt beide und entscheidet vor Ort. Später wechseln kostet vier Schrauben. In v1.2 gab es dafür dünne Ausbrechfelder, die lassen sich nach dem Ausbrechen aber nicht wieder schließen.

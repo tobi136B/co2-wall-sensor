@@ -27,7 +27,7 @@
 - name: "**ESP32-C3 SuperMini**"
   name_de: "**ESP32-C3 SuperMini**"
   qty: 1
-  details: "USB-C, WiFi, 22.5 x 18 mm"
+  details: "USB-C, WiFi, board 22.7 x 18.2 x 0.74 mm (other batches within the tolerances of the FAQ fit)"
   used_for: controller
   aliexpress:
     price: "2.79"

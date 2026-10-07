@@ -59,7 +59,7 @@ The back cover is held at four points: two bosses in the bottom corners and two 
 
 The ESP32-C3 sits with its USB-C socket pointing **down**, with 13 mm of free space below it. The cable leaves through a small L-shaped **cable port module** at the lower back edge:
 
-* **PortBack:** hole for the boot of a right-angle plug. The cable goes straight into the flush wall box or through the desk stand. The plug body is caught behind the module, which works as strain relief.
+* **PortBack:** oblong hole for the round body of a right-angle plug (measured: Ø 8 × 18.2 mm), 1.5 mm play up and 0.5 mm down for other makes. The cable goes straight into the flush wall box or through the desk stand. The collar of the plug sits under the module, which works as strain relief.
 * **PortBottom:** opening for a straight plug, if the cable runs on the wall surface.
 
 The module is clamped between housing and back cover, a step in the bottom wall and a lip under the cover hold it. Both versions take 2 g of filament, so you print both and decide on site. Changing it later takes four screws. Thin knock-out membranes were tried before (v1.2), but they cannot be closed again once broken out.

@@ -61,7 +61,7 @@ Das Kabel verlässt das Gerät durch ein kleines, tauschbares **Kabelport-Modul*
 
 Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt. Eine Stufe in der Unterseite verhindert, dass es herausfällt, eine Lippe unter dem Rückdeckel hält es nach hinten. Den Kabelaustritt später zu wechseln, kostet vier Schrauben.
 
-**Zugentlastung:** Beim Modul hinten sitzt der Körper des Winkelsteckers hinter dem Modul. Zug am Kabel endet am Modul und nicht an der USB-Buchse.
+**Zugentlastung:** Beim Modul hinten geht der runde Körper des Winkelsteckers durch ein Langloch, sein Kragen sitzt unter dem Modul. Zug am Kabel endet am Modul und nicht an der USB-Buchse.
 
 ## 5. Zusammenbau
 
