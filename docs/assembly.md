@@ -33,7 +33,7 @@ Every part carries its name, the version and its print orientation as an engrave
 
 | Qty | Part | Where |
 |----:|------|-------|
-| 10 | Heat-set insert **M2 × 3**, outer diameter 3.2 mm (hole Ø 3.0 × 3.4 mm) | 4 display, 4 back cover, 2 sensor carrier |
+| 10 | Heat-set insert **M2 × 3**, outer diameter 3.0 or 3.2 mm (hole Ø 2.9 × 3.4 mm fits both) | 4 display, 4 back cover, 2 sensor carrier |
 | 10 | Button head screw **M2 × 4**, ISO 7380, hex socket 1.3 mm | same positions |
 | +2 | the same insert and screw | optional lock tab: 1 in the housing, 1 in the wall plate |
 

@@ -43,7 +43,7 @@ Das Einsetzfenster über der Nut liegt verdeckt hinter dem Gerät. Gerät von vo
 
 Kunststoffgewinde nutzen sich nach wenigen Zyklen ab, und selbstschneidende Schrauben sprengen dünne Dome. Deshalb sitzt an jeder Schraubstelle eine Einschmelzmutter aus Messing, überall mit denselben Teilen:
 
-* **10 × Einschmelzmutter M2 × 3** (Außendurchmesser 3,2 mm, Bohrung Ø 3,0 × 3,4 mm): 4 für das Display, 4 für den Rückdeckel, 2 für den Sensorträger.
+* **10 × Einschmelzmutter M2 × 3** (Außendurchmesser 3,0 oder 3,2 mm, Bohrung Ø 2,9 × 3,4 mm passt für beide): 4 für das Display, 4 für den Rückdeckel, 2 für den Sensorträger.
 * **10 × Linsenkopfschraube (Halbrundkopf) M2 × 4, ISO 7380.** Ein Innensechskantschlüssel für das ganze Gerät.
 * **Je +2** für die optionale Sicherungslasche, die das Gerät mit der Wandplatte verbindet.
 

@@ -33,7 +33,7 @@ Jedes Teil trägt auf einer verdeckten Fläche seinen Namen, die Version und die
 
 | Anz. | Teil | Wo |
 |----:|------|----|
-| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm (Bohrung Ø 3,0 × 3,4 mm) | 4 Display, 4 Rückdeckel, 2 Sensorträger |
+| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm (Bohrung Ø 2,9 × 3,4 mm passt für beide) | 4 Display, 4 Rückdeckel, 2 Sensorträger |
 | 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380, Innensechskant 1,3 mm | gleiche Stellen |
 | +2 | dieselbe Mutter und Schraube | optionale Sicherungslasche: 1 im Gehäuse, 1 in der Wandplatte |
 

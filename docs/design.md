@@ -43,7 +43,7 @@ The insertion window above the slot is hidden behind the device. You insert the 
 
 Plastic threads wear out after a few cycles and self-tapping screws crack thin bosses. Every screw connection therefore uses a brass heat-set insert, and all of them use the same parts:
 
-* **10 × heat-set insert M2 × 3** (outer diameter 3.2 mm, hole Ø 3.0 × 3.4 mm): 4 for the display, 4 for the back cover, 2 for the sensor carrier.
+* **10 × heat-set insert M2 × 3** (outer diameter 3.0 or 3.2 mm, hole Ø 2.9 × 3.4 mm fits both): 4 for the display, 4 for the back cover, 2 for the sensor carrier.
 * **10 × button head screw M2 × 4, ISO 7380.** One hex key for the whole device.
 * **+2 of each** for the optional lock tab that ties the device to the wall plate.
 

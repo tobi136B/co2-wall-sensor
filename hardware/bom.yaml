@@ -48,15 +48,15 @@
     price: "16.31"
     link: https://www.amazon.de/dp/B081Q79X2F
 
-- name: 'Heat-set insert **M2 × 3**, outer diameter 3.2 mm (variant "M2 (OD3.2)", length 3 mm)'
-  name_de: 'Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm (Variante "M2 (OD3.2)", Länge 3 mm)'
+- name: "Heat-set insert **M2 × 3**, outer diameter 3.0 or 3.2 mm, length 3 mm"
+  name_de: "Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm, Länge 3 mm"
   qty: 10
-  details: "outer diameter 3.2 mm (AliExpress variant M2 OD3.2, length 3 mm), hole 3.0 x 3.4 mm; the Amazon set has OD 3.0, then set INSERT_HOLE_D to 2.8"
+  details: "outer diameter 3.0 or 3.2 mm, length 3 mm; the hole of 2.9 x 3.4 mm takes both"
   used_for: "display 4, back cover 4, sensor carrier 2"
   aliexpress:
     link: https://de.aliexpress.com/item/1005008575446687.html
   amazon:
-    price: "6.99 (200 pcs, OD 3.0) ¹"
+    price: "6.99 (200 pcs, OD 3.0)"
     link: https://www.amazon.de/dp/B0DZHK4JRC
 
 - name: "Button head screw **M2 × 4**, ISO 7380"

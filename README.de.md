@@ -82,14 +82,13 @@ Insgesamt rund 45 €. Die Links sind Vorschläge, Stand Oktober 2026; Preise ä
 | 1 | Sensirion **SCD41** Platine, **13,5 × 21,75 mm** oder **15 × 20 mm** ² | [20,99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
 | 1 | **ESP32-C3 SuperMini** | [2,79 €](https://de.aliexpress.com/item/1005007479144456.html) | [8,99 € (2 Stk.)](https://www.amazon.de/dp/B0DMNBWTFD) |
 | 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12,39 €](https://de.aliexpress.com/item/1005008772378337.html) | [16,31 €](https://www.amazon.de/dp/B081Q79X2F) |
-| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,2 mm (Variante "M2 (OD3.2)", Länge 3 mm) | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) ¹ |
+| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm, Länge 3 mm | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) |
 | 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 |  | [4,30 € (50 Stk.)](https://www.amazon.de/dp/B0DGXPQ7TW) |
 | 1 | USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten |  | [7,69 €](https://www.amazon.de/dp/B01MSIE2L1) |
 | 1 | USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät |  | [8,99 €](https://www.amazon.de/dp/B0HHF42X68) |
 |  | Silikonlitze AWG 30 |  | [15,49 € (8 Farben)](https://www.amazon.de/dp/B0DH2FBWH7) |
 <!-- bom:end -->
 
-¹ Bei Muttern mit 3,0 mm Außendurchmesser den Fusion-Parameter `INSERT_HOLE_D` auf 2,8 setzen.
 ² Shops zeigen oft eine andere Platine als die, die geliefert wird. Nach dem Auspacken nachmessen und den passenden Träger drucken.
 SCD41-Platinen gibt es in verschiedenen Größen. Nur der kleine Sensorträger hängt von der Platine ab: Es gibt einen für die **13,5 × 21,75 mm** und einen für die **15 × 20 mm** Platine, für andere reichen sechs Messwerte. Siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md).
 Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Shop-Links stehen nur in dieser Datei; die Tabelle oben und die Projektseite werden daraus erzeugt.

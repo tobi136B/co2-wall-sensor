@@ -183,25 +183,14 @@ def parts(p: dict) -> list[dict]:
         for j in range(8):
             y = c3y + p["C3_H"] - 1.6 - j * 2.54
             esp.append(cyl((c3x + side * (p["C3_W"] / 2 - 1.3), y, c3top - 0.02), (0, 0, 1), 0.06, 1.5, GOLD, "brass"))
+    # right-angle plug with a round aluminium body (measured), the cable leaves towards the wall
+    z0 = p["PLUG_Z"] - p["PLUG_CAP"]
+    z1 = z0 + p["PLUG_BODY_L"]
     plug = [
-        box(
-            c3x - p["PLUG_W"] / 2,
-            mouth - 11.0,
-            p["PLUG_Z"] - p["PLUG_H"] / 2,
-            c3x + p["PLUG_W"] / 2,
-            mouth - 0.5,
-            p["COVER_Z"] - 0.2,
-            RUBBER,
-        ),
-        cyl(
-            (c3x, p["BOOT_Y"], p["COVER_Z"] - 0.21),
-            (0, 0, 1),
-            p["DEPTH"] + 5 - p["COVER_Z"] + 0.21,
-            p["BOOT_D"] - 0.6,
-            RUBBER,
-            "rubber",
-        ),
-        cyl((c3x, p["BOOT_Y"], p["DEPTH"] + 5), (0, 0, 1), 8, 3.6, RUBBER, "rubber"),
+        box(c3x - 4.0, p["BOOT_Y"], p["PLUG_Z"] - 2.5, c3x + 4.0, mouth - 0.3, p["PLUG_Z"] + 2.5, RUBBER),
+        cyl((c3x, p["BOOT_Y"], z0), (0, 0, 1), p["PLUG_BODY_L"], p["PLUG_BODY_D"], "#9aa1a9", "metal"),
+        cyl((c3x, p["BOOT_Y"], z1), (0, 0, 1), p["PLUG_BOOT_L"], p["PLUG_BOOT_D"], RUBBER, "rubber"),
+        cyl((c3x, p["BOOT_Y"], z1 + p["PLUG_BOOT_L"]), (0, 0, 1), 8, 3.6, "#3a3d42", "rubber"),
     ]
     inserts = [insert((x, y, lip + glass_t)) for x, y in p["LCD_HOLES"]]
     inserts += [insert((x, y, p["COVER_Z"])) for x, y in p["COVER_SCREWS"]]
