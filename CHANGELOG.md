@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.8.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.7.2...v1.8.0) (2026-10-07)
+
+
+### Added
+
+* **firmware:** outdoor values, window hint and settings in Home Assistant ([#21](https://github.com/tobi136B/co2-wall-sensor/issues/21)) ([9c6789e](https://github.com/tobi136B/co2-wall-sensor/commit/9c6789ecc3ec2cc87e6c7034e68d26a26aef3755))
+
 ## [1.7.2](https://github.com/tobi136B/co2-wall-sensor/compare/v1.7.1...v1.7.2) (2026-10-07)
 
 
