@@ -8,3 +8,4 @@ networkx>=3.2
 lxml>=5.0
 rtree>=1.2
 scipy>=1.11
+python-fcl>=0.7  # collision check of the assembly guide (tools/assembly_check.py)

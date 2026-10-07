@@ -56,7 +56,7 @@ WIRE = {
 }
 
 INSERT_D, INSERT_L = 3.2, 3.0
-SCREW_HEAD_D, SCREW_HEAD_H, SCREW_D, SCREW_L = 3.8, 1.3, 2.0, 4.0
+SCREW_HEAD_D, SCREW_HEAD_H, SCREW_D, SCREW_L = 3.5, 1.1, 2.0, 4.0  # ISO 7380 M2 x 4
 
 
 def box(x0, y0, z0, x1, y1, z1, color, mat="plastic"):
@@ -83,8 +83,8 @@ def stl(name, color):
     return {"type": "stl", "file": f"{name}.stl", "color": color, "mat": "print"}
 
 
-def part(pid, en, de, groups, explode, meshes):
-    return {"id": pid, "name": {"en": en, "de": de}, "groups": groups, "explode": explode, "meshes": meshes}
+def part(pid, en, de, groups, meshes):
+    return {"id": pid, "name": {"en": en, "de": de}, "groups": groups, "meshes": meshes}
 
 
 def wires_display(p: dict) -> list[dict]:
@@ -144,6 +144,7 @@ def parts(p: dict) -> list[dict]:
     sx, sy = -p["SCD_SENSOR_X"], p["SCD_Y0"] + p["SCD_L"] / 2 + p["SCD_SENSOR_Y"]
     c3x, c3y, c3z = p["C3_X"], p["C3_Y0"], p["C3_Z0"]
     c3top = c3z + p["C3_PCB"]
+    mouth, usb_w = p["C3_MOUTH"], p["C3_USB_W"] / 2
     lock_y = -p["PLATE"] / 2 + 2.0 + p["INSERT_HOLE_D"] / 2 + 0.2
     lx0, lx1 = p["LOCK_POINTS"]
 
@@ -171,7 +172,10 @@ def parts(p: dict) -> list[dict]:
         scd.append(cyl((-p["SCD_PAD_X"], y, p["SCD_ZT"] - 0.02), (0, 0, 1), 0.08, 1.6, GOLD, "brass"))
     esp = [
         box(c3x - p["C3_W"] / 2, c3y, c3z, c3x + p["C3_W"] / 2, c3y + p["C3_H"], c3top, PCB_BLUE),
-        box(c3x - 4.45, c3y - 0.5, c3top, c3x + 4.45, c3y + 7.0, p["SOCKET_TOP"], STEEL, "metal"),
+        box(c3x - usb_w, mouth, c3top, c3x + usb_w, c3y + 7.0, p["SOCKET_TOP"], STEEL, "metal"),
+        # the two buttons next to the socket, the tallest parts on the board
+        box(c3x - 8.0, c3y + 2.5, c3top, c3x - 5.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
+        box(c3x + 5.0, c3y + 2.5, c3top, c3x + 8.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
         box(c3x - 2.5, c3y + 10, c3top, c3x + 2.5, c3y + 15, c3top + 0.8, "#15171a"),
         box(c3x - 6.5, c3y + p["C3_H"] - 4.5, c3top, c3x + 1.5, c3y + p["C3_H"] - 1.2, c3top + 0.5, "#e8e4da"),
     ]
@@ -182,10 +186,10 @@ def parts(p: dict) -> list[dict]:
     plug = [
         box(
             c3x - p["PLUG_W"] / 2,
-            c3y - 11.5,
+            mouth - 11.0,
             p["PLUG_Z"] - p["PLUG_H"] / 2,
             c3x + p["PLUG_W"] / 2,
-            c3y - 1.0,
+            mouth - 0.5,
             p["COVER_Z"] - 0.2,
             RUBBER,
         ),
@@ -197,7 +201,7 @@ def parts(p: dict) -> list[dict]:
             RUBBER,
             "rubber",
         ),
-        cyl((c3x, p["BOOT_Y"], p["DEPTH"] + 5), (0, 0, 1), 22, 3.6, RUBBER, "rubber"),
+        cyl((c3x, p["BOOT_Y"], p["DEPTH"] + 5), (0, 0, 1), 8, 3.6, RUBBER, "rubber"),
     ]
     inserts = [insert((x, y, lip + glass_t)) for x, y in p["LCD_HOLES"]]
     inserts += [insert((x, y, p["COVER_Z"])) for x, y in p["COVER_SCREWS"]]
@@ -206,67 +210,90 @@ def parts(p: dict) -> list[dict]:
     carrier_screws = [m for x, y in p["CARRIER_SCREWS"] for m in screw((x, y, p["FLOOR_Z"] + p["FLOOR_T"]), (0, 0, -1))]
     cover_screws = [m for x, y in p["COVER_SCREWS"] for m in screw((x, y, p["DEPTH"] - p["HEAD_H"]), (0, 0, -1))]
     y_tab = -p["BODY"] / 2 - 0.2
-    lock_screws = screw((lx0, y_tab - p["HEAD_H"], p["LOCK_Z"]), (0, 1, 0))
-    lock_screws += screw((lx1, lock_y, p["DEPTH"] - p["HEAD_H"]), (0, 0, 1))
-    lock_inserts = [insert((lx0, -p["BODY"] / 2, p["LOCK_Z"]), (0, 1, 0)), insert((lx1, lock_y, p["DEPTH"]), (0, 0, 1))]
+    lock_screw_housing = screw((lx0, y_tab - p["HEAD_H"], p["LOCK_Z"]), (0, 1, 0))
+    lock_screw_plate = screw((lx1, lock_y, p["DEPTH"] - p["HEAD_H"]), (0, 0, 1))
 
-    dev, car = ["device"], ["device", "carrier"]
+    dev, car, wall = ["device"], ["device", "carrier"], ["wall"]
     return [
-        part("housing", "Housing", "Gehäuse", dev, [0, 0, 0], [stl("housing", PRINT_DARK)]),
-        part("inserts", "10 heat-set inserts M2", "10 Einschmelzmuttern M2", dev, [0, 0, 14], inserts),
-        part("display", 'Display 2" (Waveshare)', 'Display 2" (Waveshare)', dev, [0, 0, -45], display),
-        part("display_screws", "4 screws M2 × 4", "4 Schrauben M2 × 4", dev, [0, 0, -22], display_screws),
+        part("housing", "Housing", "Gehäuse", dev, [stl("housing", PRINT_DARK)]),
+        part("inserts", "10 heat-set inserts M2", "10 Einschmelzmuttern M2", dev, inserts),
+        part("display", 'Display 2" (Waveshare)', 'Display 2" (Waveshare)', dev, display),
+        part("display_screws", "4 screws M2 × 4", "4 Schrauben M2 × 4", dev, display_screws),
         part(
             "carrier",
             "Sensor carrier 13.5 × 21.75",
             "Sensorträger 13,5 × 21,75",
             car,
-            [0, -4, 38],
             [stl("sensor_carrier_14x22", PRINT_LIGHT)],
         ),
-        part("scd41", "SCD41 sensor", "SCD41-Sensor", car, [0, -4, 22], scd),
-        part("esp32", "ESP32-C3 SuperMini", "ESP32-C3 SuperMini", car, [0, -4, 58], esp),
-        part("plug", "USB-C angled plug", "USB-C-Winkelstecker", car, [0, -30, 74], plug),
-        part("carrier_screws", "2 screws M2 × 4", "2 Schrauben M2 × 4", dev, [0, -4, 48], carrier_screws),
+        part("scd41", "SCD41 sensor", "SCD41-Sensor", car, scd),
+        part("esp32", "ESP32-C3 SuperMini", "ESP32-C3 SuperMini", car, esp),
+        part("plug", "USB-C angled plug", "USB-C-Winkelstecker", car, plug),
+        part("carrier_screws", "2 screws M2 × 4", "2 Schrauben M2 × 4", dev, carrier_screws),
+        part("wires_display", "Display wires", "Displaylitzen", dev, [{"type": "tube", **w} for w in wires_display(p)]),
+        part("wires_scd", "SCD41 wires", "SCD41-Litzen", car, [{"type": "tube", **w} for w in wires_scd(p)]),
+        part("port", "Cable port module (back)", "Kabelport-Modul (hinten)", dev, [stl("cable_port_back", PRINT_MID)]),
+        part("cover", "Back cover", "Rückdeckel", dev, [stl("back_cover", PRINT_MID)]),
+        part("cover_screws", "4 screws M2 × 4", "4 Schrauben M2 × 4", dev, cover_screws),
+        part("wall_plate", "Wall plate", "Wandplatte", wall, [stl("wall_plate", PRINT_WHITE)]),
         part(
-            "wires_display",
-            "Display wires",
-            "Displaylitzen",
+            "lock_insert_housing",
+            "Heat-set insert M2 (housing)",
+            "Einschmelzmutter M2 (Gehäuse)",
             dev,
-            [0, 0, 0],
-            [{"type": "tube", **w} for w in wires_display(p)],
+            [insert((lx0, -p["BODY"] / 2, p["LOCK_Z"]), (0, 1, 0))],
         ),
-        part("wires_scd", "SCD41 wires", "SCD41-Litzen", car, [0, 0, 0], [{"type": "tube", **w} for w in wires_scd(p)]),
         part(
-            "port",
-            "Cable port module (back)",
-            "Kabelport-Modul (hinten)",
-            dev,
-            [0, -18, 66],
-            [stl("cable_port_back", PRINT_MID)],
+            "lock_insert_plate",
+            "Heat-set insert M2 (wall plate)",
+            "Einschmelzmutter M2 (Wandplatte)",
+            wall,
+            [insert((lx1, lock_y, p["DEPTH"]), (0, 0, 1))],
         ),
-        part("cover", "Back cover", "Rückdeckel", dev, [0, 0, 90], [stl("back_cover", PRINT_MID)]),
-        part("cover_screws", "4 screws M2 × 4", "4 Schrauben M2 × 4", dev, [0, 0, 104], cover_screws),
-        part("wall_plate", "Wall plate", "Wandplatte", ["wall"], [0, 0, 125], [stl("wall_plate", PRINT_WHITE)]),
-        part("lock_inserts", "2 heat-set inserts M2", "2 Einschmelzmuttern M2", ["lock"], [0, -12, 60], lock_inserts),
+        part("lock_tab", "Lock tab (optional)", "Sicherungslasche (optional)", ["lock"], [stl("lock_tab", PRINT_DARK)]),
+        part("lock_screw_housing", "Screw M2 × 4 (housing)", "Schraube M2 × 4 (Gehäuse)", ["lock"], lock_screw_housing),
         part(
-            "lock_tab",
-            "Lock tab (optional)",
-            "Sicherungslasche (optional)",
-            ["lock"],
-            [0, -26, 125],
-            [stl("lock_tab", PRINT_DARK)],
+            "lock_screw_plate", "Screw M2 × 4 (wall plate)", "Schraube M2 × 4 (Wandplatte)", ["lock"], lock_screw_plate
         ),
-        part("lock_screws", "2 screws M2 × 4", "2 Schrauben M2 × 4", ["lock"], [0, -36, 125], lock_screws),
     ]
 
 
+# Stages of the guide: offsets of whole groups, reached along the waypoints (and left the same way back),
+# so the carrier leaves the housing through the open back before it moves down.
 STAGES = {
-    "carrier_out": {"carrier": [0, -50, 50]},  # out of the back and below, so its front is visible
+    "carrier_out": {"carrier": [[0, 0, 40], [0, -50, 40]]},  # out of the back, then below: its front is visible
     "carrier_in": {},
-    "device_away": {"device": [0, 15, -60]},
+    "device_away": {"device": [[0, 15, 0], [0, 15, -60]]},  # slid up off the rail, then pulled off the wall
     "device_slide": {},
 }
+
+# motion of site/assembly.js: every path is travelled at constant speed with ease in and out
+TIMING = {"speed": 70.0, "min_time": 0.6, "pause": 0.12}  # mm/s, shortest move in s, pause between parts in s
+
+CARRIER_UNIT = ["carrier", "scd41", "esp32", "plug", "wires_scd"]
+
+# Disassembly for the "take apart" slider, in the order of a real disassembly. One move after the other,
+# every move pulls its parts along a free path (tools/assembly_check.py proves that nothing passes through
+# anything else). The inserts stay in their parts. Only the display leaves through the window to the front.
+DISASSEMBLY = [
+    {"lock_screw_housing": [0, -40, 0], "lock_screw_plate": [0, 0, -30]},
+    {"lock_tab": [0, -22, 0]},
+    {"wall_plate": [0, -15, 0], "lock_insert_plate": [0, -15, 0]},  # the device slides up off the rail
+    {"wall_plate": [0, 0, 110], "lock_insert_plate": [0, 0, 110]},
+    {"cover_screws": [0, 0, 18]},
+    {"cover": [0, 0, 60], "cover_screws": [0, 0, 60]},
+    {"port": [0, 0, 45]},
+    {"port": [45, 0, 0]},
+    {"carrier_screws": [0, 0, 20]},
+    {"carrier_screws": [0, 55, 0]},
+    {pid: [0, 0, 40] for pid in CARRIER_UNIT},
+    {pid: [0, -50, 0] for pid in CARRIER_UNIT},
+    {"plug": [0, -15, 0]},  # unplugged downwards, the carrier is open below the socket
+    {"esp32": [0, 35, 0]},
+    {"scd41": [0, 25, 0]},
+    {"display_screws": [0, 0, 30]},
+    {"display": [0, 0, -45]},
+]
 
 
 def model(p: dict) -> dict:
@@ -276,15 +303,19 @@ def model(p: dict) -> dict:
         "parts": parts(p),
         "stages": STAGES,
         "steps": steps,
-        "slide": {"start": [0, p["RAIL_TRAVEL"], -60], "engage": [0, p["RAIL_TRAVEL"], 0]},
+        "explode": DISASSEMBLY,
+        "timing": TIMING,
     }
     ids = {q["id"] for q in data["parts"]}
     for i, s in enumerate(steps, 1):
-        unknown = set(s.get("new", [])) - ids
+        unknown = (set(s.get("new", [])) | set(s.get("from_part", {}))) - ids
         if unknown:
             raise SystemExit(f"assembly_steps.yaml step {i}: unknown parts {sorted(unknown)}")
         if s.get("stage") and s["stage"] not in STAGES:
             raise SystemExit(f"assembly_steps.yaml step {i}: unknown stage {s['stage']}")
+    unknown = {pid for move in DISASSEMBLY for pid in move} - ids
+    if unknown:
+        raise SystemExit(f"DISASSEMBLY: unknown parts {sorted(unknown)}")
     return data
 
 

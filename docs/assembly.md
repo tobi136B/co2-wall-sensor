@@ -71,11 +71,11 @@ The module is clamped between housing and back cover. A step in the bottom wall 
 2. **SCD41:** solder four wires of about 8 cm to GND, VDD, SCL and SDA. Slide the board **from the top** into the two rails on the front side of the sensor carrier, sensor facing away from the carrier, pads towards the wire notch. Push it down until it stands on the end stops: the hook of the spring tongue clicks over the upper edge and holds the board without play. Lead the wires through the notch at the upper edge. To remove the board, push the tongue back with a small screwdriver.
 
    <img src="images/sensor_carrier_front.png" width="70%" alt="SCD41 in its rails">
-3. **ESP32-C3:** solder the wires to display and SCD41 ([wiring](wiring.md)). Plug the USB cable into the ESP32-C3 first:
-   * back module: lay the cable into the side slot of the module,
-   * bottom module: push the plug through the module from outside.
+3. **ESP32-C3:** solder the wires to display and SCD41 ([wiring](wiring.md)). Slide the ESP32-C3 from above between the side guides on the back of the carrier until its lower edge rests on the end stops and slips under the two small lips.
 
-   Then slide the ESP32-C3 from above between the side guides on the back of the carrier until its lower edge rests on the end stops and slips under the two small lips.
+   Then plug the USB cable in from below, the carrier is open below the socket:
+   * back module: lay the cable into the side slot of the module,
+   * bottom module: push the plug through the module from outside first.
 
    <img src="images/sensor_carrier_back.png" width="70%" alt="ESP32-C3 on the back of the carrier">
 4. **Sensor carrier:** put it onto the ledges in the chin and fix it with 2 × M2 × 4. It closes the sensor chamber against the warm electronics. Seal the wire notch with a drop of hot glue.

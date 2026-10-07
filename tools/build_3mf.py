@@ -38,6 +38,7 @@ PLATES = {
         ("cable_port_back", FLIP),
         ("cable_port_bottom", FLIP),
         ("lock_tab", FLAT),
+        ("desk_stand", ON_SIDE),  # on the plate as well, delete it in the slicer for a wall mount
     ],
     "co2_wall_sensor_mounts": [
         ("wall_plate", FLAT),

@@ -71,11 +71,11 @@ Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt. Eine Stufe in der Unt
 2. **SCD41:** vier Litzen von ca. 8 cm an GND, VDD, SCL und SDA löten. Die Platine **von oben** in die beiden Schienen auf der Frontseite des Sensorträgers schieben, Sensor zeigt vom Träger weg, Lötpunkte zur Kabelkerbe. Nach unten schieben, bis sie auf den Anschlägen steht: Der Haken der Federzunge schnappt über die Oberkante und hält die Platine spielfrei. Die Litzen durch die Kerbe an der Oberkante führen. Zum Herausnehmen die Zunge mit einem kleinen Schraubendreher nach hinten drücken.
 
    <img src="../images/sensor_carrier_front.png" width="70%" alt="SCD41 in den Schienen">
-3. **ESP32-C3:** die Litzen von Display und SCD41 anlöten ([Verdrahtung](verdrahtung.md)). Zuerst das USB-Kabel in den ESP32-C3 stecken:
-   * Modul hinten: das Kabel seitlich in den Schlitz des Moduls legen,
-   * Modul unten: den Stecker von außen durch das Modul schieben.
+3. **ESP32-C3:** die Litzen von Display und SCD41 anlöten ([Verdrahtung](verdrahtung.md)). Den ESP32-C3 von oben zwischen die Seitenführungen auf der Rückseite des Trägers schieben, bis die Unterkante auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht.
 
-   Dann den ESP32-C3 von oben zwischen die Seitenführungen auf der Rückseite des Trägers schieben, bis die Unterkante auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht.
+   Dann das USB-Kabel von unten einstecken, der Träger ist unter der Buchse offen:
+   * Modul hinten: das Kabel seitlich in den Schlitz des Moduls legen,
+   * Modul unten: den Stecker vorher von außen durch das Modul schieben.
 
    <img src="../images/sensor_carrier_back.png" width="70%" alt="ESP32-C3 auf der Rückseite des Trägers">
 4. **Sensorträger:** auf die Leisten im Kinn legen und mit 2 × M2 × 4 verschrauben. Er schließt die Sensorkammer gegen die warme Elektronik ab. Die Kabelkerbe mit einem Tropfen Heißkleber abdichten.

@@ -15,7 +15,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [English](README.md) | **Deutsch** | [Projektseite und Browser-Installer](https://tobi136b.github.io/co2-wall-sensor/de/)
 
-<img src="docs/images/hero_de.gif" width="88%" alt="Der CO2-Wandsensor dreht sich, zerlegt sich und baut sich wieder zusammen, das Display zeigt die Luftqualität">
+<img src="docs/images/exploded.gif" width="88%" alt="Der CO2-Wandsensor zerlegt sich Teil für Teil und baut sich wieder zusammen">
 
 </div>
 
@@ -96,7 +96,7 @@ Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Sho
 
 ## Schnellstart
 
-1. **Drucken:** die beiden fertigen Druckplatten [`co2_wall_sensor_device.3mf`](cad/3mf/co2_wall_sensor_device.3mf) und [`co2_wall_sensor_mounts.3mf`](cad/3mf/co2_wall_sensor_mounts.3mf) (alle Teile schon in Drucklage) oder die einzelnen Dateien aus [`cad/stl`](cad/stl). Einstellungen: [docs/de/aufbau.md](docs/de/aufbau.md).
+1. **Drucken:** die beiden fertigen Druckplatten [`co2_wall_sensor_device.3mf`](cad/3mf/co2_wall_sensor_device.3mf) und [`co2_wall_sensor_mounts.3mf`](cad/3mf/co2_wall_sensor_mounts.3mf) (alle Teile schon in Drucklage, die Geräteplatte enthält auch den Tischständer: für die Wand einfach löschen) oder die einzelnen Dateien aus [`cad/stl`](cad/stl). Einstellungen: [docs/de/aufbau.md](docs/de/aufbau.md).
 2. **Verdrahten** nach [docs/de/verdrahtung.md](docs/de/verdrahtung.md) und **zusammenbauen** nach [docs/de/aufbau.md](docs/de/aufbau.md). Die [3D-Aufbauanleitung](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html) zeigt jeden Schritt: Gerät drehen, zerlegen und sehen, welches Teil als Nächstes kommt.
 
    <img src="docs/images/wiring_de.png" width="80%" alt="Verdrahtungsplan">
@@ -181,8 +181,11 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 
 * [x] Sensorträger-Profile für verschiedene SCD41-Platinen ([#7](https://github.com/tobi136B/co2-wall-sensor/issues/7), v1.4)
 * [x] Interaktive 3D-Aufbauanleitung ([öffnen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html), v1.6)
-* [ ] ESP32-C3-Halter mit Toleranzfeder und saubere Kabelführung mit Clips und Kanälen (v1.7)
-* [ ] Online-Konfigurator: Sensorträger als STL aus drei Maßen ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.8)
+* [x] ESP32-C3-Halter nach der gemessenen Platine, tolerant für andere Lieferungen (v1.7)
+* [x] Kollisionsprüfung aller Montagewege in der CI (v1.7)
+* [ ] Saubere Kabelführung mit Clips und Kanälen
+* [ ] Außentemperatur auf dem Display, mit Hinweis wenn Lüften hilft
+* [ ] Online-Konfigurator: Sensorträger als STL aus drei Maßen ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8))
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 * [ ] Optionaler Drucksensor (BMP280) für die CO2-Druckkompensation in Echtzeit
 * [ ] Wandplatte für Wände ohne Hohlwanddose
