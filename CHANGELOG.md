@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.7.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.6.0...v1.7.0) (2026-10-07)
+
+
+### Added
+
+* measured ESP32-C3 holder, collision-free assembly and new animation ([#14](https://github.com/tobi136B/co2-wall-sensor/issues/14)) ([0e9e9ed](https://github.com/tobi136B/co2-wall-sensor/commit/0e9e9ed84a7108affdd0960e28bb1d37ff0fe281))
+
 ## [1.6.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.5.0...v1.6.0) (2026-10-06)
 
 
