@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install pyyaml
+      - run: pip install pyyaml pillow matplotlib
       - name: Generate the tables from hardware/bom.yaml
         run: python tools/bom.py
       - name: Commit if something changed
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
-      - run: pip install pyyaml
+      - run: pip install pyyaml pillow matplotlib
       - uses: actions/download-artifact@v8
         with:
           name: release-dist
