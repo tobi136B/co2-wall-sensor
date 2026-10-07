@@ -74,19 +74,19 @@ Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_
 
 ## Stückliste
 
-Insgesamt rund 45 €. Die Links sind Vorschläge, Stand Oktober 2026; Preise ändern sich oft.
+Rund 55 € für ein Gerät (jeweils der günstigste Shop, ohne Litze und Filament). Die Links sind Vorschläge, Stand Oktober 2026; Preise ändern sich oft.
 
 <!-- bom:start (generated from hardware/bom.yaml) -->
 | Anz. | Teil | AliExpress | Amazon.de |
 |----:|------|-----------:|----------:|
-| 1 | Sensirion **SCD41** Platine, **13,5 × 21,75 mm** oder **15 × 20 mm** ² | [20,99 €](https://de.aliexpress.com/item/1005009740863220.html) |  |
-| 1 | **ESP32-C3 SuperMini** | [2,79 €](https://de.aliexpress.com/item/1005007479144456.html) | [8,99 € (2 Stk.)](https://www.amazon.de/dp/B0DMNBWTFD) |
-| 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12,39 €](https://de.aliexpress.com/item/1005008772378337.html) | [16,31 €](https://www.amazon.de/dp/B081Q79X2F) |
-| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm, Länge 3 mm | [Link](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) |
-| 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 |  | [4,30 € (50 Stk.)](https://www.amazon.de/dp/B0DGXPQ7TW) |
-| 1 | USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten |  | [7,69 €](https://www.amazon.de/dp/B01MSIE2L1) |
-| 1 | USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät |  | [8,99 €](https://www.amazon.de/dp/B0HHF42X68) |
-|  | Silikonlitze AWG 30 |  | [15,49 € (8 Farben)](https://www.amazon.de/dp/B0DH2FBWH7) |
+| 1 | Sensirion **SCD41** Platine, **13,5 × 21,75 mm** oder **15 × 20 mm** ² | [21,19 €](https://de.aliexpress.com/item/1005009740863220.html) | *nur AliExpress* |
+| 1 | **ESP32-C3 SuperMini** | [2,79 €](https://de.aliexpress.com/item/1005007479144456.html) | [4,30 € (2 Stk.: 8,59 €)](https://www.amazon.de/dp/B0HDCHXHMT) |
+| 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12,49 €](https://de.aliexpress.com/item/1005008772378337.html) | [16,31 €](https://www.amazon.de/dp/B081Q79X2F) |
+| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm, Länge 3 mm | [2,39 € (50 Stk., AD 3,2)](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) |
+| 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 | *nur Amazon* | [4,79 € (60 Stk.)](https://www.amazon.de/dp/B0FVT11R5L) |
+| 1 | USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten | *nur Amazon* | [5,90 € (0,3 m)](https://www.amazon.de/dp/B0DGTQD4Y5) |
+| 1 | USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät | *nur Amazon* | [4,80 € (2 Stk.: 9,59 €)](https://www.amazon.de/dp/B0GVWPHKJM) |
+|  | Silikonlitze AWG 30 | *nur Amazon* | [15,49 € (8 Farben)](https://www.amazon.de/dp/B0DH2FBWH7) |
 <!-- bom:end -->
 
 ² Shops zeigen oft eine andere Platine als die, die geliefert wird. Nach dem Auspacken nachmessen und den passenden Träger drucken.

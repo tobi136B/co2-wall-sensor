@@ -61,7 +61,7 @@ The cable leaves through a small, swappable **cable port module** at the lower b
 
 The module is clamped between housing and back cover. A step in the bottom wall stops it from falling out, a lip under the back cover stops it from leaving towards the back. Changing the cable exit later takes four screws.
 
-**Strain relief:** with the back module the body of the right-angle plug sits behind the module. A pull on the cable ends at the module, not at the USB socket.
+**Strain relief:** with the back module the round body of the right-angle plug passes through an oblong hole, its collar sits under the module. A pull on the cable ends at the module, not at the USB socket.
 
 ## 5. Assembly
 
