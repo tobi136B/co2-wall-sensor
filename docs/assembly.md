@@ -39,16 +39,7 @@ Every part carries its name, the version and its print orientation as an engrave
 
 The only other screws are the two that come with your flush wall box. Nothing in the device is glued.
 
-## 3. Pre-assembly
-
-1. **Press in the inserts** with a soldering iron (about 200 to 220 °C, M2 tip if you have one). Every hole has a small entry chamfer that centres the insert. Let it sink in under its own weight and stop flush.
-   * 4 on the display bosses around the display bay. The front skin behind them is only 1.1 mm thick, so work with low temperature and little pressure.
-   * 4 for the back cover: 2 in the bottom corners, 2 in the solid band above the display.
-   * 2 for the sensor carrier on the short bosses in the chin.
-   * Optional lock: 1 from outside into the bottom of the housing, 1 into the front of the wall plate below the device.
-2. **Test the electronics on the desk first.** Wire everything as described in [wiring.md](wiring.md), flash the firmware and check the display before building it in.
-
-## 4. Choose the cable exit
+## 3. Choose the cable exit
 
 The cable leaves through a small, swappable **cable port module** at the lower back edge. Print both versions and decide on site:
 
@@ -63,42 +54,149 @@ The module is clamped between housing and back cover. A step in the bottom wall 
 
 **Strain relief:** with the back module the round body of the right-angle plug passes through an oblong hole, its collar sits under the module. A pull on the cable ends at the module, not at the USB socket.
 
-## 5. Assembly
+## 4. Step by step
 
-![Interior](images/interior.png)
+**Before you start, have at hand:** soldering iron with a fine tip, hex key 1.3 mm, small flat screwdriver, hot glue, side cutter. All 13 steps are also in the [3D assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html), where you can turn every step and take the device apart.
 
-1. **Display:** place it glass first into the display bay. Fix it with 4 × M2 × 4.
-2. **SCD41:** solder four wires of about 8 cm to GND, VDD, SCL and SDA. Slide the board **from the top** into the two rails on the front side of the sensor carrier, sensor facing away from the carrier, pads towards the wire notch. Push it down until it stands on the end stops: the hook of the spring tongue clicks over the upper edge and holds the board without play. Lead the wires through the notch at the upper edge. To remove the board, push the tongue back with a small screwdriver.
+<!-- steps:start (generated from site/assembly_steps.yaml) -->
 
-   <img src="images/sensor_carrier_front.png" width="70%" alt="SCD41 in its rails">
-3. **ESP32-C3:** solder the wires to display and SCD41 ([wiring](wiring.md)). Slide the ESP32-C3 from above between the side guides on the back of the carrier until its lower edge rests on the end stops and slips under the two small lips.
+### Step 1 of 13: The housing
 
-   Then plug the USB cable in from below, the carrier is open below the socket:
-   * back module: lay the cable into the side slot of the module,
-   * bottom module: push the plug through the module from outside first.
+<img src="images/steps/step_01.png" width="60%" alt="The housing">
 
-   <img src="images/sensor_carrier_back.png" width="70%" alt="ESP32-C3 on the back of the carrier">
-4. **Sensor carrier:** put it onto the ledges in the chin and fix it with 2 × M2 × 4. It closes the sensor chamber against the warm electronics. Seal the wire notch with a drop of hot glue.
-5. **Cable port module:** slide it into the opening at the lower back edge.
-6. **Back cover:** put it into the seat and fix it with 4 × M2 × 4. The button heads sit in counterbores below the surface, so the cover still slides onto the wall plate.
+**You need:** Printed housing
 
-## 6. Wall mounting on a flush wall box
+Printed front face down. You look at it from the back, the side that later faces the wall. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-1))
 
-1. **Bring power into the box:** either a flush mounted USB power supply (work on 230 V must be done by a qualified electrician) or a USB cable that runs inside the wall to a socket.
-2. **Mount the wall plate** with the two box screws (60 mm spacing, horizontal). The slots compensate a slightly rotated box.
-3. Route the USB cable through the cable passage and plug it into the device.
-4. **Attach the device:** hold it in front of the plate, insert the rail into the hidden insertion window and **slide it 15 mm down**. Done.
-5. **Optional lock:** hold the lock tab below the device, screw it up into the housing and back into the wall plate (2 × M2 × 4).
+> **Tip:** No supports needed. Remove the brim and check that the four cover seats in the corners are clean.
 
-   <img src="images/lock_tab.png" width="60%" alt="Lock tab below the device">
+### Step 2 of 13: 10 heat-set inserts
 
-To remove the device, take off the lock tab if fitted, push the device 15 mm up and pull it off.
+<img src="images/steps/step_02.png" width="60%" alt="10 heat-set inserts">
 
-## 7. Desk stand
+**You need:** 10 heat-set inserts M2 × 3, soldering iron at 200 to 220 °C
+
+Press the M2 inserts in with the soldering iron (about 200 to 220 °C). 4 around the display bay, 4 for the back cover, 2 for the sensor carrier. The entry chamfer centres them. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-2))
+
+> **Tip:** Set the insert on the hole, touch it with the iron and let it sink under its own weight until it is flush. Do not push. The front behind the 4 display domes is only 1.1 mm thick: little heat, no pressure.
+
+### Step 3 of 13: Display
+
+<img src="images/steps/step_03.png" width="60%" alt="Display">
+
+**You need:** Display, 4 screws M2 × 4, hex key 1.3 mm
+
+Glass first into the display bay, then 4 screws M2 × 4 through the corner holes of the display board. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-3))
+
+> **Tip:** Test the electronics on the desk before you build them in: wire everything, flash the firmware and check the display. Keep the protective film on the glass until the end.
+
+### Step 4 of 13: Sensor carrier
+
+<img src="images/steps/step_04.png" width="60%" alt="Sensor carrier">
+
+**You need:** Sensor carrier for your SCD41 board
+
+The carrier is the removable floor of the sensor chamber. Print the one that matches your SCD41 board, here the 13.5 × 21.75 mm version. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-4))
+
+> **Tip:** Not sure which board you have? See [measure your sensor](measure-sensor.md).
+
+### Step 5 of 13: SCD41 into the rails
+
+<img src="images/steps/step_05.png" width="60%" alt="SCD41 into the rails">
+
+**You need:** SCD41, 4 wires of about 8 cm, soldering iron
+
+Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire notch. The spring tongue clicks over the upper edge. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-5))
+
+> **Tip:** To take the board out again, push the spring tongue back with a small screwdriver.
+
+### Step 6 of 13: ESP32-C3 on the back
+
+<img src="images/steps/step_06.png" width="60%" alt="ESP32-C3 on the back">
+
+**You need:** ESP32-C3 SuperMini, USB cable with right-angle plug
+
+Slide the ESP32-C3 from above between the side guides until it rests on the end stops and slips under the two small lips. Then plug the USB cable in from below, the carrier is open below the socket. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-6))
+
+> **Tip:** Back port module: lay the cable into the side slot of the module first. Bottom port module: push the straight plug through the module from outside first.
+
+### Step 7 of 13: Carrier into the housing
+
+<img src="images/steps/step_07.png" width="60%" alt="Carrier into the housing">
+
+**You need:** 2 screws M2 × 4, a drop of hot glue
+
+Put the carrier onto the ledges in the chin and fix it with 2 screws M2 × 4. It closes the sensor chamber against the warm electronics. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-7))
+
+> **Tip:** Seal the wire notch with a drop of hot glue. Then the sensor chamber stays apart from the warm electronics.
+
+### Step 8 of 13: Wiring
+
+<img src="images/steps/step_08.png" width="60%" alt="Wiring">
+
+**You need:** Silicone wire AWG 30, soldering iron, the [wiring diagram](wiring.md)
+
+Display: 8 wires from the connector across the back of the display to the ESP32-C3. SCD41: 4 wires through the notch in the carrier. Colours as in the wiring diagram. The wire path shown here is schematic. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-8))
+
+> **Tip:** Keep the wires short and lay them flat over the back of the display, so the cover closes without pressing on them.
+
+### Step 9 of 13: Cable port module
+
+<img src="images/steps/step_09.png" width="60%" alt="Cable port module">
+
+**You need:** Cable port module: back (right-angle plug) or bottom (straight plug)
+
+Slide the module into the opening at the lower back edge. Back module for a right-angle plug into the wall box, bottom module for a cable on the wall. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-9))
+
+> **Tip:** Print both modules and decide on site. Swapping later takes four screws.
+
+### Step 10 of 13: Back cover
+
+<img src="images/steps/step_10.png" width="60%" alt="Back cover">
+
+**You need:** Back cover, 4 screws M2 × 4
+
+Put the cover into its seat and fix it with 4 screws M2 × 4. The heads sit below the surface, so the cover still slides onto the wall plate. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-10))
+
+> **Tip:** Nothing may stick out of the back: the heads sit below the surface, otherwise the device does not slide onto the wall plate.
+
+### Step 11 of 13: Wall plate on the flush box
+
+<img src="images/steps/step_11.png" width="60%" alt="Wall plate on the flush box">
+
+**You need:** Wall plate, the 2 screws of the flush box
+
+Screw the wall plate to the two device screws of the flush box (60 mm apart). The slotted holes even out a slightly twisted box. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-11))
+
+> **Tip:** Power in the box: a flush mounted USB power module (work on 230 V only by a qualified electrician) or a USB cable inside the wall. Lead the cable through the passage of the plate.
+
+### Step 12 of 13: Slide the device on
+
+<img src="images/steps/step_12.png" width="60%" alt="Slide the device on">
+
+**You need:** Nothing
+
+Hold the device in front of the plate, put the rail into the hidden window and slide it 15 mm down. Done. To remove it, slide it up and pull it off. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-12))
+
+> **Tip:** Plug the cable into the device before you put it on the rail.
+
+### Step 13 of 13: Optional lock tab
+
+<img src="images/steps/step_13.png" width="60%" alt="Optional lock tab">
+
+**You need:** Lock tab, 2 heat-set inserts and 2 screws M2 × 4
+
+In an office, a school or with children, press one insert into the bottom of the housing and one into the wall plate, then screw the small tab on from below (2 screws M2 × 4). Then the device cannot be slid off the wall. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-13))
+
+> **Tip:** Only where needed. To take the device off later, remove the tab first.
+
+<!-- steps:end -->
+
+## 5. Desk stand
 
 Use the back module with a right-angle plug. Place the device on the rail from above and slide it down. The device leans back by 12°, a 5 mm air gap below keeps the vents free. The cable runs out through the notch at the back of the foot.
 
-## 8. Commissioning
+## 6. Commissioning
 
 **The easy way:** flash the firmware from the browser on the [project page](https://tobi136b.github.io/co2-wall-sensor/), enter your WiFi in the same window and adopt the device in Home Assistant. Firmware updates then appear in Home Assistant.
 
@@ -111,4 +209,6 @@ Use the back module with a right-angle plug. Place the device on the rail from a
 **After that, in both cases:**
 
 1. **Calibration:** put the device next to an open window for 15 minutes, then press *Calibrate SCD41 (fresh air 420 ppm)* in Home Assistant. Automatic self calibration is enabled in addition.
-2. **Temperature:** after 24 hours compare with a reference thermometer and adjust the substitution `temperature_offset` in your device file (after adopting the device in the ESPHome dashboard, if you used the browser installer).
+2. **Temperature:** after 24 hours compare with a reference thermometer and set the difference as *Temperature correction* in Home Assistant. The humidity is corrected with it.
+3. **Altitude:** set *Altitude above sea level* for your place, it makes the CO2 value more exact.
+4. **Night and outdoor values:** night times, dimming or switching off, the window hint and the outdoor sensor are all set in Home Assistant, see [Home Assistant](../README.md#home-assistant).

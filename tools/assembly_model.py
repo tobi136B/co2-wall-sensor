@@ -317,7 +317,7 @@ def write(out: Path) -> None:
     for f in sorted(files):
         shutil.copy2(ROOT / "cad" / "stl" / f, out / f)
     for lang in ("en", "de"):
-        img = display_preview.screen(lang, "good", 620, 21.4, 45, "08:15", 760, "falling", None)
+        img = display_preview.screen(lang, "good", 620, 21.4, 45, "08:15", 760, "falling", None, 14.5)
         img.convert("RGB").save(out / f"screen_{lang}.png", optimize=True)
     print(f"written: {out} ({len(data['parts'])} parts, {len(data['steps'])} steps, {len(files)} STL files)")
 

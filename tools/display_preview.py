@@ -54,11 +54,11 @@ TEXT = {
         "warm": "Fenster zu: außen wärmer",
     },
 }
-# (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red)
+# (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red, outdoor, window hint)
 STATES = [
-    ("good", 642, 21.4, 45, "08:15", 760, "falling", None),
-    ("moderate", 1180, 22.1, 51, "13:40", 780, "rising", 44),
-    ("ventilate", 1620, 23.0, 58, "19:05", 980, "steady", None),
+    ("good", 642, 21.4, 45, "08:15", 760, "falling", None, 14.5, None),
+    ("moderate", 1180, 22.1, 63, "13:40", 780, "rising", 44, 9.0, "dry"),
+    ("ventilate", 1620, 25.6, 52, "19:05", 980, "steady", None, 17.5, "cool"),
 ]
 
 

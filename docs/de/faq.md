@@ -16,7 +16,7 @@ Wichtiger als die Größe ist der Platz:
 * **Nicht neben Fenster, Tür, Heizkörper oder Lüftungsauslass** und nicht in direkte Sonne.
 
 ### Wofür ist das Loch unten im Gehäuse?
-Dort kommt eine Einschmelzmutter für die optionale Sicherungslasche hinein. Die Lasche wird von unten an Gehäuse und Wandplatte geschraubt, damit niemand das Gerät einfach von der Wand schieben kann (Büro, Schule, Kinder). Ohne Lasche bleibt das Loch leer; es ist nur von unten sichtbar. Siehe [Aufbau](aufbau.md#6-wandmontage-auf-der-hohlwanddose).
+Dort kommt eine Einschmelzmutter für die optionale Sicherungslasche hinein. Die Lasche wird von unten an Gehäuse und Wandplatte geschraubt, damit niemand das Gerät einfach von der Wand schieben kann (Büro, Schule, Kinder). Ohne Lasche bleibt das Loch leer; es ist nur von unten sichtbar. Siehe [Aufbau](aufbau.md#schritt-13-von-13-optionale-sicherungslasche).
 
 ### Welche Schwellen sind sinnvoll?
 Standard sind 1000 ppm (Gelb) und 1400 ppm (Rot). Werte unter 1000 ppm gelten allgemein als unbedenklich, über 2000 ppm sollte dringend gelüftet werden. Beide Schwellen lassen sich jederzeit in Home Assistant ändern.
@@ -46,7 +46,7 @@ Nein. Die Firmware prüft nur das Release-Manifest auf der Projektseite auf Upda
 Handelsübliche Einschmelzmuttern M2 × 3 mit 3,2 mm Außendurchmesser (die verbreiteten Packungen „M2 x 3 x 3,2“) und Linsenkopfschrauben M2 × 4 nach ISO 7380, je 10 Stück (12 mit der optionalen Sicherungslasche). Muttern mit anderem Außendurchmesser gehen, wenn `INSERT_HOLE_D` angepasst wird.
 
 ### Kabel von unten oder von hinten?
-Beides. Die zwei Kabelport-Module drucken und das passende einsetzen: hinten mit Winkelstecker für die Hohlwanddose und den Tischständer, unten mit geradem Stecker für ein Kabel auf Putz. Später wechseln kostet vier Schrauben. Siehe [Aufbau](aufbau.md#4-kabelaustritt-wählen).
+Beides. Die zwei Kabelport-Module drucken und das passende einsetzen: hinten mit Winkelstecker für die Hohlwanddose und den Tischständer, unten mit geradem Stecker für ein Kabel auf Putz. Später wechseln kostet vier Schrauben. Siehe [Aufbau](aufbau.md#3-kabelaustritt-wählen).
 
 ### Mein gerader USB-C-Stecker passt nicht.
 Der Port unten nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder den Port hinten mit Winkelstecker nehmen.

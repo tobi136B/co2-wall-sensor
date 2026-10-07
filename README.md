@@ -25,7 +25,9 @@ It covers a flush wall box or stands on your desk.**
 
 * **Flash it from your browser.** Connect the ESP32-C3 via USB, click *Install* on the [project page](https://tobi136b.github.io/co2-wall-sensor/), enter your WiFi. Home Assistant finds the device and offers new releases as a firmware update.
 * **Real CO2 measurement** with the Sensirion SCD41 (photoacoustic NDIR), plus temperature and humidity.
-* **2" IPS colour display** with everything at a glance: traffic light status, large CO2 value, 3 hour trend, clock, temperature and humidity.
+* **2" IPS colour display** with everything at a glance: traffic light status, large CO2 value, 3 hour trend, clock, indoor and outdoor temperature and humidity.
+* **Window hint.** The display tells you when opening the window cools the room or dries the air, using an outdoor sensor or simply your Home Assistant weather forecast.
+* **Everything adjustable in Home Assistant.** Night schedule (dim or off), night brightness, warnings at night, temperature correction, altitude and hint thresholds, no reflashing needed.
 * **One device, two mounts.** A dovetail rail slides onto the **wall plate** (covers a standard 68 mm flush wall box) or the **desk stand**. An optional lock tab screws it to the wall.
 * **Cable from the back or from below**, decided after printing with a small swappable **cable port module** that doubles as strain relief.
 * **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 slides into rails, the ESP32-C3 sits in guides.
@@ -115,13 +117,31 @@ Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the onl
 | Entity | Type | Purpose |
 |--------|------|---------|
 | CO2, Temperature, Humidity | sensor | measurements every 30 s |
+| CO2 trend, Ventilate in | sensor | ppm per hour, minutes until the red level |
 | Air quality | text | Good, Moderate, Ventilate! |
+| Outdoor temperature, Outdoor humidity | sensor | from Home Assistant, see [outdoor values](#outdoor-values) |
+| Window hint | text | Open the window, Airing dries the air, Keep it shut, None |
 | CO2 threshold yellow / red | number | traffic light limits (default 1000 / 1400 ppm) |
-| Display brightness | light | dim or switch off the display |
-| Night mode (dim 22:00 to 06:00) | switch | automatic dimming at night |
+| Display brightness | light | dim or switch off the display by hand |
+| Night mode, Night from, Night until | switch, time | night schedule (default 22:00 to 06:00) |
+| Display at night, Night brightness | select, number | dim (default 8 %) or switch off |
+| Red warning at night | switch | the display wakes up while the CO2 level is red |
+| Window hint on the display, Outdoor value on the display | switch | show or hide them |
+| Window hint from indoor temperature, Window hint: cooler outside by | number | default 24 °C and 3 °C |
+| Temperature correction | number | self-heating at your wall: compare with a reference thermometer |
+| Altitude above sea level | number | pressure compensation of the CO2 value (default 300 m) |
 | Calibrate SCD41 (fresh air 420 ppm) | button | forced recalibration in fresh air |
 | Firmware | update | new releases (browser installer firmware) |
 | WiFi signal, Uptime, Restart | diagnostic | |
+
+All settings are kept after a power cut. Nothing has to be built yourself: the browser installer firmware has every setting.
+
+### Outdoor values
+
+The display shows the outdoor temperature under **OUT**, and the window hint compares inside and outside.
+
+* **Without anything to set up** the device takes `weather.forecast_home`, the weather entity Home Assistant creates for your home location (integration *Meteorologisk institutt (Met.no)*).
+* **A real outdoor sensor wins.** Pair it as usual (Zigbee, Homematic IP, Shelly, ...), open it under *Settings > Devices & services > Entities*, click the gear and set the **entity ID** to `sensor.outdoor_temperature` (humidity: `sensor.outdoor_humidity`). A few seconds later the display shows it. No new firmware needed.
 
 **Ventilation reminder:** a ready blueprint notifies your phone when the CO2 level stays high and again when the air is good.
 
