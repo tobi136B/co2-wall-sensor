@@ -1,6 +1,6 @@
 {
-  "enclosure_version": "1.6",
-  "parameters_sha256": "10889875e9f12c5848580f859c38e4951bc3a70ff7d869945e9fe4f3f04778ab",
+  "enclosure_version": "1.7",
+  "parameters_sha256": "f0359a765fbba8a4d2e8da3604e877a109bda21403d3239038924c39b2d16ae3",
   "parts": [
     "back_cover",
     "cable_port_back",
