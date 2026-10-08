@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.8.1](https://github.com/tobi136B/co2-wall-sensor/compare/v1.8.0...v1.8.1) (2026-10-08)
+
+
+### Fixed
+
+* **cad:** measured display dimensions, enclosure version in README and releases ([#23](https://github.com/tobi136B/co2-wall-sensor/issues/23)) ([1508daf](https://github.com/tobi136B/co2-wall-sensor/commit/1508daf660b60382c9f27564ec78d0dec3c2818f))
+
 ## [1.8.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.7.2...v1.8.0) (2026-10-07)
 
 
