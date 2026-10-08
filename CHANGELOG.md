@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [1.9.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.8.1...v1.9.0) (2026-10-08)
+
+
+### Added
+
+* cable routing without glue, sensor carrier configurator, smarter window hint ([#25](https://github.com/tobi136B/co2-wall-sensor/issues/25)) ([0bba271](https://github.com/tobi136B/co2-wall-sensor/commit/0bba27104b0521be16eefd1cf8ddc44e6eb2b700))
+
 ## [1.8.1](https://github.com/tobi136B/co2-wall-sensor/compare/v1.8.0...v1.8.1) (2026-10-08)
 
 
