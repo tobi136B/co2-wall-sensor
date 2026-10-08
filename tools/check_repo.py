@@ -85,6 +85,11 @@ def check_print_files() -> list[str]:
             "The parameters in generate_enclosure.py changed after the print files were exported. "
             "Run the generator in Fusion with EXPORT = True and commit the new STL/STEP files."
         )
+    version = info.get("enclosure_version", "")
+    for readme in ("README.md", "README.de.md"):
+        badge = re.search(r"img\.shields\.io/badge/[^-]+-v([0-9.]+)-", (ROOT / readme).read_text(encoding="utf-8"))
+        if not badge or badge.group(1) != version:
+            errors.append(f"{readme}: enclosure badge must show v{version} (cad/build_info.json)")
     for part in info.get("parts", []):
         if not (ROOT / "cad" / "stl" / f"{part}.stl").exists():
             errors.append(f"cad/stl/{part}.stl is missing")

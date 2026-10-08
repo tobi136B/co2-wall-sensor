@@ -6,6 +6,7 @@ Usage:  python tools/release_notes.py 1.3.0 > release_notes.md
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -34,6 +35,21 @@ Am einfachsten flashen: [Projektseite]({PAGE}) öffnen, ESP32-C3 per USB anschli
 """
 
 
+def enclosure_version() -> str:
+    """Version of the printed parts, written by the Fusion export into cad/build_info.json."""
+    info = json.loads((ROOT / "cad" / "build_info.json").read_text(encoding="utf-8"))
+    return info["enclosure_version"]
+
+
+def version_line(version: str) -> str:
+    enc = enclosure_version()
+    return (
+        f"> **Release {version} · Enclosure v{enc}** (engraved on every printed part)  \n"
+        f"> Parts that show v{enc} belong to this release. "
+        f"**Deutsch:** Release {version}, Gehäuse v{enc} (auf jedem gedruckten Teil eingeprägt)."
+    )
+
+
 def section(version: str) -> str:
     text = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     m = re.search(rf"^## \[?{re.escape(version)}\]?.*?$(.*?)(?=^## |\Z)", text, flags=re.M | re.S)
@@ -44,5 +60,7 @@ def section(version: str) -> str:
 
 
 if __name__ == "__main__":
+    print(version_line(sys.argv[1]))
+    print()
     print(section(sys.argv[1]))
     print(ASSETS)
