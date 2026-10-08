@@ -18,6 +18,7 @@ from urllib.parse import quote
 
 import assembly_model
 import bom
+import carrier_params
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "https://github.com/tobi136B/co2-wall-sensor"
@@ -34,6 +35,8 @@ IMAGES = [
     "display_preview_en.png",
     "display_preview_de.png",
     "social_preview.png",
+    "measure_sensor_en.png",
+    "measure_sensor_de.png",
 ]
 
 TEXT = {
@@ -82,6 +85,8 @@ TEXT = {
         "t_dl_all": "All files of the release",
         "t_guide": "3D assembly guide",
         "t_guide_text": "Every step in 3D: turn the device, take it apart and see which part comes next.",
+        "t_configurator": "Sensor carrier configurator",
+        "t_configurator_text": "Another SCD41 board? Enter its dimensions and download the matching carrier.",
         "t_cap_exploded": "Housing, sensor carrier, cable port and back cover",
         "t_cap_back": "Cable to the back, into the wall box",
         "t_cap_bottom": "Cable to the bottom, on the wall surface",
@@ -153,6 +158,8 @@ TEXT = {
         "t_dl_all": "Alle Dateien des Releases",
         "t_guide": "3D-Aufbauanleitung",
         "t_guide_text": "Jeder Schritt in 3D: Gerät drehen, zerlegen und sehen, welches Teil als Nächstes kommt.",
+        "t_configurator": "Sensorträger-Konfigurator",
+        "t_configurator_text": "Andere SCD41-Platine? Maße eingeben und den passenden Träger herunterladen.",
         "t_cap_exploded": "Gehäuse, Sensorträger, Kabelport und Rückdeckel",
         "t_cap_back": "Kabel nach hinten, in die Hohlwanddose",
         "t_cap_bottom": "Kabel nach unten, auf Putz",
@@ -216,6 +223,81 @@ ASSEMBLY = {
 }
 
 
+CONFIGURATOR = {
+    "en": {
+        "c_title": "Sensor carrier configurator · CO2 Wall Sensor",
+        "c_description": "Enter the dimensions of your SCD41 board and download the matching sensor carrier as STL.",
+        "c_back": "Project page",
+        "c_hint": "Drag to turn, scroll to zoom",
+        "c_loading": "Loading the geometry engine …",
+        "c_noscript": "The configurator needs JavaScript. Without it, use the Fusion generator, see docs/measure-sensor.md.",
+        "c_heading": "Your own sensor carrier",
+        "c_lead": "Only the sensor carrier depends on the SCD41 board. Measure your board with a caliper, enter the "
+        "values and download the carrier. It is built right here in your browser with the same geometry as the "
+        "Fusion generator, nothing is uploaded.",
+        "c_presets": "Known boards:",
+        "c_sketch_alt": "Measuring sketch of the SCD41 board",
+        "c_w": "Width across the rails, edge to edge",
+        "c_l": "Length in the slide direction",
+        "c_pcb": "Board thickness at the edge",
+        "c_h": "Height of the sensor above the board",
+        "c_sx": "Sensor centre from the board centre, right positive",
+        "c_px": "Solder pad row from the board centre, right positive, 0 if not on a rail",
+        "c_download": "Download STL",
+        "c_print": "Print it standing on its lower edge with a 5 mm brim, PETG, 0.2 mm layers. "
+        "Everything else of the enclosure stays the same.",
+        "c_more": "Board not listed?",
+        "c_more_text": "Please open an issue on GitHub with your values and a photo of the board. It becomes a known "
+        "profile, then the next person just picks it.",
+        "c_json": {
+            "ok": "Fits. The carrier is ready for download.",
+            "known": "Fits: known board {name}, identical to the carrier in the release.",
+            "invalid": "Please check the values marked in red.",
+            "length": "Too long for the chamber: turn the board by 90 degrees.",
+            "width": "Too wide for the chamber.",
+            "height": "Board and sensor too high: the sensor would touch the front wall.",
+            "error": "The geometry engine could not be loaded. Please reload the page.",
+        },
+    },
+    "de": {
+        "c_title": "Sensorträger-Konfigurator · CO2-Wandsensor",
+        "c_description": "Maße deiner SCD41-Platine eingeben und den passenden Sensorträger als STL herunterladen.",
+        "c_back": "Projektseite",
+        "c_hint": "Ziehen zum Drehen, Scrollen zum Zoomen",
+        "c_loading": "Geometrie wird geladen …",
+        "c_noscript": "Der Konfigurator braucht JavaScript. Ohne geht es mit dem Fusion-Generator, siehe "
+        "docs/de/sensor-ausmessen.md.",
+        "c_heading": "Dein eigener Sensorträger",
+        "c_lead": "Nur der Sensorträger hängt von der SCD41-Platine ab. Platine mit dem Messschieber ausmessen, Werte "
+        "eintragen und den Träger herunterladen. Er wird direkt hier im Browser mit derselben Geometrie wie im "
+        "Fusion-Generator erzeugt, es wird nichts hochgeladen.",
+        "c_presets": "Bekannte Platinen:",
+        "c_sketch_alt": "Messskizze der SCD41-Platine",
+        "c_w": "Breite quer zwischen den Schienen, Kante zu Kante",
+        "c_l": "Länge in Schieberichtung",
+        "c_pcb": "Platinendicke am Rand",
+        "c_h": "Höhe des Sensors über der Platine",
+        "c_sx": "Sensormitte ab Platinenmitte, rechts positiv",
+        "c_px": "Lötpunktreihe ab Platinenmitte, rechts positiv, 0 wenn nicht an einer Schiene",
+        "c_download": "STL herunterladen",
+        "c_print": "Stehend auf der Unterkante drucken, 5 mm Brim, PETG, 0,2 mm Schichthöhe. "
+        "Alle anderen Teile des Gehäuses bleiben gleich.",
+        "c_more": "Platine nicht dabei?",
+        "c_more_text": "Bitte auf GitHub ein Issue mit deinen Werten und einem Foto der Platine anlegen. Sie wird als "
+        "Profil aufgenommen, dann wählt der Nächste sie einfach aus.",
+        "c_json": {
+            "ok": "Passt. Der Träger ist bereit zum Herunterladen.",
+            "known": "Passt: bekannte Platine {name}, identisch mit dem Träger im Release.",
+            "invalid": "Bitte die rot markierten Werte prüfen.",
+            "length": "Zu lang für die Kammer: Platine um 90 Grad drehen.",
+            "width": "Zu breit für die Kammer.",
+            "height": "Platine und Sensor zu hoch: Der Sensor würde die Frontwand berühren.",
+            "error": "Die Geometrie konnte nicht geladen werden. Bitte die Seite neu laden.",
+        },
+    },
+}
+
+
 def fill(template: str, values: dict) -> str:
     text = (ROOT / "site" / template).read_text(encoding="utf-8")
     for key, value in values.items():
@@ -230,6 +312,23 @@ def assembly_page(lang: str, base: str) -> str:
         "assembly.html",
         {
             **ASSEMBLY[lang],
+            "lang": lang,
+            "base": base,
+            "home": "index.html" if lang == "en" else "de/index.html",
+            "t_language": TEXT[lang]["t_language"],
+            "cur_en": 'aria-current="page"' if lang == "en" else "",
+            "cur_de": 'aria-current="page"' if lang == "de" else "",
+        },
+    )
+
+
+def configurator_page(lang: str, base: str) -> str:
+    values = {k: v for k, v in CONFIGURATOR[lang].items() if k != "c_json"}
+    return fill(
+        "configurator.html",
+        {
+            **values,
+            "c_json": json.dumps(CONFIGURATOR[lang]["c_json"], ensure_ascii=False),
             "lang": lang,
             "base": base,
             "home": "index.html" if lang == "en" else "de/index.html",
@@ -283,6 +382,7 @@ def page(lang: str, version: str, base: str) -> str:
     }
     values["t_other_language"] = t["t_other_language"].replace("{base}", base)
     values["guide"] = f"{base}{'de/' if lang == 'de' else ''}assembly.html"
+    values["configurator"] = f"{base}{'de/' if lang == 'de' else ''}configurator.html"
     return fill("template.html", values)
 
 
@@ -307,6 +407,10 @@ def main():
     (out / "assembly.html").write_text(assembly_page("en", ""), encoding="utf-8")
     (out / "de" / "assembly.html").write_text(assembly_page("de", "../"), encoding="utf-8")
     shutil.copy2(ROOT / "site" / "assembly.js", out / "assembly.js")
+    (out / "configurator.html").write_text(configurator_page("en", ""), encoding="utf-8")
+    (out / "de" / "configurator.html").write_text(configurator_page("de", "../"), encoding="utf-8")
+    shutil.copy2(ROOT / "site" / "carrier.js", out / "carrier.js")
+    (out / "carrier_params.json").write_text(json.dumps(carrier_params.data()) + "\n", encoding="utf-8")
     assembly_model.write(out / "models")
     (out / ".nojekyll").write_text("", encoding="utf-8")
     manifests(args.version, args.dist, out)

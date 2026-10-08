@@ -45,7 +45,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '1.7'          # enclosure version, engraved into every part
+VERSION = '1.8'          # enclosure version, engraved into every part
 
 # ===================== PARAMETERS =====================
 # --- device ---
@@ -114,6 +114,11 @@ SPRING_W, SPRING_L = 4.0, 10.0  # width and free length of the tongue
 SPRING_T = 1.2          # thickness of the tongue (the carrier is FLOOR_T thick)
 SPRING_HOOK = 0.8       # height of the 45 degree hook in front of the tongue
 SPRING_PRELOAD = 0.4    # the hook is pushed back this far by a board of nominal length
+# --- cable management: soldered wires, nothing glued ---
+CABLE_Y = 1.5           # the display cable runs straight across the back of the display at this height
+SCD_SLOT_W = 1.3        # narrow wire slot through the sensor carrier: 4 wires in a row, no glue needed
+SCD_CHANNEL_W = 2.4     # wire channel on the back of the carrier, between clip edge and divider wall
+CLIP_LIP = 0.8          # snap lip over the wire channel
 # --- cable port module ---
 PORT_W = 16.0           # width of the module (outside)
 PORT_STEP = 1.2         # the module is wider behind the outer skin, so it cannot fall out
@@ -779,9 +784,20 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     r = PLUG_BODY_D / 2 + 0.5
     box(comp, C3_X - r, BOOT_Y - r - 0.5, FLOOR_Z + FLOOR_T - 1.0, C3_X + r, min(BOOT_Y + r + BOOT_PLAY, C3_Y0 - 1.3),
         FLOOR_Z + FLOOR_T + 1.0, CUT, 'PlugPocket', body)
-    # cable notch for the SCD41 wires (seal with a drop of hot glue)
-    box(comp, -SCD_W / 2 - 6, y_hi - 4, FLOOR_Z - 0.5, -SCD_W / 2 - 2, y_hi + 0.1, FLOOR_Z + FLOOR_T + 0.5,
-        CUT, 'ScdCableNotch', body)
+    # SCD41 wires: narrow slot through the floor beside the rail, open towards the divider so the soldered
+    # wires are laid in from the side. 4 wires in a row fill it, the sensor chamber stays closed without glue.
+    slot_x = -(SCD_W / 2 + g + 1.2 + MIN_WALL + SCD_SLOT_W / 2)
+    box(comp, slot_x - SCD_SLOT_W / 2, y_hi - 4.0, FLOOR_Z - 0.5, slot_x + SCD_SLOT_W / 2, y_hi + 0.1,
+        FLOOR_Z + FLOOR_T + 0.5, CUT, 'ScdWireSlot', body)
+    # wire channel on the back: a clip edge with a snap lip, the divider wall of the housing closes it.
+    # The 45 degree flank prints without support (the carrier prints standing on its lower edge).
+    top = FLOOR_Z + FLOOR_T
+    yw, hc = Y_DIV_LOW - SCD_CHANNEL_W, 2.5
+    cx0, cx1 = slot_x + SCD_SLOT_W / 2 + MIN_WALL, SPRING_X - SPRING_W / 2 - 1.6
+    if cx1 - cx0 > 2.0:
+        prism_x(comp, [(yw - hc - 1.0, top - 0.01), (yw - 1.0, top + hc), (yw, top + hc), (yw, top - 0.01)],
+                cx0, cx1, JOIN, 'WireClip', body)
+        box(comp, cx0, yw - 0.01, top + hc - CLIP_LIP, cx1, yw + CLIP_LIP, top + hc, JOIN, 'WireClipLip', body)
 
     # ESP32-C3: support ribs, side guides, end stops below the board (the cable pulls downwards).
     # Tolerant to other batches: crush ribs centre the board in guides with play, the lips take boards up
@@ -807,7 +823,7 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
         la, lb = sorted((C3_X + sx * (C3_W / 2 - 0.6), C3_X + sx * (gx + wall)))   # grows out of the guide
         box(comp, la, C3_Y0 - 0.05, z_lip, lb, C3_Y0 + 1.2, z_lip + MIN_WALL + 0.1, JOIN, 'C3GrooveLip', body)
 
-    label(comp, body, top, XL + 4, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 4,
+    label(comp, body, top, XL + 4, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 6.5,
           f'CARRIER v{VERSION}\nSCD {profile or "custom"}\nPRINT: EDGE DOWN', name='Label', height=1.5)
     return comp
 
@@ -977,6 +993,10 @@ def build_dummies(root, ops):
         LIP + GLASS_T + LCD_PCB, NEW, 'Pcb')
     box(lcd, BAY_X0 + 4, LCD_Y - 10, LIP + GLASS_T + LCD_PCB, BAY_X0 + 10, LCD_Y + 10, LIP + GLASS_T + LCD_PCB + 6, NEW,
         'PH2Connector')
+    # display cable (8 wires, cut to about 5 cm): straight across the back of the display to the upper end of
+    # the ESP32-C3, the collision check proves the path stays free
+    zc = LIP + GLASS_T + LCD_PCB
+    box(lcd, BAY_X0 + 10, CABLE_Y - 1.6, zc + 0.2, C3_X - C3_W / 2 - 1.0, CABLE_Y + 1.6, zc + 3.4, NEW, 'DisplayCable')
     scd = new_component(root, 'Dummy_SCD41')
     zb = SCD_ZT - SCD_PCB
     box(scd, -SCD_W / 2, SCD_Y0, zb, SCD_W / 2, SCD_TOP, SCD_ZT - 0.01, NEW, 'Pcb')

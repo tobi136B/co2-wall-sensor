@@ -46,6 +46,7 @@ substitutions:
   txt_hint_cool: "Fenster auf: außen kühler"
   txt_hint_dry: "Lüften trocknet die Luft"
   txt_hint_warm: "Fenster zu: außen wärmer"
+  txt_hint_short: "Kurz stoßlüften: außen wärmer"
   txt_hint_none: "Keiner"
   txt_label_hum: "FEUCHTE"
   # Optionale Anpassungen (Standardwerte in common/base.yaml)

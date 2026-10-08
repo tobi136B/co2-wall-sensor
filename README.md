@@ -7,7 +7,7 @@ It covers a flush wall box or stands on your desk.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Enclosure](https://img.shields.io/badge/enclosure-v1.7-6E7B8B)
+![Enclosure](https://img.shields.io/badge/enclosure-v1.8-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -31,7 +31,7 @@ It covers a flush wall box or stands on your desk.**
 * **Everything adjustable in Home Assistant.** Night schedule (dim or off), night brightness, warnings at night, temperature correction, altitude and hint thresholds, no reflashing needed.
 * **One device, two mounts.** A dovetail rail slides onto the **wall plate** (covers a standard 68 mm flush wall box) or the **desk stand**. An optional lock tab screws it to the wall.
 * **Cable from the back or from below**, decided after printing with a small swappable **cable port module** that doubles as strain relief.
-* **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 slides into rails, the ESP32-C3 sits in guides.
+* **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 slides into rails, the ESP32-C3 sits in guides, the wires lie in a wire slot and under a printed wire clip.
 * **Thought-through thermals.** The sensor lives in its own chamber below the electronics, fresh air enters from below, the front stays closed.
 * **Fully parametric CAD.** Every dimension is a Fusion user parameter. Change a value, run the script, get new STL, STEP, print plates and drawing.
 * **Bilingual.** Firmware, documentation, drawings and project page in English and German.
@@ -77,7 +77,7 @@ Technical drawing (A3, ISO first angle): [English PDF](docs/drawing/co2_wall_sen
 
 ## Bill of materials
 
-About 55 € for one device (cheapest shop each, without wire and filament). The links are suggestions, checked in October 2026; prices change often.
+The total for one device is in the last row of the table. The links are suggestions, checked in October 2026; prices change often.
 
 <!-- bom:start (generated from hardware/bom.yaml) -->
 | Qty | Part | AliExpress | Amazon.de |
@@ -90,10 +90,11 @@ About 55 € for one device (cheapest shop each, without wire and filament). The
 | 1 | USB cable with **right-angle USB-C plug** (angled up/down) for the back port | *Amazon only* | [5.90 € (0.3 m)](https://www.amazon.de/dp/B0DGTQD4Y5) |
 | 1 | USB power module for the flush wall box (installation by a qualified electrician), or any USB charger | *Amazon only* | [4.80 € (2 pcs: 9.59 €)](https://www.amazon.de/dp/B0GVWPHKJM) |
 |  | Silicone wire AWG 30 | *Amazon only* | [15.49 € (8 colours)](https://www.amazon.de/dp/B0DH2FBWH7) |
+| | **Total** (one device, each part from this shop if it has it, otherwise from the other; without wire and filament) | **54.35 €** | **64.28 €** |
 <!-- bom:end -->
 
 ² Shops often show a different board than the one they send. Measure it on arrival and print the matching carrier.
-SCD41 boards come in different sizes. Only the small sensor carrier depends on the board: there is one for the **13.5 × 21.75 mm** and one for the **15 × 20 mm** board, others take six measurements. See [measure your sensor](docs/measure-sensor.md).
+SCD41 boards come in different sizes. Only the small sensor carrier depends on the board: there is one for the **13.5 × 21.75 mm** and one for the **15 × 20 mm** board, for others enter six measurements in the [online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html) and download the carrier. See [measure your sensor](docs/measure-sensor.md).
 Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the only place for parts, prices and shop links; the table above and the project page are generated from it.
 
 ## Quick start
@@ -194,7 +195,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 ## Before your first print
 
 * **Versions:** the release number (e.g. 1.9.0) counts every change, firmware and docs included. The **enclosure version** (badge at the top, engraved on every printed part) only changes when the printed parts change. Parts with the same enclosure version fit together, whatever release they came from.
-* **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md).
+* **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md). Other boards: [online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html).
 * **Display:** all dimensions of the Waveshare 2inch LCD Module are measured with a caliper (PCB 58.2 × 35.3 × 1.62 mm, glass 47.7 × 34.6 mm, PCB and glass 4.43 mm thick). Other batches may differ slightly: check `LCD_*` and `GLASS_*`.
 * **Hardware status:** the enclosure and firmware are verified in CAD and CI. Photos and measurements of a printed device are welcome.
 
@@ -204,12 +205,10 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * [x] Interactive 3D assembly guide ([open it](https://tobi136b.github.io/co2-wall-sensor/assembly.html), v1.6)
 * [x] ESP32-C3 holder from the measured board, tolerant to other batches (v1.7)
 * [x] Collision check of every assembly path in the CI (v1.7)
-* [ ] Clean cable routing with clips and channels
-* [ ] Outdoor temperature on the display, with a hint when opening the window helps
-* [ ] Online configurator: sensor carrier STL from three measurements ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8))
+* [x] Outdoor temperature on the display, with a hint when opening the window helps (v1.8)
+* [x] Clean cable routing without glue: wire slot and wire clip on the sensor carrier, free cable path behind the display (v1.9)
+* [x] [Online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html): sensor carrier STL from the dimensions of the board ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
 * [ ] Verify display layout and thermals on real hardware, add photos
-* [ ] Optional pressure sensor (BMP280) for live CO2 pressure compensation
-* [ ] Wall plate variant for walls without a flush box
 
 ## Contributing
 

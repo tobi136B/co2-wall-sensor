@@ -96,6 +96,15 @@ def check_print_files() -> list[str]:
     return errors
 
 
+def check_configurator() -> list[str]:
+    """The browser loads the same manifold-3d version that the CI check uses."""
+    pinned = json.loads((ROOT / "tools" / "package.json").read_text(encoding="utf-8"))["dependencies"]["manifold-3d"]
+    page = (ROOT / "site" / "configurator.html").read_text(encoding="utf-8")
+    if f"manifold-3d@{pinned}/" not in page:
+        return [f"site/configurator.html must load manifold-3d@{pinned} (tools/package.json)"]
+    return []
+
+
 def check_bom() -> list[str]:
     """Shop links are https and the README tables match hardware/bom.yaml."""
     errors = bom.check_links()
@@ -118,7 +127,7 @@ def main() -> int:
         BUILD_INFO.write_text(json.dumps(info, indent=2) + "\n", encoding="utf-8")
         print(f"written: {BUILD_INFO.relative_to(ROOT)}")
         return 0
-    errors = check_docs() + check_print_files() + check_bom()
+    errors = check_docs() + check_print_files() + check_configurator() + check_bom()
     for e in errors:
         print(f"::error::{e}")
     if not errors:

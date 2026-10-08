@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{c_title}}</title>
+<meta name="description" content="{{c_description}}">
+<meta property="og:title" content="{{c_title}}">
+<meta property="og:description" content="{{c_description}}">
+<meta property="og:image" content="{{base}}img/sensor_carrier_front.png">
+<link rel="icon" href="{{base}}img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@112,500;112,700;125,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script type="importmap">
+  {"imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+    "manifold-3d": "https://cdn.jsdelivr.net/npm/manifold-3d@3.5.1/manifold.js"
+  }}
+</script>
+<style>
+  :root {
+    --plastic: #eef0f1; --panel: #ffffff; --ink: #1d2226; --muted: #5d666e; --rule: #d5dadd;
+    --graphite: #2b3036; --link: #0b6e99; --accent: #ff7a1a; --accent-soft: #fff1e6;
+    --stage-top: #f7f8f9; --stage-bottom: #dfe3e6; --ok: #1f8a4c; --bad: #c0392b;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --plastic: #171a1d; --panel: #20252a; --ink: #e9ecee; --muted: #a2abb3; --rule: #343b42;
+      --graphite: #0f1214; --link: #6cc4ec; --accent-soft: #3a2a1d;
+      --stage-top: #2a3036; --stage-bottom: #121518; --ok: #4cc47f; --bad: #ff7b6b;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--plastic); color: var(--ink);
+    font: 16px/1.55 "Atkinson Hyperlegible", system-ui, sans-serif;
+    display: grid; grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr); overflow: hidden;
+  }
+  a { color: var(--link); text-underline-offset: 3px; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+  h1, h2 { font-family: "Archivo", system-ui, sans-serif; font-stretch: 112%; line-height: 1.15; margin: 0; }
+  header {
+    display: flex; align-items: center; gap: 18px; padding: 12px 20px; border-bottom: 1px solid var(--rule);
+    background: var(--panel);
+  }
+  header h1 { font-size: 1.15rem; font-weight: 800; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  header nav { display: flex; gap: 14px; font-size: .95rem; white-space: nowrap; }
+  header nav a[aria-current] { color: var(--ink); text-decoration: none; font-weight: 700; }
+
+  .app { display: grid; grid-template-columns: minmax(0, 1fr) 420px; min-height: 0; }
+  .stage { position: relative; min-height: 0; overflow: hidden; background: radial-gradient(120% 90% at 50% 35%, var(--stage-top), var(--stage-bottom)); }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  .stage canvas:active { cursor: grabbing; }
+  .loading {
+    position: absolute; inset: 0; display: grid; place-items: center; z-index: 4; color: var(--muted); text-align: center; padding: 20px;
+    background: radial-gradient(120% 90% at 50% 35%, var(--stage-top), var(--stage-bottom)); transition: opacity .6s;
+  }
+  .loading.done { opacity: 0; pointer-events: none; }
+  .hint {
+    position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 2; pointer-events: none;
+    background: color-mix(in srgb, var(--panel) 85%, transparent); color: var(--muted); font-size: .85rem;
+    padding: 6px 14px; border-radius: 999px; width: max-content; max-width: calc(100% - 32px); text-align: center;
+  }
+
+  .panel { background: var(--panel); border-left: 1px solid var(--rule); overflow-y: auto; padding: 22px 24px 28px; display: grid; gap: 18px; align-content: start; }
+  .panel h2 { font-size: 1.5rem; font-weight: 700; }
+  .panel p { margin: 0; }
+  .lead { color: var(--muted); }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 0; border-radius: 999px; padding: 7px 14px; cursor: pointer; font-weight: 700; font-size: .92rem;
+    background: transparent; box-shadow: inset 0 0 0 2px var(--rule);
+  }
+  .chip[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+  .field { display: grid; gap: 3px; align-content: start; }
+  .field label { font-weight: 700; font-size: .92rem; }
+  .field small { color: var(--muted); font-size: .8rem; line-height: 1.3; }
+  .field input {
+    width: 100%; padding: 8px 10px; border-radius: 8px; border: 2px solid var(--rule); background: var(--plastic);
+    font-variant-numeric: tabular-nums;
+  }
+  .field input:focus { border-color: var(--accent); outline: none; }
+  .field input[aria-invalid="true"] { border-color: var(--bad); }
+  .sketch { width: 100%; border-radius: 10px; border: 1px solid var(--rule); background: #fff; }
+  .status { padding: 10px 14px; border-radius: 10px; font-size: .95rem; border-left: 4px solid var(--ok); background: var(--plastic); }
+  .status.bad { border-left-color: var(--bad); }
+  .btn {
+    border: 0; border-radius: 999px; padding: 12px 20px; font-weight: 700; cursor: pointer; text-align: center;
+    background: var(--accent); color: #1d2226; transition: transform .1s, opacity .2s; width: 100%;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .35; cursor: default; }
+  .note { font-size: .88rem; color: var(--muted); }
+  details summary { cursor: pointer; font-weight: 700; }
+
+  @media (max-width: 900px) {
+    body { overflow-x: hidden; overflow-y: auto; grid-template-rows: auto auto; }
+    .app { grid-template-columns: 1fr; }
+    .stage { height: 46vh; min-height: 280px; }
+    .panel { border-left: 0; border-top: 1px solid var(--rule); overflow: visible; }
+  }
+  @media (max-width: 420px) { .fields { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { header nav .home { display: none; } }
+</style>
+</head>
+<body data-base="{{base}}" data-lang="{{lang}}">
+<header>
+  <h1>{{c_title}}</h1>
+  <nav aria-label="{{t_language}}">
+    <a class="home" href="{{base}}{{home}}">{{c_back}}</a>
+    <a href="{{base}}configurator.html" {{cur_en}}>EN</a>
+    <a href="{{base}}de/configurator.html" {{cur_de}}>DE</a>
+  </nav>
+</header>
+<div class="app">
+  <div class="stage" id="stage">
+    <div class="hint">{{c_hint}}</div>
+    <div class="loading" id="loading">{{c_loading}}</div>
+    <noscript><div class="loading">{{c_noscript}}</div></noscript>
+  </div>
+  <aside class="panel">
+    <div>
+      <h2>{{c_heading}}</h2>
+    </div>
+    <p class="lead">{{c_lead}}</p>
+    <div>
+      <p class="note" style="margin-bottom:8px">{{c_presets}}</p>
+      <div class="presets" id="presets"></div>
+    </div>
+    <img class="sketch" src="{{base}}img/measure_sensor_{{lang}}.png" alt="{{c_sketch_alt}}">
+    <form class="fields" id="fields" novalidate>
+      <div class="field"><label for="SCD_W">SCD_W</label><input id="SCD_W" type="number" step="0.01" min="8" max="40" inputmode="decimal"><small>{{c_w}}</small></div>
+      <div class="field"><label for="SCD_L">SCD_L</label><input id="SCD_L" type="number" step="0.01" min="8" max="21" inputmode="decimal"><small>{{c_l}}</small></div>
+      <div class="field"><label for="SCD_PCB">SCD_PCB</label><input id="SCD_PCB" type="number" step="0.01" min="0.6" max="2.0" inputmode="decimal"><small>{{c_pcb}}</small></div>
+      <div class="field"><label for="SCD_H">SCD_H</label><input id="SCD_H" type="number" step="0.01" min="3" max="9" inputmode="decimal"><small>{{c_h}}</small></div>
+      <div class="field"><label for="SCD_SENSOR_X">SCD_SENSOR_X</label><input id="SCD_SENSOR_X" type="number" step="0.01" min="-15" max="15" inputmode="decimal"><small>{{c_sx}}</small></div>
+      <div class="field"><label for="SCD_PAD_X">SCD_PAD_X</label><input id="SCD_PAD_X" type="number" step="0.01" min="-20" max="20" inputmode="decimal"><small>{{c_px}}</small></div>
+    </form>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <button class="btn" id="download" disabled>{{c_download}}</button>
+    <p class="note">{{c_print}}</p>
+    <details>
+      <summary>{{c_more}}</summary>
+      <p class="note" style="margin-top:8px">{{c_more_text}}</p>
+    </details>
+  </aside>
+</div>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+  import Module from "manifold-3d";
+  import { buildCarrier, checkBoard, toStl } from "./{{base}}carrier.js";
+
+  const T = {{c_json}};
+  const base = document.body.dataset.base;
+  const KEYS = ["SCD_W", "SCD_L", "SCD_PCB", "SCD_H", "SCD_SENSOR_X", "SCD_PAD_X"];
+  const $ = (id) => document.getElementById(id);
+  const loading = $("loading"), status = $("status"), download = $("download");
+
+  const [params, wasm] = await Promise.all([
+    fetch(base + "carrier_params.json").then((r) => r.json()),
+    Module().then((m) => { m.setup(); return m; }),
+  ]).catch((e) => { loading.textContent = T.error; throw e; });
+
+  // ---------------------------------------------------------------- 3D preview
+  const stage = $("stage");
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  stage.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(32, 1, 1, 1000);
+  camera.position.set(-60, 55, 110);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x6b7076, 2.2));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.0);
+  sun.position.set(-40, 80, 120);
+  scene.add(sun);
+  const material = new THREE.MeshStandardMaterial({ color: 0x4a4f57, roughness: 0.7, metalness: 0.05 });
+  const boardMat = new THREE.MeshStandardMaterial({ color: 0x1d4e9e, roughness: 0.5, transparent: true, opacity: 0.85 });
+  const sensorMat = new THREE.MeshStandardMaterial({ color: 0xdedfe0, roughness: 0.4 });
+  let carrierMesh, boardGroup, current;
+
+  function resize() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(stage);
+
+  function show(manifold, b) {
+    const mesh = manifold.getMesh();
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(mesh.triVerts.length * 3);
+    for (let i = 0; i < mesh.triVerts.length; i++) {
+      const v = mesh.triVerts[i] * mesh.numProp;
+      pos.set([mesh.vertProperties[v], mesh.vertProperties[v + 1], mesh.vertProperties[v + 2]], i * 3);
+    }
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.computeVertexNormals();
+    if (carrierMesh) { scene.remove(carrierMesh); carrierMesh.geometry.dispose(); }
+    carrierMesh = new THREE.Mesh(geo, material);
+    scene.add(carrierMesh);
+    // the SCD41 board in its rails, sensor towards the front (-z)
+    if (boardGroup) scene.remove(boardGroup);
+    boardGroup = new THREE.Group();
+    const p = params.base, y0 = p.Y_CHIN_LOW + 0.2 + p.SCD_STOP + 0.15, zt = p.FLOOR_Z;
+    const pcb = new THREE.Mesh(new THREE.BoxGeometry(b.SCD_W, b.SCD_L, b.SCD_PCB), boardMat);
+    pcb.position.set(0, y0 + b.SCD_L / 2, zt - b.SCD_PCB / 2);
+    const s = Math.min(10.1, b.SCD_W - 1, b.SCD_L - 1);
+    const sensor = new THREE.Mesh(new THREE.BoxGeometry(s, s, b.SCD_H), sensorMat);
+    sensor.position.set(-b.SCD_SENSOR_X, y0 + b.SCD_L / 2 + (b.SCD_SENSOR_Y || 0), zt - b.SCD_PCB - b.SCD_H / 2);
+    boardGroup.add(pcb, sensor);
+    scene.add(boardGroup);
+    if (!current) {
+      const box = new THREE.Box3().setFromObject(carrierMesh), c = box.getCenter(new THREE.Vector3());
+      controls.target.copy(c);
+      camera.position.copy(c).add(new THREE.Vector3(-55, 35, -100));
+      camera.up.set(0, 1, 0);
+    }
+  }
+
+  (function loop() {
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  })();
+
+  // ---------------------------------------------------------------- form
+  const presets = $("presets");
+  const fmt = (v) => (Math.round(v * 100) / 100).toString();
+  function fill(board) { for (const k of KEYS) $(k).value = fmt(board[k] ?? 0); }
+  function read() {
+    const b = {};
+    for (const k of KEYS) {
+      const el = $(k), v = parseFloat(String(el.value).replace(",", "."));
+      const ok = Number.isFinite(v) && v >= parseFloat(el.min) && v <= parseFloat(el.max);
+      el.setAttribute("aria-invalid", ok ? "false" : "true");
+      b[k] = ok ? v : NaN;
+    }
+    b.SCD_SENSOR_Y = 0;
+    return b;
+  }
+  function presetName(b) {
+    for (const [name, prof] of Object.entries(params.boards))
+      if (KEYS.every((k) => Math.abs((prof[k] ?? 0) - b[k]) < 1e-6)) return name;
+    return null;
+  }
+  for (const name of Object.keys(params.boards)) {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "chip"; btn.textContent = name.replace("x", " × ") + " mm";
+    btn.dataset.name = name;
+    btn.addEventListener("click", () => { fill(params.boards[name]); update(); });
+    presets.append(btn);
+  }
+
+  let timer;
+  function update() {
+    const b = read();
+    const known = presetName(b);
+    for (const c of presets.children) c.setAttribute("aria-pressed", String(c.dataset.name === known));
+    if (KEYS.some((k) => Number.isNaN(b[k]))) {
+      status.className = "status bad"; status.textContent = T.invalid; download.disabled = true; return;
+    }
+    const problems = checkBoard(params.base, b);
+    if (problems.length) {
+      status.className = "status bad"; status.textContent = problems.map((p) => T[p]).join(" ");
+      download.disabled = true; return;
+    }
+    if (known) b.SCD_SENSOR_Y = params.boards[known].SCD_SENSOR_Y || 0;
+    const m = buildCarrier(wasm, params.base, b);
+    show(m, b);
+    current = { m, b, name: known || "custom" };
+    status.className = "status";
+    status.textContent = known ? T.known.replace("{name}", known) : T.ok;
+    download.disabled = false;
+    loading.classList.add("done");
+  }
+  $("fields").addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(update, 180); });
+  download.addEventListener("click", () => {
+    if (!current) return;
+    const name = `sensor_carrier_${current.name === "custom"
+      ? `custom_${fmt(current.b.SCD_W)}x${fmt(current.b.SCD_L)}`.replaceAll(".", "_") : current.name}`;
+    const blob = new Blob([toStl(current.m, name)], { type: "model/stl" });
+    const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: name + ".stl" });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+
+  // start with the board from the address (?board=15x20) or the most common one
+  const q = new URLSearchParams(location.search);
+  fill(params.boards[q.get("board")] || params.boards["14x22"]);
+  update();
+</script>
+</body>
+</html>

@@ -247,15 +247,25 @@ text_sensor:
     icon: mdi:window-open-variant
     update_interval: 60s
     lambda: |-
+      // hysteresis: a hint that is shown stays until its condition is clearly gone (0.5 K, 0.5 g/m3),
+      // so it does not flicker while the temperatures hover around a threshold
+      static std::string last = "${txt_hint_none}";
       const float ti = id(temperature).state, hi = id(humidity).state;
       const float to = id(outdoor_temperature).state, ho = id(outdoor_humidity).state;
-      if (std::isnan(ti) || std::isnan(to)) return {"${txt_hint_none}"};
-      if (ti >= id(hint_temp).state && to <= ti - id(hint_delta).state) return {"${txt_hint_cool}"};
+      if (std::isnan(ti) || std::isnan(to)) { last = "${txt_hint_none}"; return last; }
+      auto keep = [&](const char *h) { return last == h ? 0.5f : 0.0f; };
+      const bool stale = id(co2).has_state() && id(co2).state >= id(threshold_yellow).state;
+      if (ti >= id(hint_temp).state - keep("${txt_hint_cool}") &&
+          to <= ti - id(hint_delta).state + keep("${txt_hint_cool}")) { last = "${txt_hint_cool}"; return last; }
       // absolute humidity in g/m3: airing dries the room when the outdoor air holds clearly less water
       auto ah = [](float t, float rh) { return 216.7f * rh / 100.0f * 6.112f * expf(17.62f * t / (243.12f + t)) / (273.15f + t); };
-      if (!std::isnan(hi) && !std::isnan(ho) && hi >= 60 && ah(to, ho) <= ah(ti, hi) - 2.0f) return {"${txt_hint_dry}"};
-      if (ti >= id(hint_temp).state && to >= ti + 1.0f) return {"${txt_hint_warm}"};
-      return {"${txt_hint_none}"};
+      if (!std::isnan(hi) && !std::isnan(ho) && hi >= 60 - 2 * keep("${txt_hint_dry}") &&
+          ah(to, ho) <= ah(ti, hi) - 2.0f + keep("${txt_hint_dry}")) { last = "${txt_hint_dry}"; return last; }
+      // warmer outside: keep the window shut, unless the air needs a change anyway (then air briefly)
+      const char *warm = stale ? "${txt_hint_short}" : "${txt_hint_warm}";
+      if (ti >= id(hint_temp).state - keep(warm) && to >= ti + 1.0f - keep(warm)) { last = warm; return last; }
+      last = "${txt_hint_none}";
+      return last;
   - platform: template
     id: air_quality
     name: "${txt_air_quality}"
@@ -592,18 +602,29 @@ display:
       it.line(10, 199, W - 10, 199, id(col_line));
       it.graph(10, 132, id(co2_graph), level);
       it.print(12, 132, id(font_small), id(col_muted), TextAlign::TOP_LEFT, "3h");
-      // forecast: when the red threshold will be reached (bottom right: a rising curve is high on the right)
-      if (id(co2_forecast).has_state() && !std::isnan(id(co2_forecast).state) && id(co2_forecast).state > 0) {
-        it.printf(W - 12, 196, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, "${txt_forecast_display}",
-                  (int) id(co2_forecast).state);
-      }
-
-      // window hint above the footer, left (the forecast stays on the right)
+      // window hint above the footer, left, with a coloured marker like a status light
+      int hint_end = 0;
       if (id(show_hint).state && id(window_hint).has_state()) {
         const std::string h = id(window_hint).state;
         Color hc = id(col_cool);
-        if (h == "${txt_hint_warm}") hc = id(col_warm);
-        if (h != "${txt_hint_none}") it.print(12, 196, id(font_hint), hc, TextAlign::BOTTOM_LEFT, h.c_str());
+        if (h == "${txt_hint_warm}" || h == "${txt_hint_short}") hc = id(col_warm);
+        if (h != "${txt_hint_none}") {
+          int bx, by, bw, bh;
+          it.get_text_bounds(27, 196, h.c_str(), id(font_hint), TextAlign::BOTTOM_LEFT, &bx, &by, &bw, &bh);
+          it.filled_circle(17, 188, 4, hc);
+          it.print(27, 196, id(font_hint), hc, TextAlign::BOTTOM_LEFT, h.c_str());
+          hint_end = bx + bw;
+        }
+      }
+      // forecast: when the red threshold will be reached (bottom right: a rising curve is high on the right).
+      // It gives way to the window hint if both do not fit side by side.
+      if (id(co2_forecast).has_state() && !std::isnan(id(co2_forecast).state) && id(co2_forecast).state > 0) {
+        char fc[40];
+        snprintf(fc, sizeof(fc), "${txt_forecast_display}", (int) id(co2_forecast).state);
+        int fx, fy, fw, fh;
+        it.get_text_bounds(W - 12, 196, fc, id(font_small), TextAlign::BOTTOM_RIGHT, &fx, &fy, &fw, &fh);
+        if (hint_end == 0 || fx > hint_end + 12)
+          it.print(W - 12, 196, id(font_small), id(col_muted), TextAlign::BOTTOM_RIGHT, fc);
       }
 
       // footer like an instrument panel: IN, OUT and humidity with a small label above each value

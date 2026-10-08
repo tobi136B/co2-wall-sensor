@@ -19,7 +19,7 @@ Deviations of a few tenths of a millimetre are fine: the **spring tongue** press
 
 ![Measuring sketch](images/measure_sensor_en.png)
 
-Hold the board **as it will be mounted**: sensor towards you, the pads on the side where the wire notch is (top right seen from the front).
+Hold the board **as it will be mounted**: sensor towards you, the pads on the side where the wire slot is (top right seen from the front).
 
 | Parameter | What to measure |
 |-----------|-----------------|
@@ -33,6 +33,10 @@ Hold the board **as it will be mounted**: sensor towards you, the pads on the si
 The chamber takes boards up to 20 mm in the slide direction and about 40 mm across, so almost every board fits one way or the other.
 
 ## 3. Create the carrier
+
+**In the browser (easiest):** open the [sensor carrier configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html), enter the six values and download the STL. It builds the same carrier as Fusion, the CI compares both for every known board.
+
+**In Fusion:**
 
 1. Run the generator in Fusion once (see [Customising the enclosure](../README.md#customising-the-enclosure)).
 2. Enter your six values under *Modify > Change Parameters*.

@@ -56,7 +56,7 @@ Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt. Eine Stufe in der Unt
 
 ## 4. Schritt für Schritt
 
-**Bevor du anfängst, leg dir bereit:** Lötkolben mit feiner Spitze, Innensechskant 1,3 mm, kleiner Schlitzschraubendreher, Heißkleber, Seitenschneider. Alle 13 Schritte gibt es auch in der [3D-Aufbauanleitung](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html), dort kannst du jeden Schritt drehen und das Gerät zerlegen.
+**Bevor du anfängst, leg dir bereit:** Lötkolben mit feiner Spitze, Innensechskant 1,3 mm, kleiner Schlitzschraubendreher, Seitenschneider. Alle 13 Schritte gibt es auch in der [3D-Aufbauanleitung](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html), dort kannst du jeden Schritt drehen und das Gerät zerlegen.
 
 <!-- steps:start (generated from site/assembly_steps.yaml) -->
 
@@ -106,7 +106,7 @@ Der Träger ist der herausnehmbare Boden der Sensorkammer. Drucke den, der zu de
 
 **Du brauchst:** SCD41, 4 Litzen von ca. 8 cm, Lötkolben
 
-Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zur Kabelkerbe. Die Federzunge schnappt über die Oberkante. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-5))
+Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz. Die Federzunge schnappt über die Oberkante. Die vier Litzen nebeneinander von der offenen Seite in den schmalen Schlitz legen und auf der Rückseite unter die Lippe des Kabelclips drücken. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-5))
 
 > **Tipp:** Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken.
 
@@ -124,21 +124,21 @@ Den ESP32-C3 von oben zwischen die Seitenführungen schieben, bis er auf den Ans
 
 <img src="../images/steps/step_07.png" width="60%" alt="Träger ins Gehäuse">
 
-**Du brauchst:** 2 Schrauben M2 × 4, ein Tropfen Heißkleber
+**Du brauchst:** 2 Schrauben M2 × 4
 
 Den Träger auf die Leisten im Kinn legen und mit 2 Schrauben M2 × 4 festschrauben. Er schließt die Sensorkammer gegen die warme Elektronik ab. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-7))
 
-> **Tipp:** Die Kabelkerbe mit einem Tropfen Heißkleber abdichten. Dann bleibt die Sensorkammer von der warmen Elektronik getrennt.
+> **Tipp:** Nichts abdichten: Die vier SCD41-Litzen füllen den schmalen Kabelschlitz, so bleibt die Sensorkammer ohne Kleber von der warmen Elektronik getrennt.
 
 ### Schritt 8 von 13: Verdrahtung
 
 <img src="../images/steps/step_08.png" width="60%" alt="Verdrahtung">
 
-**Du brauchst:** Silikonlitze AWG 30, Lötkolben, den [Verdrahtungsplan](verdrahtung.md)
+**Du brauchst:** Das Kabel, das dem Display beiliegt (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)
 
-Display: 8 Litzen vom Stecker über die Rückseite des Displays zum ESP32-C3. SCD41: 4 Litzen durch die Kerbe im Träger. Farben wie im Verdrahtungsplan. Der gezeigte Kabelweg ist schematisch. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-8))
+Display: Die 8 Adern des mitgelieferten Kabels laufen vom Stecker gerade über die Rückseite des Displays zum oberen Ende des ESP32-C3. SCD41: 4 Litzen durch den Kabelschlitz und am Kabelclip des Trägers entlang. Farben wie im Verdrahtungsplan. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-8))
 
-> **Tipp:** Die Litzen kurz halten und flach über die Rückseite des Displays legen, damit der Deckel schließt, ohne auf sie zu drücken.
+> **Tipp:** Das Displaykabel vor dem Löten auf ca. 5 cm kürzen. Dann liegt es flach und gerade auf der Rückseite des Displays und kann nirgends anstoßen.
 
 ### Schritt 9 von 13: Kabelport-Modul
 
