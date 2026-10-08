@@ -193,7 +193,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 ## Before your first print
 
 * **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md).
-* **Display glass:** Waveshare does not document the glass thickness, 2.5 mm is assumed (`GLASS_T`).
+* **Display:** all dimensions of the Waveshare 2inch LCD Module are measured with a caliper (PCB 58.2 × 35.3 × 1.62 mm, glass 47.7 × 34.6 mm, PCB and glass 4.43 mm thick). Other batches may differ slightly: check `LCD_*` and `GLASS_*`.
 * **Hardware status:** the enclosure and firmware are verified in CAD and CI. Photos and measurements of a printed device are welcome.
 
 ## Roadmap

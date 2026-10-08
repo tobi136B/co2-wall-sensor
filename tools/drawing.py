@@ -54,7 +54,7 @@ TEXT = {
         "source": "Source",
         "sheet": "Sheet",
         "footer": "Generated from the parametric Fusion model. Verify placeholder dimensions "
-        "(SCD41 board, display glass) before printing.",
+        "(SCD41 board) before printing.",
         "sheet1": "Device (housing + back cover)",
         "sheet2": "Wall plate and desk stand",
         "front": "Front view",
@@ -109,7 +109,7 @@ TEXT = {
         "source": "Quelle",
         "sheet": "Blatt",
         "footer": "Generiert aus dem parametrischen Fusion-Modell. Platzhaltermaße "
-        "(SCD41-Platine, Displayglas) vor dem Druck prüfen.",
+        "(SCD41-Platine) vor dem Druck prüfen.",
         "sheet1": "Gerät (Gehäuse + Rückdeckel)",
         "sheet2": "Wandplatte und Tischständer",
         "front": "Vorderansicht",

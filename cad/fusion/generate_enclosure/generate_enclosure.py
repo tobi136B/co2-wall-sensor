@@ -45,7 +45,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '1.6'          # enclosure version, engraved into every part
+VERSION = '1.7'          # enclosure version, engraved into every part
 
 # ===================== PARAMETERS =====================
 # --- device ---
@@ -68,8 +68,10 @@ BOSS_FILLET = 0.6       # fillet at the root of the bosses
 SCREW_CLEAR_D = 2.4     # clearance hole for M2
 HEAD_D, HEAD_H = 4.2, 1.3   # counterbore for M2 ISO 7380 button head (head 3.5 x 1.1)
 # --- display: Waveshare 2inch LCD Module ---
-LCD_W, LCD_H, LCD_PCB = 58.0, 35.0, 1.6
-GLASS_W, GLASS_H, GLASS_T = 48.2, 34.7, 2.5     # GLASS_T is an assumption, measure it
+# measured with a caliper: PCB 58.21 x 35.29 x 1.62, glass 47.73 x 34.6, PCB + glass 4.43 thick
+LCD_W, LCD_H, LCD_PCB = 58.2, 35.3, 1.62
+GLASS_W, GLASS_H = 47.7, 34.6
+GLASS_T = 2.9           # glass incl. backlight 2.81 measured, +0.1 so the screws never press the glass
 ACTIVE_W, ACTIVE_H = 40.8, 30.6
 LCD_X = -2.1            # PCB offset so the active area is centred in the window
 LCD_HOLE_X, LCD_HOLE_Y = 26.5, 15.0
