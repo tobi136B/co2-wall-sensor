@@ -62,7 +62,7 @@ jobs:
       - name: Check links in the documentation
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --offline --no-progress './**/*.md'
+          args: --offline --no-progress --exclude-path tools/node_modules './**/*.md'
           fail: true
       - uses: actions/upload-artifact@v7
         with:
