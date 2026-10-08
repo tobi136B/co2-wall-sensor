@@ -73,6 +73,55 @@ def price_label(price: object, lang: str) -> tuple[str, str]:
     return (label, note)
 
 
+TOTAL = {
+    "en": (
+        "Total",
+        "one device, each part from this shop if it has it, otherwise from the other; without wire and filament",
+    ),
+    "de": (
+        "Summe",
+        "ein Gerät, jedes Teil aus diesem Shop, falls vorhanden, sonst aus dem anderen; ohne Litze und Filament",
+    ),
+}
+
+
+def price_value(part: dict, shop: str) -> float | None:
+    """First number of a shop price: the amount you pay for the listed offer."""
+    offer = part.get(shop)
+    if not offer:
+        return None
+    m = re.match(r"\s*(\d+(?:\.\d+)?)", str(offer.get("price", "")))
+    return float(m.group(1)) if m else None
+
+
+def totals() -> dict[str, float]:
+    """Cost of one device per shop column, parts without a quantity (consumables) are left out."""
+    out = {}
+    for shop in SHOPS:
+        other = [s for s in SHOPS if s != shop][0]
+        total = 0.0
+        for part in rows():
+            if not part.get("qty"):
+                continue
+            value = price_value(part, shop)
+            total += value if value is not None else (price_value(part, other) or 0.0)
+        out[shop] = round(total, 2)
+    out["cheapest"] = round(
+        sum(
+            min(v for v in (price_value(p, s) for s in SHOPS) if v is not None)
+            for p in rows()
+            if p.get("qty") and any(price_value(p, s) is not None for s in SHOPS)
+        ),
+        2,
+    )
+    return out
+
+
+def euro(value: float, lang: str) -> str:
+    text = f"{value:.2f} €"
+    return text.replace(".", ",") if lang == "de" else text
+
+
 def markdown_table(lang: str) -> str:
     lines = [HEADER[lang]]
     for r in rows():
@@ -84,6 +133,8 @@ def markdown_table(lang: str) -> str:
             else:
                 cells.append(f"*{ONLY[lang][shop]}*")
         lines.append(f"| {r.get('qty', '')} | {part_name(r, lang)} | {cells[0]} | {cells[1]} |")
+    t, (word, note) = totals(), TOTAL[lang]
+    lines.append(f"| | **{word}** ({note}) | **{euro(t['aliexpress'], lang)}** | **{euro(t['amazon'], lang)}** |")
     return "\n".join(lines)
 
 
@@ -103,6 +154,12 @@ def html_rows(lang: str) -> str:
             f'          <tr><td class="qty">{r.get("qty", "")}</td><td>{part}</td>'
             f'<td class="shop">{cells[0]}</td><td class="shop">{cells[1]}</td></tr>'
         )
+    t, (word, note) = totals(), TOTAL[lang]
+    out.append(
+        f'          <tr class="total"><td></td><td><strong>{word}</strong> ({html.escape(note)})</td>'
+        f'<td class="shop"><strong>{euro(t["aliexpress"], lang)}</strong></td>'
+        f'<td class="shop"><strong>{euro(t["amazon"], lang)}</strong></td></tr>'
+    )
     return "\n".join(out)
 
 

@@ -22,7 +22,7 @@ Every electronic device heats itself up. An ESP32 with WiFi and an LCD backlight
 * **Separate sensor chamber** in the chin of the housing, closed towards the display bay by a divider and towards the ESP bay by the screwed sensor carrier. The carrier is a separate part, so the SCD41 is easy to mount and to replace.
 * **Air enters from below** through a diamond mesh in the bottom and on both sides of the sensor chamber. Warm air from the electronics rises upwards behind the display, away from the sensor.
 * **ESP32-C3 instead of a classic ESP32:** single core, no USB-UART chip, no charger. Less waste heat.
-* **Wire notch sealed with hot glue**, so no warm air is drawn from the ESP bay into the chamber.
+* **Narrow wire slot instead of a notch:** the four SCD41 wires lie side by side in the 1.3 mm slot and fill it. So no warm air is drawn from the ESP bay into the chamber, without glue. On the back a printed wire clip holds them.
 * **Night mode** dims the backlight, which also reduces heat.
 * The remaining offset is compensated by `temperature_offset` in the firmware (default 2.0 °C, verify against a reference).
 

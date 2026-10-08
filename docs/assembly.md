@@ -56,7 +56,7 @@ The module is clamped between housing and back cover. A step in the bottom wall 
 
 ## 4. Step by step
 
-**Before you start, have at hand:** soldering iron with a fine tip, hex key 1.3 mm, small flat screwdriver, hot glue, side cutter. All 13 steps are also in the [3D assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html), where you can turn every step and take the device apart.
+**Before you start, have at hand:** soldering iron with a fine tip, hex key 1.3 mm, small flat screwdriver, side cutter. All 13 steps are also in the [3D assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html), where you can turn every step and take the device apart.
 
 <!-- steps:start (generated from site/assembly_steps.yaml) -->
 
@@ -106,7 +106,7 @@ The carrier is the removable floor of the sensor chamber. Print the one that mat
 
 **You need:** SCD41, 4 wires of about 8 cm, soldering iron
 
-Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire notch. The spring tongue clicks over the upper edge. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-5))
+Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire slot. The spring tongue clicks over the upper edge. Lay the four wires side by side into the narrow slot from its open end and press them on the back under the lip of the wire clip. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-5))
 
 > **Tip:** To take the board out again, push the spring tongue back with a small screwdriver.
 
@@ -124,21 +124,21 @@ Slide the ESP32-C3 from above between the side guides until it rests on the end 
 
 <img src="images/steps/step_07.png" width="60%" alt="Carrier into the housing">
 
-**You need:** 2 screws M2 × 4, a drop of hot glue
+**You need:** 2 screws M2 × 4
 
 Put the carrier onto the ledges in the chin and fix it with 2 screws M2 × 4. It closes the sensor chamber against the warm electronics. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-7))
 
-> **Tip:** Seal the wire notch with a drop of hot glue. Then the sensor chamber stays apart from the warm electronics.
+> **Tip:** Nothing to seal: the four SCD41 wires fill the narrow wire slot, so the sensor chamber stays apart from the warm electronics without glue.
 
 ### Step 8 of 13: Wiring
 
 <img src="images/steps/step_08.png" width="60%" alt="Wiring">
 
-**You need:** Silicone wire AWG 30, soldering iron, the [wiring diagram](wiring.md)
+**You need:** The cable supplied with the display (shortened), soldering iron, the [wiring diagram](wiring.md)
 
-Display: 8 wires from the connector across the back of the display to the ESP32-C3. SCD41: 4 wires through the notch in the carrier. Colours as in the wiring diagram. The wire path shown here is schematic. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-8))
+Display: the 8 wires of the supplied cable run straight from the connector across the back of the display to the upper end of the ESP32-C3. SCD41: 4 wires through the wire slot and along the clip channel of the carrier. Colours as in the wiring diagram. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-8))
 
-> **Tip:** Keep the wires short and lay them flat over the back of the display, so the cover closes without pressing on them.
+> **Tip:** Shorten the display cable to about 5 cm before soldering. Then it lies flat and straight on the back of the display and cannot touch anything else.
 
 ### Step 9 of 13: Cable port module
 

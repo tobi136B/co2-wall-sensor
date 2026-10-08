@@ -46,6 +46,7 @@ substitutions:
   txt_hint_cool: "Open the window: cooler outside"
   txt_hint_dry: "Airing dries the air"
   txt_hint_warm: "Keep it shut: warmer outside"
+  txt_hint_short: "Air briefly: warmer outside"
   txt_hint_none: "None"
   txt_label_hum: "HUMIDITY"
   # Optional overrides (defaults in common/base.yaml)

@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Node tools of the CO2 Wall Sensor (configurator check)",
+  "dependencies": {
+    "manifold-3d": "3.5.1"
+  }
+}

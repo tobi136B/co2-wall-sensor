@@ -88,22 +88,26 @@ def part(pid, en, de, groups, meshes):
 
 
 def wires_display(p: dict) -> list[dict]:
-    """8 wires from the display connector over the back of the display to the ESP32-C3 (schematic path)."""
-    top = p["LIP"] + p["GLASS_T"] + p["LCD_PCB"] + 6
-    cx = p["BAY_X0"] + 7
+    """8 wires from the display connector straight across the back of the display to the ESP32-C3.
+
+    The bundle runs at CABLE_Y, the path the collision check of the generator keeps free (Dummy DisplayCable).
+    """
+    lcd_back = p["LIP"] + p["GLASS_T"] + p["LCD_PCB"]
+    x_conn = p["BAY_X0"] + 10.2  # side of the PH2.0 connector
+    z_run = lcd_back + 1.8
     esp_x = p["C3_X"] - p["C3_W"] / 2 + 1.3
     esp_top = p["C3_Z0"] + p["C3_PCB"]
     names = ["3V3", "GND", "DIN", "CLK", "CS", "DC", "RST", "BL"]
     out = []
     for i, n in enumerate(names):
         y0 = p["LCD_Y"] + (i - 3.5) * 2.0
+        yb = p["CABLE_Y"] + (i - 3.5) * 0.38  # bundle of 8 wires, about 3 mm
         y1 = p["C3_Y0"] + p["C3_H"] - 1.6 - i * 2.54
-        lift = 14.0 + i * 0.45
         pts = [
-            [cx, y0, top],
-            [cx, y0, lift],
-            [cx + 10, y0 - 1, lift + 0.5],
-            [-4, (y0 + y1) / 2, lift + 1.5],
+            [x_conn, y0, lcd_back + 3.0],
+            [x_conn + 3, (y0 + yb) / 2, z_run],
+            [x_conn + 7, yb, z_run],
+            [esp_x - 8, yb, z_run],
             [esp_x - 3, y1, esp_top + 2.5],
             [esp_x, y1, esp_top + 1.2],
             [esp_x, y1, esp_top],
@@ -113,20 +117,30 @@ def wires_display(p: dict) -> list[dict]:
 
 
 def wires_scd(p: dict) -> list[dict]:
-    """4 wires from the SCD41 pads through the notch of the carrier to the ESP32-C3 (schematic path)."""
+    """4 wires from the SCD41 pads through the wire slot of the carrier and its clip channel to the ESP32-C3."""
     pad_x = -p["SCD_PAD_X"]
     yc = p["SCD_Y0"] + p["SCD_L"] / 2
+    g = 0.15
+    slot_x = -(p["SCD_W"] / 2 + g + 1.2 + p["MIN_WALL"] + p["SCD_SLOT_W"] / 2)
+    y_hi = p["Y_DIV_LOW"] - 0.2
+    top = p["FLOOR_Z"] + p["FLOOR_T"]
+    y_ch = p["Y_DIV_LOW"] - p["SCD_CHANNEL_W"] / 2  # middle of the clip channel
+    x_ch = p["SPRING_X"] - p["SPRING_W"] / 2 - 1.6  # end of the clip
     esp_x = p["C3_X"] + p["C3_W"] / 2 - 1.3
     esp_top = p["C3_Z0"] + p["C3_PCB"]
     out = []
     for k, n in enumerate(["GND", "3V3", "SCL", "SDA"]):
         y0 = yc + (k - 1.5) * 2.54
+        ys = y_hi - 3.4 + k * 0.85  # the 4 wires in a row in the slot
         y1 = p["C3_Y0"] + p["C3_H"] - 1.6 - k * 2.54
         lift = 18.4 + k * 0.45
         pts = [
-            [pad_x, y0, p["SCD_ZT"]],
-            [pad_x, y0, lift - 2],
-            [pad_x + 4, y0 + 1, lift],
+            [pad_x, y0, p["SCD_ZT"] - 0.3],
+            [pad_x, p["SCD_TOP"] + 0.6, p["FLOOR_Z"] - 0.4],
+            [slot_x, ys, p["FLOOR_Z"] - 0.4],
+            [slot_x, ys, top + 0.5],
+            [slot_x + 2, y_ch, top + 0.5 + k * 0.25],
+            [x_ch, y_ch, top + 0.5 + k * 0.25],
             [p["C3_X"] - 3, p["C3_Y0"] + 4 + k, lift + 0.6],
             [esp_x + 3, y1, esp_top + 2.5],
             [esp_x, y1, esp_top + 1.2],

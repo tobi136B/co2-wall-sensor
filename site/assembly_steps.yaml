@@ -85,8 +85,8 @@
     en: SCD41 into the rails
     de: SCD41 in die Schienen
   text:
-    en: Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire notch. The spring tongue clicks over the upper edge.
-    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zur Kabelkerbe. Die Federzunge schnappt über die Oberkante.
+    en: Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire slot. The spring tongue clicks over the upper edge. Lay the four wires side by side into the narrow slot from its open end and press them on the back under the lip of the wire clip.
+    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz. Die Federzunge schnappt über die Oberkante. Die vier Litzen nebeneinander von der offenen Seite in den schmalen Schlitz legen und auf der Rückseite unter die Lippe des Kabelclips drücken.
 
 - new: [esp32, plug]
   from: [0, 35, 0]
@@ -111,11 +111,11 @@
   stage: carrier_in
   camera: {eye: [-60, 55, 150], target: [0, -14, 14]}
   need:
-    en: "2 screws M2 × 4, a drop of hot glue"
-    de: "2 Schrauben M2 × 4, ein Tropfen Heißkleber"
+    en: "2 screws M2 × 4"
+    de: "2 Schrauben M2 × 4"
   tip:
-    en: "Seal the wire notch with a drop of hot glue. Then the sensor chamber stays apart from the warm electronics."
-    de: "Die Kabelkerbe mit einem Tropfen Heißkleber abdichten. Dann bleibt die Sensorkammer von der warmen Elektronik getrennt."
+    en: "Nothing to seal: the four SCD41 wires fill the narrow wire slot, so the sensor chamber stays apart from the warm electronics without glue."
+    de: "Nichts abdichten: Die vier SCD41-Litzen füllen den schmalen Kabelschlitz, so bleibt die Sensorkammer ohne Kleber von der warmen Elektronik getrennt."
   title:
     en: Carrier into the housing
     de: Träger ins Gehäuse
@@ -128,17 +128,17 @@
   stage: carrier_in
   camera: {eye: [-30, 60, 135], target: [0, -4, 15]}
   need:
-    en: "Silicone wire AWG 30, soldering iron, the [wiring diagram](wiring.md)"
-    de: "Silikonlitze AWG 30, Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
+    en: "The cable supplied with the display (shortened), soldering iron, the [wiring diagram](wiring.md)"
+    de: "Das Kabel, das dem Display beiliegt (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
   tip:
-    en: "Keep the wires short and lay them flat over the back of the display, so the cover closes without pressing on them."
-    de: "Die Litzen kurz halten und flach über die Rückseite des Displays legen, damit der Deckel schließt, ohne auf sie zu drücken."
+    en: "Shorten the display cable to about 5 cm before soldering. Then it lies flat and straight on the back of the display and cannot touch anything else."
+    de: "Das Displaykabel vor dem Löten auf ca. 5 cm kürzen. Dann liegt es flach und gerade auf der Rückseite des Displays und kann nirgends anstoßen."
   title:
     en: Wiring
     de: Verdrahtung
   text:
-    en: "Display: 8 wires from the connector across the back of the display to the ESP32-C3. SCD41: 4 wires through the notch in the carrier. Colours as in the wiring diagram. The wire path shown here is schematic."
-    de: "Display: 8 Litzen vom Stecker über die Rückseite des Displays zum ESP32-C3. SCD41: 4 Litzen durch die Kerbe im Träger. Farben wie im Verdrahtungsplan. Der gezeigte Kabelweg ist schematisch."
+    en: "Display: the 8 wires of the supplied cable run straight from the connector across the back of the display to the upper end of the ESP32-C3. SCD41: 4 wires through the wire slot and along the clip channel of the carrier. Colours as in the wiring diagram."
+    de: "Display: Die 8 Adern des mitgelieferten Kabels laufen vom Stecker gerade über die Rückseite des Displays zum oberen Ende des ESP32-C3. SCD41: 4 Litzen durch den Kabelschlitz und am Kabelclip des Trägers entlang. Farben wie im Verdrahtungsplan."
 
 - new: [port]
   from: [0, 0, 45]

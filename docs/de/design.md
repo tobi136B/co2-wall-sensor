@@ -22,7 +22,7 @@ Jedes elektronische Gerät heizt sich selbst auf. Ein ESP32 mit WLAN und ein Dis
 * **Eigene Sensorkammer** im Kinn des Gehäuses, zum Display durch eine Trennwand und zum ESP durch den verschraubten Sensorträger abgeschlossen. Der Träger ist ein eigenes Teil, dadurch lässt sich der SCD41 leicht einbauen und tauschen.
 * **Luft kommt von unten** durch ein Rautengitter im Boden und an beiden Seiten der Sensorkammer. Warme Luft der Elektronik steigt hinter dem Display nach oben, weg vom Sensor.
 * **ESP32-C3 statt klassischem ESP32:** ein Kern, kein USB-UART-Chip, kein Laderegler. Weniger Abwärme.
-* **Litzenkerbe mit Heißkleber abgedichtet**, damit keine warme Luft vom ESP in die Kammer gezogen wird.
+* **Schmaler Kabelschlitz statt Kerbe:** Die vier SCD41-Litzen liegen nebeneinander im 1,3 mm breiten Schlitz und füllen ihn aus. So wird ohne Kleber keine warme Luft vom ESP in die Kammer gezogen. Auf der Rückseite hält ein mitgedruckter Kabelclip die Litzen.
 * **Nachtmodus** dimmt das Hintergrundlicht und reduziert dabei auch die Wärme.
 * Der Rest wird mit `temperature_offset` in der Firmware ausgeglichen (Standard 2,0 °C, mit Referenz prüfen).
 

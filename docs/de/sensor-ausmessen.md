@@ -19,7 +19,7 @@ Abweichungen von ein paar Zehnteln sind kein Problem: Die **Federzunge** drückt
 
 ![Messskizze](../images/measure_sensor_de.png)
 
-Die Platine so halten, **wie sie eingebaut wird**: Sensor zeigt zu dir, Lötpunkte auf der Seite der Kabelkerbe (von vorne gesehen oben rechts).
+Die Platine so halten, **wie sie eingebaut wird**: Sensor zeigt zu dir, Lötpunkte auf der Seite des Kabelschlitzes (von vorne gesehen oben rechts).
 
 | Parameter | Was messen |
 |-----------|------------|
@@ -33,6 +33,10 @@ Die Platine so halten, **wie sie eingebaut wird**: Sensor zeigt zu dir, Lötpunk
 In die Kammer passen Platinen bis 20 mm in Schieberichtung und rund 40 mm quer, fast jede Platine passt also in der einen oder anderen Lage.
 
 ## 3. Träger erzeugen
+
+**Im Browser (am einfachsten):** den [Sensorträger-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html) öffnen, die sechs Werte eintragen und die STL herunterladen. Er erzeugt denselben Träger wie Fusion, die CI vergleicht beide für jede bekannte Platine.
+
+**In Fusion:**
 
 1. Das Skript in Fusion einmal ausführen (siehe [Gehäuse anpassen](../../README.de.md#gehäuse-anpassen)).
 2. Die sechs Werte unter *Ändern > Parameter ändern* eintragen.

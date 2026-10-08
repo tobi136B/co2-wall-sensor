@@ -41,6 +41,7 @@ TEXT = {
         "cool": "Open the window: cooler outside",
         "dry": "Airing dries the air",
         "warm": "Keep it shut: warmer outside",
+        "short": "Air briefly: warmer outside",
     },
     "de": {
         "good": "Gut",
@@ -52,6 +53,7 @@ TEXT = {
         "cool": "Fenster auf: außen kühler",
         "dry": "Lüften trocknet die Luft",
         "warm": "Fenster zu: außen wärmer",
+        "short": "Kurz stoßlüften: außen wärmer",
     },
 }
 # (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red, outdoor, window hint)
@@ -98,7 +100,7 @@ def arrow(d: ImageDraw.ImageDraw, x_right: float, y_top: float, kind: str, fill)
         d.line([s(tip[0]), s(tip[1]), s(tip[0] + 6 * math.cos(a)), s(tip[1] + 6 * math.sin(a))], fill=fill, width=s(3))
 
 
-HINT_COLORS = {"cool": (90, 190, 255), "dry": (90, 190, 255), "warm": (255, 170, 60)}
+HINT_COLORS = {"cool": (90, 190, 255), "dry": (90, 190, 255), "warm": (255, 170, 60), "short": (255, 170, 60)}
 
 
 def screen(
@@ -146,10 +148,16 @@ def screen(
     d.line([(s(x), s(y)) for x, y in pts], fill=level, width=s(2))
     d.line([s(10), s(199), s(W - 10), s(199)], fill=COLORS["line"], width=s(1))
     text(d, (12, 132), "3h", font(12), COLORS["muted"])
-    if forecast:
-        text(d, (W - 12, 196), t["fc"].format(m=forecast), font(12), COLORS["muted"], "rd")
-    if hint:  # only when opening the window really helps (or would make it worse)
-        text(d, (12, 196), t[hint], font(12, True), HINT_COLORS[hint], "ld")
+    hint_end = 0
+    if hint:  # only when opening the window really helps (or would make it worse), marker in front
+        r = 4
+        d.ellipse([s(17 - r), s(188 - r), s(17 + r), s(188 + r)], fill=HINT_COLORS[hint])
+        text(d, (27, 196), t[hint], font(12, True), HINT_COLORS[hint], "ld")
+        hint_end = 27 + d.textlength(t[hint], font=font(12, True)) / SCALE
+    if forecast:  # gives way to the hint when both do not fit side by side (as in the firmware)
+        fc = t["fc"].format(m=forecast)
+        if not hint or W - 12 - d.textlength(fc, font=font(12)) / SCALE > hint_end + 12:
+            text(d, (W - 12, 196), fc, font(12), COLORS["muted"], "rd")
 
     # footer: three columns with a small label above each value, like an instrument panel
     def column(x, label, value, colour, anchor):

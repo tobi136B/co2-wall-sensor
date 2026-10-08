@@ -22,7 +22,7 @@ It takes a heat-set insert for the optional lock tab. The tab is screwed to the 
 The defaults are 1000 ppm (yellow) and 1400 ppm (red). Values below 1000 ppm are generally considered harmless, above 2000 ppm ventilation is clearly needed. Both thresholds can be changed in Home Assistant at any time.
 
 ### The temperature reads too high.
-Compare with a reference thermometer after 24 hours and adjust `temperature_offset` in the device file. Make sure the wire notch between ESP bay and sensor chamber is sealed.
+Compare with a reference thermometer after 24 hours and adjust `temperature_offset` in the device file. Make sure all four SCD41 wires lie side by side in the wire slot, so it seals the sensor chamber against the ESP bay.
 
 ### Can I use a different ESP32 board?
 Yes. Any ESP32 supported by ESPHome works, but you must adjust the pins in `esphome/common/base.yaml` and the bay for the board in the generator. The ESP32-C3 SuperMini was chosen for its size, native USB-C and low heat.

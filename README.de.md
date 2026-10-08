@@ -7,7 +7,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v1.7-6E7B8B)
+![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v1.8-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -31,7 +31,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 * **Alles in Home Assistant einstellbar.** Nachtzeiten (dimmen oder aus), Nachthelligkeit, Warnung in der Nacht, Temperaturkorrektur, Höhe und Schwellen für den Hinweis, ganz ohne neu zu flashen.
 * **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (verdeckt eine Standard-Hohlwanddose Ø 68 mm) oder den **Tischständer**. Eine optionale Sicherungslasche schraubt es an der Wand fest.
 * **Kabel von hinten oder unten**, entschieden nach dem Druck mit einem kleinen, tauschbaren **Kabelport-Modul**, das gleichzeitig als Zugentlastung dient.
-* **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. Der SCD41 gleitet in Schienen, der ESP32-C3 sitzt in Führungen.
+* **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. Der SCD41 gleitet in Schienen, der ESP32-C3 sitzt in Führungen, die Litzen liegen in einem Kabelschlitz und unter einem mitgedruckten Kabelclip.
 * **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer unterhalb der Elektronik, Frischluft kommt von unten, die Front bleibt geschlossen.
 * **Vollständig parametrisches CAD.** Jedes Maß ist ein Fusion-Benutzerparameter. Wert ändern, Skript starten, neue STL, STEP, Druckplatten und Zeichnung.
 * **Zweisprachig.** Firmware, Doku, Zeichnungen und Projektseite auf Englisch und Deutsch.
@@ -77,7 +77,7 @@ Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_
 
 ## Stückliste
 
-Rund 55 € für ein Gerät (jeweils der günstigste Shop, ohne Litze und Filament). Die Links sind Vorschläge, Stand Oktober 2026; Preise ändern sich oft.
+Die Gesamtkosten für ein Gerät stehen in der letzten Zeile der Tabelle. Die Links sind Vorschläge, Stand Oktober 2026; Preise ändern sich oft.
 
 <!-- bom:start (generated from hardware/bom.yaml) -->
 | Anz. | Teil | AliExpress | Amazon.de |
@@ -90,10 +90,11 @@ Rund 55 € für ein Gerät (jeweils der günstigste Shop, ohne Litze und Filame
 | 1 | USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten | *nur Amazon* | [5,90 € (0,3 m)](https://www.amazon.de/dp/B0DGTQD4Y5) |
 | 1 | USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät | *nur Amazon* | [4,80 € (2 Stk.: 9,59 €)](https://www.amazon.de/dp/B0GVWPHKJM) |
 |  | Silikonlitze AWG 30 | *nur Amazon* | [15,49 € (8 Farben)](https://www.amazon.de/dp/B0DH2FBWH7) |
+| | **Summe** (ein Gerät, jedes Teil aus diesem Shop, falls vorhanden, sonst aus dem anderen; ohne Litze und Filament) | **54,35 €** | **64,28 €** |
 <!-- bom:end -->
 
 ² Shops zeigen oft eine andere Platine als die, die geliefert wird. Nach dem Auspacken nachmessen und den passenden Träger drucken.
-SCD41-Platinen gibt es in verschiedenen Größen. Nur der kleine Sensorträger hängt von der Platine ab: Es gibt einen für die **13,5 × 21,75 mm** und einen für die **15 × 20 mm** Platine, für andere reichen sechs Messwerte. Siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md).
+SCD41-Platinen gibt es in verschiedenen Größen. Nur der kleine Sensorträger hängt von der Platine ab: Es gibt einen für die **13,5 × 21,75 mm** und einen für die **15 × 20 mm** Platine, für andere trägst du sechs Messwerte in den [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html) ein und lädst den Träger herunter. Siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md).
 Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Shop-Links stehen nur in dieser Datei; die Tabelle oben und die Projektseite werden daraus erzeugt.
 
 ## Schnellstart
@@ -194,7 +195,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 ## Vor dem ersten Druck
 
 * **Versionen:** Die Releasenummer (z. B. 1.9.0) zählt jede Änderung, auch an Firmware und Doku. Die **Gehäuseversion** (Badge oben, auf jedem gedruckten Teil eingeprägt) ändert sich nur, wenn sich die Druckteile ändern. Teile mit derselben Gehäuseversion passen zusammen, egal aus welchem Release sie stammen.
-* **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md).
+* **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md). Andere Platinen: [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html).
 * **Display:** Alle Maße des Waveshare 2inch LCD Module sind mit dem Messschieber nachgemessen (Platine 58,2 × 35,3 × 1,62 mm, Glas 47,7 × 34,6 mm, Platine und Glas zusammen 4,43 mm). Andere Chargen können leicht abweichen: `LCD_*` und `GLASS_*` prüfen.
 * **Stand der Hardware:** Gehäuse und Firmware sind im CAD und in der CI geprüft. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 
@@ -204,12 +205,10 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * [x] Interaktive 3D-Aufbauanleitung ([öffnen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html), v1.6)
 * [x] ESP32-C3-Halter nach der gemessenen Platine, tolerant für andere Lieferungen (v1.7)
 * [x] Kollisionsprüfung aller Montagewege in der CI (v1.7)
-* [ ] Saubere Kabelführung mit Clips und Kanälen
-* [ ] Außentemperatur auf dem Display, mit Hinweis wenn Lüften hilft
-* [ ] Online-Konfigurator: Sensorträger als STL aus drei Maßen ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8))
+* [x] Außentemperatur auf dem Display, mit Hinweis wenn Lüften hilft (v1.8)
+* [x] Saubere Kabelführung ohne Kleber: Kabelschlitz und Kabelclip am Sensorträger, freier Kabelweg hinter dem Display (v1.9)
+* [x] [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html): Sensorträger als STL aus den Maßen der Platine ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
-* [ ] Optionaler Drucksensor (BMP280) für die CO2-Druckkompensation in Echtzeit
-* [ ] Wandplatte für Wände ohne Hohlwanddose
 
 ## Mitmachen
 

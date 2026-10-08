@@ -22,7 +22,7 @@ Dort kommt eine Einschmelzmutter für die optionale Sicherungslasche hinein. Die
 Standard sind 1000 ppm (Gelb) und 1400 ppm (Rot). Werte unter 1000 ppm gelten allgemein als unbedenklich, über 2000 ppm sollte dringend gelüftet werden. Beide Schwellen lassen sich jederzeit in Home Assistant ändern.
 
 ### Die Temperatur ist zu hoch.
-Nach 24 Stunden mit einem Referenzthermometer vergleichen und `temperature_offset` in der Gerätedatei anpassen. Prüfen, ob die Litzenkerbe zwischen ESP-Bereich und Sensorkammer abgedichtet ist.
+Nach 24 Stunden mit einem Referenzthermometer vergleichen und `temperature_offset` in der Gerätedatei anpassen. Prüfen, ob alle vier SCD41-Litzen nebeneinander im Kabelschlitz liegen, damit er zwischen ESP-Bereich und Sensorkammer dicht ist.
 
 ### Kann ich ein anderes ESP32-Board nehmen?
 Ja. Jeder von ESPHome unterstützte ESP32 funktioniert, aber die Pins in `esphome/common/base.yaml` und die Aufnahme im Generator müssen angepasst werden. Der ESP32-C3 SuperMini wurde wegen Größe, USB-C und geringer Abwärme gewählt.
