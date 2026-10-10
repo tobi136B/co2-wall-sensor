@@ -72,15 +72,16 @@ LCD_W, LCD_H, LCD_PCB = 58.2, 35.3, 1.62
 GLASS_W, GLASS_H = 47.7, 34.6
 GLASS_T = 2.9           # glass incl. backlight 2.81 measured, +0.1 so the screws never press the glass
 ACTIVE_W, ACTIVE_H = 40.8, 30.6
-LCD_X = -2.1            # PCB offset so the active area is centred in the window
+LCD_X = 2.1             # PCB offset so the active area is centred in the window
+GLASS_DX = -0.1         # glass centre from the PCB centre (the electronics strip makes the glass asymmetric)
 LCD_HOLE_X, LCD_HOLE_Y = 26.5, 15.0
 LCD_BOSS_D = 4.6        # slightly smaller boss, sits right next to the glass
-# the 8 wire cable stays plugged into the PH2.0 connector: connector on the +x side (seen from the back:
-# right, above the ESP32-C3), the electronics strip of the glass on the -x side behind the frame
+# the 8 wire cable stays plugged into the PH2.0 connector. The display sits upright: connector on the -x side
+# (seen from the back: left), the electronics strip of the glass on the +x side behind the frame
 LCD_CABLE_SPAN = 67.0   # measured: from the PCB edge without connector to the bend of the plugged cable
 LCD_PLUG_H = 5.77       # measured: connector above the back of the PCB, the highest part
-PH2_X0, PH2_X1 = 5.9, 13.4      # connector from the +x PCB edge (from a photo, only for the dummy)
-PH2_Y0, PH2_Y1 = 5.9, 24.7      # connector from the upper PCB edge (from a photo, only for the dummy)
+PH2_X0, PH2_X1 = 5.9, 13.4      # connector from the -x PCB edge (from a photo, only for the dummy)
+PH2_Y0, PH2_Y1 = 5.9, 24.7      # connector from the lower PCB edge (from a photo, only for the dummy)
 # --- chin: sensor chamber in front, ESP32-C3 behind ---
 DIVIDER = 2.5           # wall between display bay and chin
 FLOOR_Z, FLOOR_T = 12.0, 2.0    # sensor carrier (removable floor of the chamber)
@@ -189,7 +190,7 @@ def derive():
     global LCD_Y, Y_DIV_LOW, Y_CHIN_LOW, Y_CHIN_MID, C3_MOUTH, C3_Y0, C3_Z0, PLUG_Z, SOCKET_TOP, B, COVER_SCREWS
     global CARRIER_SCREWS, LCD_HOLES, CABLE, SCD_Y0, SCD_ZT
     global SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT
-    global VENT_BOTTOM, VENT_SIDE, PLATE_W, PLATE_H, LCD_BACK, LCD_PCB_X0, LCD_CABLE_X1, EXT_Z0
+    global VENT_BOTTOM, VENT_SIDE, PLATE_W, PLATE_H, LCD_BACK, LCD_PCB_X1, LCD_CABLE_X0, EXT_Z0
     global C3_TOP, C3_HOOK_Y, C3_TIP, C3_ROOT, C3_EXT_Y1, ADAPTER_Y0, ADAPTER_Z0, ADAPTER_Z1, BRIDGE_Y0
     CLEARANCE = FIT
     RAIL_CLEARANCE = FIT
@@ -216,8 +217,8 @@ def derive():
     CARRIER_SCREWS = [(XL + B, Y_DIV_LOW - B), (XR - B, Y_DIV_LOW - B)]
     LCD_HOLES = [(LCD_X + sx * LCD_HOLE_X, LCD_Y + sy * LCD_HOLE_Y) for sx in (-1, 1) for sy in (-1, 1)]
     LCD_BACK = LIP + GLASS_T + LCD_PCB               # back of the display PCB
-    LCD_PCB_X0 = LCD_X - LCD_W / 2                   # PCB edge without connector
-    LCD_CABLE_X1 = LCD_PCB_X0 + LCD_CABLE_SPAN       # bend of the plugged display cable
+    LCD_PCB_X1 = LCD_X + LCD_W / 2                   # PCB edge without connector
+    LCD_CABLE_X0 = LCD_PCB_X1 - LCD_CABLE_SPAN       # bend of the plugged display cable
     EXT_Z0 = LCD_BACK + LCD_PLUG_H + 0.3             # the ESP32-C3 sled passes over the display connector
     # 90 degree adapter in the USB-C socket, its body points to the wall
     ADAPTER_Y0 = C3_MOUTH - ADAPTER_T
@@ -696,9 +697,9 @@ def build_housing(root, ops):
 
     # display bay and window
     box(comp, BAY_X0, BAY_Y0, LIP, BAY_X1, BAY_Y1, COVER_Z + 1, CUT, 'DisplayBay')
-    # room for the plugged display cable behind the display, up to the +x wall: the display fits only with
+    # room for the plugged display cable behind the display, up to the -x wall: the display fits only with
     # its connector on this side, so the electronics strip of the glass always sits behind the frame
-    box(comp, BAY_X1 - 0.01, BAY_Y0, LCD_BACK - LCD_PCB, XR + 0.01, BAY_Y1, COVER_Z + 1, CUT, 'CableBay')
+    box(comp, XL - 0.01, BAY_Y0, LCD_BACK - LCD_PCB, BAY_X0 + 0.01, BAY_Y1, COVER_Z + 1, CUT, 'CableBay')
     ww, wh = ACTIVE_W + 1.0, ACTIVE_H + 1.0
     box(comp, -ww / 2, LCD_Y - wh / 2, -1, ww / 2, LCD_Y + wh / 2, LIP + 0.5, CUT, 'DisplayWindow')
     fillet(comp, z_edges(body, LIP, lambda p: abs(abs(p.x) - cm(ww / 2)) < 1e-5), 1.0, 'WindowCorners')
@@ -959,16 +960,17 @@ def build_desk_stand(root, ops, cable):
 def build_dummies(root, ops):
     NEW = ops[0]
     lcd = new_component(root, 'Dummy_LCD_2inch')
-    box(lcd, LCD_X - GLASS_W / 2 + 0.1, LCD_Y - GLASS_H / 2, LIP, LCD_X + GLASS_W / 2 + 0.1, LCD_Y + GLASS_H / 2,
-        LIP + GLASS_T, NEW, 'Glass')
+    gx = LCD_X + GLASS_DX
+    box(lcd, gx - GLASS_W / 2, LCD_Y - GLASS_H / 2, LIP, gx + GLASS_W / 2, LCD_Y + GLASS_H / 2, LIP + GLASS_T, NEW,
+        'Glass')
     box(lcd, BAY_X0 + CLEARANCE, BAY_Y0 + CLEARANCE, LIP + GLASS_T, BAY_X1 - CLEARANCE, BAY_Y1 - CLEARANCE,
         LCD_BACK, NEW, 'Pcb')
-    # PH2.0 connector with the plugged cable: the cable leaves towards +x and bends to the back at LCD_CABLE_X1
-    x_pcb1, y_pcb1 = LCD_X + LCD_W / 2, LCD_Y + LCD_H / 2
-    box(lcd, x_pcb1 - PH2_X1, y_pcb1 - PH2_Y1, LCD_BACK, x_pcb1 - PH2_X0, y_pcb1 - PH2_Y0, LCD_BACK + LCD_PLUG_H, NEW,
+    # PH2.0 connector with the plugged cable: the cable leaves towards -x and bends to the back at LCD_CABLE_X0
+    x_pcb0, y_pcb0 = LCD_X - LCD_W / 2, LCD_Y - LCD_H / 2
+    box(lcd, x_pcb0 + PH2_X0, y_pcb0 + PH2_Y0, LCD_BACK, x_pcb0 + PH2_X1, y_pcb0 + PH2_Y1, LCD_BACK + LCD_PLUG_H, NEW,
         'PH2Connector')
-    yc = y_pcb1 - (PH2_Y0 + PH2_Y1) / 2
-    box(lcd, x_pcb1 - PH2_X0, yc - 7.5, LCD_BACK + 0.5, LCD_CABLE_X1 - 1.5, yc + 7.5, LCD_BACK + 3.5, NEW,
+    yc = y_pcb0 + (PH2_Y0 + PH2_Y1) / 2
+    box(lcd, LCD_CABLE_X0 + 1.5, yc - 7.5, LCD_BACK + 0.5, x_pcb0 + PH2_X0, yc + 7.5, LCD_BACK + 3.5, NEW,
         'DisplayCable')
     scd = new_component(root, 'Dummy_SCD41')
     zb = SCD_ZT - SCD_PCB

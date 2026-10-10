@@ -45,14 +45,14 @@
     en: "Display with its cable plugged in, 4 screws M2 × 4, hex key 1.3 mm"
     de: "Display mit eingestecktem Kabel, 4 Schrauben M2 × 4, Innensechskant 1,3 mm"
   tip:
-    en: "It fits only one way: the connector on the right, where the bay is longer. The picture then appears upside down on your desk, the firmware turns it. Keep the protective film on the glass until the end."
-    de: "Es passt nur in einer Richtung: Stecker nach rechts, wo der Schacht länger ist. Auf dem Tisch steht das Bild dann auf dem Kopf, die Firmware dreht es. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen."
+    en: "It fits only one way: the connector on the left, where the bay is longer. Then the picture stands upright and the strip with the electronics hides behind the frame. Keep the protective film on the glass until the end."
+    de: "Es passt nur in einer Richtung: Stecker nach links, wo der Schacht länger ist. Dann steht das Bild aufrecht und der Elektronikstreifen verschwindet hinter dem Rahmen. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen."
   title:
     en: Display
     de: Display
   text:
-    en: Plug the supplied cable into the display first. Then glass first into the display bay, connector to the right, and 4 screws M2 × 4 through the corner holes.
-    de: Zuerst das mitgelieferte Kabel ins Display stecken. Dann mit dem Glas voran in den Displayschacht, Stecker nach rechts, und 4 Schrauben M2 × 4 durch die Ecklöcher.
+    en: Plug the supplied cable into the display first. Then glass first into the display bay, connector to the left, and 4 screws M2 × 4 through the corner holes.
+    de: Zuerst das mitgelieferte Kabel ins Display stecken. Dann mit dem Glas voran in den Displayschacht, Stecker nach links, und 4 Schrauben M2 × 4 durch die Ecklöcher.
 
 - new: [carrier]
   from: [0, 0, 55]
@@ -153,8 +153,8 @@
     en: Wiring
     de: Verdrahtung
   text:
-    en: "Display: the flat cable runs up at the right wall, over to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram."
-    de: "Display: Das Flachkabel läuft an der rechten Wand hoch, hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan."
+    en: "Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram."
+    de: "Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan."
 
 - new: [cover, cover_screws]
   from: [0, 0, 50]

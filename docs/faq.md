@@ -52,7 +52,7 @@ Both, with the same printed parts. To the back: a 90° USB-C adapter (plug to so
 The window in the bottom takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or lead the cable to the back with the 90° adapter.
 
 ### The picture on the display is upside down.
-Switch on *Display upside down* in Home Assistant, the picture turns by 180° at once. The housing decides how the display sits: its connector is on the right, seen from the back.
+Switch on *Display upside down* in Home Assistant, the picture turns by 180° at once. The housing decides how the display sits: its connector is on the left, seen from the back, and the picture stands upright. The switch is only a fallback.
 
 ### My SCD41 board looks different.
 Measure it and compare it with the known profiles. Only the small sensor carrier depends on the board, everything else stays the same. See [measure your sensor](measure-sensor.md).

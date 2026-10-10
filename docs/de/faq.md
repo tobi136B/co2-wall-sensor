@@ -52,7 +52,7 @@ Beides, mit denselben gedruckten Teilen. Nach hinten: ein USB-C-Winkeladapter 90
 Das Fenster im Boden nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder das Kabel mit dem Winkeladapter nach hinten führen.
 
 ### Das Bild auf dem Display steht auf dem Kopf.
-In Home Assistant *Display auf dem Kopf* einschalten, das Bild dreht sich sofort um 180°. Wie das Display sitzt, gibt das Gehäuse vor: Sein Stecker ist rechts, von hinten gesehen.
+In Home Assistant *Display auf dem Kopf* einschalten, das Bild dreht sich sofort um 180°. Wie das Display sitzt, gibt das Gehäuse vor: Sein Stecker ist links, von hinten gesehen, und das Bild steht aufrecht. Der Schalter ist nur eine Reserve.
 
 ### Meine SCD41-Platine sieht anders aus.
 Ausmessen und mit den bekannten Profilen vergleichen. Nur der kleine Sensorträger hängt von der Platine ab, alles andere bleibt gleich. Siehe [Sensor ausmessen](sensor-ausmessen.md).
