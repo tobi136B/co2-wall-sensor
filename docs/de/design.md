@@ -71,7 +71,7 @@ Bis Version 1.8 schloss ein kleines loses Port-Modul in zwei Versionen die Öffn
 * **Einführschrägen** an allen Mutterlöchern zentrieren die Mutter und geben dem verdrängten Kunststoff Platz.
 * **Verrundungen am Fuß der Dome** machen sie stabiler, sie brechen beim Eindrücken der Muttern nicht ab.
 * **Einführschräge an der Schiene**, damit das Gerät die Nut leicht findet.
-* **Eingeprägte Beschriftung** auf verdeckten Flächen: Teilname, Version und Drucklage.
+* **Eingeprägte Beschriftung** auf verdeckten Flächen: die Gehäuseversion in kräftiger Schrift, 0,6 mm tief und mindestens 2,4 mm hoch, damit jeder Strich mindestens eine saubere Linie einer 0,4 mm Düse ergibt. Der Generator verkleinert jeden Text, bis er in sein Feld passt.
 * **Ein Passungswert** (`FIT`) für alle Schiebe- und Steckpassungen.
 * **Ausgelegt für eine 0,4 mm Düse.** Keine Wand ist dünner als `MIN_WALL` (0,8 mm, zwei Linien). Wo eine Senkung für einen Schraubenkopf am Rand eines Teils eine dünnere Haut lassen würde, ist die Senkung zum Rand hin offen; die Gehäusewand schließt sie von außen. Die CI misst die Wandstärke jeder STL-Datei flächendeckend (`tools/print_check.py`) und schlägt unter 0,8 mm fehl.
 * **Rautengitter** statt Schlitzen: Die 45° Kanten drucken an den senkrechten Wänden ohne Stützmaterial, die Stege sind 1 mm breit und die offene Fläche ist rund 40 % größer als mit den alten Schlitzen.

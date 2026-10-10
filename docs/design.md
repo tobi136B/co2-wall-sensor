@@ -71,7 +71,7 @@ Up to version 1.8 a small loose port module closed the opening, in two versions.
 * **Entry chamfers** on all insert holes centre the insert and give the displaced plastic room.
 * **Fillets at the root of the bosses** make them stronger, they do not crack while pressing inserts.
 * **Lead-in chamfer** on the rail, so the device finds the slot easily.
-* **Engraved labels** on hidden faces: part name, version and print orientation.
+* **Engraved labels** on hidden faces: the enclosure version in heavy letters, 0.6 mm deep and at least 2.4 mm high, so every stroke prints as at least one clean line of a 0.4 mm nozzle. The generator shrinks each text until it fits its field.
 * **One fit value** (`FIT`) for every sliding or plugged fit.
 * **Made for a 0.4 mm nozzle.** No wall is thinner than `MIN_WALL` (0.8 mm, two lines). Where a screw head recess would leave a thinner skin at the edge of a part, the recess is opened towards the edge; the housing wall closes it from outside. The CI measures the wall thickness of every STL file all over (`tools/print_check.py`) and fails below 0.8 mm.
 * **Diamond vent mesh** instead of slots: the 45° edges print on the vertical walls without support, the webs are 1 mm wide and the open area is about 40 % larger than with the old slots.
