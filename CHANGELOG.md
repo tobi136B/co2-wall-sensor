@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.0.2](https://github.com/tobi136B/co2-wall-sensor/compare/v2.0.1...v2.0.2) (2026-10-10)
+
+
+### Fixed
+
+* **enclosure:** bold engraved labels that print cleanly ([#31](https://github.com/tobi136B/co2-wall-sensor/issues/31)) ([1c55805](https://github.com/tobi136B/co2-wall-sensor/commit/1c558058be6b3e5ff1c02678ae90e8c0092569f5))
+
 ## [2.0.1](https://github.com/tobi136B/co2-wall-sensor/compare/v2.0.0...v2.0.1) (2026-10-10)
 
 
