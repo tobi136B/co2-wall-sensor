@@ -32,7 +32,7 @@ MIN_WALL = 2 * NOZZLE
 WARN_WALL = 3 * NOZZLE
 SAMPLES_PER_MM2 = 6.0
 GROUP = 2.0  # mm, thin points closer than this form one spot
-LABEL_DEPTH = 0.4  # mm, depth of the engraved labels
+LABEL_DEPTH = 0.6  # mm, depth of the engraved labels
 LABEL_FACE = 40.0  # mm2, a face that carries a label is at least this large ...
 LABEL_TRIANGLES = 200  # ... and is cut into many triangles by the letters
 

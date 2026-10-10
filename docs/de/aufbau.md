@@ -10,13 +10,13 @@
 
 ## 1. 3D-Druck
 
-Jedes Teil trägt auf einer verdeckten Fläche seinen Namen, die Version und die Drucklage als eingeprägte Beschriftung.
+Jedes Teil trägt auf einer verdeckten Fläche die Gehäuseversion als kräftige eingeprägte Beschriftung (der Träger zusätzlich sein Sensorprofil), groß genug für eine saubere Schrift mit 0,4 mm Düse.
 
 | Teil | Datei | Ausrichtung | Hinweise |
 |------|-------|-------------|----------|
 | Gehäuse | [`housing.stl`](../../cad/stl/housing.stl) | Front nach unten | Die Front liegt auf dem Druckbett (eine strukturierte PEI-Platte sieht super aus). Ein 45° Fuß an der Frontkante verhindert den Elefantenfuß. Kein Stützmaterial. |
 | Sensorträger | [`sensor_carrier_14x22.stl`](../../cad/stl/sensor_carrier_14x22.stl) oder [`sensor_carrier_15x20.stl`](../../cad/stl/sensor_carrier_15x20.stl) | stehend auf der Unterkante | **Passend zu deiner SCD41-Platine**, siehe [Sensor ausmessen](sensor-ausmessen.md). Stehend gedruckt werden die Schienen zu senkrechten Kanälen, beide Federzungen wachsen nach oben und die Kabelbrücke druckt ohne Stützmaterial. 5 mm Brim verwenden. |
-| Rückdeckel | [`back_cover.stl`](../../cad/stl/back_cover.stl) | Innenseite nach unten | Beschriftung "THIS FACE DOWN". Schiene zeigt nach oben, kein Stützmaterial. Derselbe Deckel für beide Kabelausgänge. |
+| Rückdeckel | [`back_cover.stl`](../../cad/stl/back_cover.stl) | Innenseite nach unten | Beschriftung "FACE DOWN". Schiene zeigt nach oben, kein Stützmaterial. Derselbe Deckel für beide Kabelausgänge. |
 | Wandplatte | [`wall_plate.stl`](../../cad/stl/wall_plate.stl) | **Sichtseite nach unten** | Die Front bekommt die Oberfläche des Druckbetts. Andersherum müsste die 78 mm große Aussparung für den Dosenrand frei überbrückt werden. |
 | Tischständer | [`desk_stand.stl`](../../cad/stl/desk_stand.stl) | auf der Seite | Auf der Seite gedruckt ist die Schiene am stabilsten. |
 

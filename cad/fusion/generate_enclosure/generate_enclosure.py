@@ -44,6 +44,7 @@ import adsk.core
 import adsk.fusion
 
 VERSION = '2.0'          # enclosure version, engraved into every part
+LABEL_FONT = 'Arial Black'  # labels: heavy strokes (about a fifth of the height) print as clean lines
 
 # ===================== PARAMETERS =====================
 # --- device ---
@@ -141,8 +142,9 @@ WALL_HEAD_D = 9.0       # head recess, countersunk or pan head M4
 TILT = 12.0             # device leans back by this angle
 STAND_GAP = 5.0         # air gap below the device, keeps the vents free
 # --- labels ---
-LABEL_H = 2.2           # text height of the embossed part labels
-LABEL_DEPTH = 0.4
+LABEL_H = 3.5           # largest text height of the engraved part labels, shrunk until the text fits its field
+LABEL_MIN_H = 2.4       # below this the strokes get thinner than one line of a 0.4 mm nozzle
+LABEL_DEPTH = 0.6       # 3 layers of 0.2 mm, the letters stay crisp
 # --- printing ---
 MIN_WALL = 0.8          # thinnest wall anywhere: 2 lines of a 0.4 mm nozzle
 VENT_HOLE = 2.5         # vent mesh: diagonal of the diamond holes (45 degree edges print without support)
@@ -597,16 +599,35 @@ def bed_foot(comp, body, z_face, half_w, half_h, r_corner, r_edge, direction, na
     combine(comp, body, [ring], ops.CutFeatureOperation, name)
 
 
+def _text_fits(txt, x0, y0, x1, y1):
+    """True if the outline of a sketch text stays inside its field (model coordinates in mm)."""
+    lo, hi = txt.boundingBox.minPoint, txt.boundingBox.maxPoint
+    w, h = (hi.x - lo.x) * 10, (hi.y - lo.y) * 10
+    return w <= abs(x1 - x0) + 1e-3 and h <= abs(y1 - y0) + 1e-3
+
+
 def label(comp, body, z_face, x0, y0, x1, y1, text, flip=False, name='Label', height=None):
-    """Engrave a text into a face that lies in the plane z_face and faces +z (or -z with flip)."""
+    """Engrave a text into a face that lies in the plane z_face and faces +z (or -z with flip).
+
+    Heavy letters as large as the field allows: the height starts at LABEL_H and shrinks in steps of 0.1 mm
+    until the text fits, but never below LABEL_MIN_H, so every stroke stays at least one extrusion line wide.
+    """
     sk = comp.sketches.add(plane_z(comp, z_face))
     sk.name = name
-    inp = sk.sketchTexts.createInput2(text, cm(height or LABEL_H))
-    inp.setAsMultiLine(sketch_pt(sk, x0, y0, z_face), sketch_pt(sk, x1, y1, z_face),
-                       adsk.core.HorizontalAlignments.CenterHorizontalAlignment,
-                       adsk.core.VerticalAlignments.MiddleVerticalAlignment, 0)
-    inp.isHorizontalFlip = flip
-    txt = sk.sketchTexts.add(inp)
+    h = height or LABEL_H
+    while True:
+        inp = sk.sketchTexts.createInput2(text, cm(h))
+        inp.setAsMultiLine(sketch_pt(sk, x0, y0, z_face), sketch_pt(sk, x1, y1, z_face),
+                           adsk.core.HorizontalAlignments.CenterHorizontalAlignment,
+                           adsk.core.VerticalAlignments.MiddleVerticalAlignment, 0)
+        inp.isHorizontalFlip = flip
+        inp.fontName = LABEL_FONT
+        txt = sk.sketchTexts.add(inp)
+        if _text_fits(txt, x0, y0, x1, y1) or h <= LABEL_MIN_H:
+            break
+        txt.deleteMe()
+        h = round(h - 0.1, 2)
+    log(f'{name} {comp.name}: {text!r} at {h:.1f} mm')
     ei = comp.features.extrudeFeatures.createInput(txt, adsk.fusion.FeatureOperations.CutFeatureOperation)
     ei.setSymmetricExtent(VI.createByReal(cm(2 * LABEL_DEPTH)), True)
     ei.participantBodies = [body]
@@ -734,8 +755,7 @@ def build_housing(root, ops):
     box(comp, C3_X - PLUG_W / 2 - g, -BODY_H / 2 - 1, PLUG_Z - PLUG_H / 2 - g, C3_X + PLUG_W / 2 + g, Y_CHIN_LOW + 0.01,
         PLUG_Z + PLUG_H / 2 + g, CUT, 'PlugWindow', body)
 
-    label(comp, body, COVER_Z, -17, BAY_Y1 + 0.6, 17, Y_TOP_IN - 0.6, f'CO2 WALL SENSOR v{VERSION}', name='Label',
-          height=1.8)
+    label(comp, body, COVER_Z, -17, BAY_Y1 + 0.6, 17, Y_TOP_IN - 0.6, f'CO2 v{VERSION}', name='Label')
     return comp
 
 
@@ -863,7 +883,7 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
         'BridgeBar', body)
 
     label(comp, body, top, XL + 4, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 6.5,
-          f'CARRIER v{VERSION}\nSCD {profile or "custom"}\nPRINT: EDGE DOWN', name='Label', height=1.5)
+          f'v{VERSION}\n{profile or "custom"}', name='Label')
     return comp
 
 
@@ -887,7 +907,7 @@ def build_back_cover(root, ops):
     edges = [e for e in body.edges if _edge_in_plane(e, 'y', RAIL_Y0)
              and _edge_within(e, lambda p: p.z > cm(DEPTH) + 1e-4)]
     try_chamfer(comp, edges, RAIL_LEAD, 'RailLeadIn')
-    label(comp, body, COVER_Z, -30, -6, -2, 6, f'BACK COVER v{VERSION}\nTHIS FACE DOWN', flip=True, name='Label')
+    label(comp, body, COVER_Z, -30, -6, -2, 6, f'COVER v{VERSION}\nFACE DOWN', flip=True, name='Label')
     return comp
 
 
@@ -918,8 +938,7 @@ def build_wall_plate(root, ops, cable):
     seat = [e for e in body.edges if _edge_in_plane(e, 'z', z_seat)
             and _edge_within(e, lambda p: abs(abs(p.x) - cm(a)) <= cm(WALL_SCREW_D / 2) + 1e-5)]
     try_chamfer(comp, seat, (WALL_HEAD_D - WALL_SCREW_D) / 2 - 0.3, 'CountersinkSeat')
-    label(comp, body, z_wall - BOX_RIM_T, -20, 21, 20, 29, f'WALL PLATE v{VERSION}\nPRINT: FRONT FACE DOWN',
-          name='Label')
+    label(comp, body, z_wall - BOX_RIM_T, -20, 21, 20, 29, f'WALL PLATE v{VERSION}', name='Label')
     return comp
 
 

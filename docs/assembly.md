@@ -10,13 +10,13 @@
 
 ## 1. 3D printing
 
-Every part carries its name, the version and its print orientation as an engraved label on a hidden face.
+Every part carries the enclosure version as a bold engraved label on a hidden face (the carrier also its sensor profile), large enough to print cleanly with a 0.4 mm nozzle.
 
 | Part | File | Orientation | Notes |
 |------|------|-------------|-------|
 | Housing | [`housing.stl`](../cad/stl/housing.stl) | front face down | The front lies on the bed (a textured PEI sheet looks great). A 45° foot on the front edge prevents elephant foot. No supports. |
 | Sensor carrier | [`sensor_carrier_14x22.stl`](../cad/stl/sensor_carrier_14x22.stl) or [`sensor_carrier_15x20.stl`](../cad/stl/sensor_carrier_15x20.stl) | standing on its lower edge | **Matching your SCD41 board**, see [measure your sensor](measure-sensor.md). Printed on edge the rails become vertical channels, both spring tongues grow upwards and the cable bridge prints without support. Use a 5 mm brim. |
-| Back cover | [`back_cover.stl`](../cad/stl/back_cover.stl) | inside face down | Label "THIS FACE DOWN". Rail points up, no supports. The same cover for both cable exits. |
+| Back cover | [`back_cover.stl`](../cad/stl/back_cover.stl) | inside face down | Label "FACE DOWN". Rail points up, no supports. The same cover for both cable exits. |
 | Wall plate | [`wall_plate.stl`](../cad/stl/wall_plate.stl) | **front face down** | The front gets the bed surface. Printed the other way round, the 78 mm recess for the box rim would have to be bridged. |
 | Desk stand | [`desk_stand.stl`](../cad/stl/desk_stand.stl) | on its side | Printed on its side the rail is strongest. |
 
