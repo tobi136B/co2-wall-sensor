@@ -7,7 +7,7 @@ It covers a flush wall box or stands on your desk.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Enclosure](https://img.shields.io/badge/enclosure-v1.8-6E7B8B)
+![Enclosure](https://img.shields.io/badge/enclosure-v2.0-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -29,9 +29,9 @@ It covers a flush wall box or stands on your desk.**
 * **2" IPS colour display** with everything at a glance: traffic light status, large CO2 value, 3 hour trend, clock, indoor and outdoor temperature and humidity.
 * **Window hint.** The display tells you when opening the window cools the room or dries the air, using an outdoor sensor or simply your Home Assistant weather forecast.
 * **Everything adjustable in Home Assistant.** Night schedule (dim or off), night brightness, warnings at night, temperature correction, altitude and hint thresholds, no reflashing needed.
-* **One device, two mounts.** A dovetail rail slides onto the **wall plate** (covers a standard 68 mm flush wall box) or the **desk stand**. An optional lock tab screws it to the wall.
-* **Cable from the back or from below**, decided after printing with a small swappable **cable port module** that doubles as strain relief.
-* **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 slides into rails, the ESP32-C3 sits in guides, the wires lie in a wire slot and under a printed wire clip.
+* **One device, two mounts.** A dovetail rail slides onto the **wall plate** (two M4 screws with wall plugs, or the screws of a 68 mm flush wall box) or the **desk stand**.
+* **Cable from the back or from below** with the same parts: a 90° USB-C adapter leads the cable straight into the wall, or a straight cable leaves through the window in the bottom.
+* **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 and the ESP32-C3 slide into rails and click behind spring hooks, the display cable stays plugged in and runs under a printed bridge.
 * **Thought-through thermals.** The sensor lives in its own chamber below the electronics, fresh air enters from below, the front stays closed.
 * **Fully parametric CAD.** Every dimension is a Fusion user parameter. Change a value, run the script, get new STL, STEP, print plates and drawing.
 * **Bilingual.** Firmware, documentation, drawings and project page in English and German.
@@ -58,15 +58,15 @@ Every 30 seconds the SCD41 delivers a new reading. The ESP32-C3 updates the disp
 
 | | |
 |---|---|
-| Device | 69.8 × 69.8 × 24 mm (+ 3 mm rail) |
-| Wall plate | 82 × 82 × 7 mm, fits flush wall boxes Ø 68 mm with 60 mm screw spacing |
+| Device | 77 × 69.8 × 24 mm (+ 3 mm rail) |
+| Wall plate | 89.2 × 82 × 7 mm, slots for M4 screws 60 mm apart, also fits flush wall boxes Ø 68 mm |
 | Display window | 41.8 × 31.6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 to 5000 ppm, ±(50 ppm + 5 % of reading) |
 | Room size | one sensor per room; in open spaces up to about 500 m² ([FAQ](docs/faq.md#how-large-a-room-can-one-sensor-monitor)) |
 | Power | 5 V via USB-C, about 0.5 W |
-| Cable exit | back (right-angle plug) or bottom (straight plug), swappable port module |
-| Fasteners | 10 heat-set inserts M2 × 3 (OD 3.2), 10 screws M2 × 4 ISO 7380 (+2 each for the lock tab) |
-| Print material | PETG (PLA possible), about 110 g |
+| Cable exit | back (90° USB-C adapter) or bottom (straight plug), same parts |
+| Fasteners | 10 heat-set inserts M2 × 3 (OD 3.0 to 3.2), 10 screws M2 × 4 ISO 7380, 2 screws M4 for the wall |
+| Print material | PETG (PLA possible), about 120 g |
 
 Technical drawing (A3, ISO first angle): [English PDF](docs/drawing/co2_wall_sensor_drawing_en.pdf) | [German PDF](docs/drawing/co2_wall_sensor_drawing_de.pdf)
 
@@ -85,12 +85,12 @@ The total for one device is in the last row of the table. The links are suggesti
 | 1 | Sensirion **SCD41** breakout, **13.5 × 21.75 mm** or **15 × 20 mm** ² | [21.19 €](https://de.aliexpress.com/item/1005009740863220.html) | *AliExpress only* |
 | 1 | **ESP32-C3 SuperMini** | [2.79 €](https://de.aliexpress.com/item/1005007479144456.html) | [4.30 € (2 pcs: 8.59 €)](https://www.amazon.de/dp/B0HDCHXHMT) |
 | 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12.49 €](https://de.aliexpress.com/item/1005008772378337.html) | [16.31 €](https://www.amazon.de/dp/B081Q79X2F) |
-| 10 | Heat-set insert **M2 × 3**, outer diameter 3.0 or 3.2 mm, length 3 mm | [2.39 € (50 pcs, OD 3.2)](https://de.aliexpress.com/item/1005008575446687.html) | [6.99 € (200 pcs, OD 3.0)](https://www.amazon.de/dp/B0DZHK4JRC) |
+| 10 | Heat-set insert **M2 × 3**, outer diameter 3.0 or 3.2 mm, length 3 mm | [2.39 € (50 pcs, OD 3.2)](https://de.aliexpress.com/item/1005008575446687.html) | [4.69 € (205 pcs, OD 3.0)](https://www.amazon.de/dp/B0GYPH7X6W) |
 | 10 | Button head screw **M2 × 4**, ISO 7380 | *Amazon only* | [4.79 € (60 pcs)](https://www.amazon.de/dp/B0FVT11R5L) |
-| 1 | USB cable with **right-angle USB-C plug** (angled up/down) for the back port | *Amazon only* | [5.90 € (0.3 m)](https://www.amazon.de/dp/B0DGTQD4Y5) |
+| 1 | **USB-C 90° adapter** (plug to socket) for the cable to the back | *Amazon only* | [4.49 €](https://www.amazon.de/dp/B0CVQ8LV5W) |
 | 1 | USB power module for the flush wall box (installation by a qualified electrician), or any USB charger | *Amazon only* | [4.80 € (2 pcs: 9.59 €)](https://www.amazon.de/dp/B0GVWPHKJM) |
 |  | Silicone wire AWG 30 | *Amazon only* | [15.49 € (8 colours)](https://www.amazon.de/dp/B0DH2FBWH7) |
-| | **Total** (one device, each part from this shop if it has it, otherwise from the other; without wire and filament) | **54.35 €** | **64.28 €** |
+| | **Total** (one device, each part from this shop if it has it, otherwise from the other; without wire and filament) | **52.94 €** | **60.57 €** |
 <!-- bom:end -->
 
 ² Shops often show a different board than the one they send. Measure it on arrival and print the matching carrier.
@@ -129,6 +129,7 @@ Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the onl
 | Display at night, Night brightness | select, number | dim (default 8 %) or switch off |
 | Red warning at night | switch | the display wakes up while the CO2 level is red |
 | Window hint on the display, Outdoor value on the display | switch | show or hide them |
+| Display upside down | switch | turns the picture by 180° if it stands on its head |
 | Window hint from indoor temperature, Window hint: cooler outside by | number | default 24 °C and 3 °C |
 | Temperature correction | number | self-heating at your wall: compare with a reference thermometer |
 | Altitude above sea level | number | pressure compensation of the CO2 value (default 300 m) |
@@ -197,7 +198,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * **Versions:** the release number (e.g. 1.9.0) counts every change, firmware and docs included. The **enclosure version** (badge at the top, engraved on every printed part) only changes when the printed parts change. Parts with the same enclosure version fit together, whatever release they came from.
 * **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md). Other boards: [online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html).
 * **Display:** all dimensions of the Waveshare 2inch LCD Module are measured with a caliper (PCB 58.2 × 35.3 × 1.62 mm, glass 47.7 × 34.6 mm, PCB and glass 4.43 mm thick). Other batches may differ slightly: check `LCD_*` and `GLASS_*`.
-* **Hardware status:** the enclosure and firmware are verified in CAD and CI. Photos and measurements of a printed device are welcome.
+* **Hardware status:** enclosure 2.0 contains the lessons of the first printed device and is verified in CAD and CI. The 90° USB-C adapter is not measured yet, its hole is generous. Photos and measurements of a printed device are welcome.
 
 ## Roadmap
 
@@ -208,6 +209,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * [x] Outdoor temperature on the display, with a hint when opening the window helps (v1.8)
 * [x] Clean cable routing without glue: wire slot and wire clip on the sensor carrier, free cable path behind the display (v1.9)
 * [x] [Online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html): sensor carrier STL from the dimensions of the board ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
+* [x] Enclosure 2.0 after the first print: display cable stays plugged, ESP32-C3 on a sled with a spring hook, 90° adapter instead of the loose port module, wall plate for M4 screws (v2.0)
 * [ ] Verify display layout and thermals on real hardware, add photos
 
 ## Contributing

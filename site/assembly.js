@@ -92,7 +92,7 @@ function cylMesh(m) {
 
 function tubeMesh(m) {
   const curve = new THREE.CatmullRomCurve3(m.points.map(v3), false, 'centripetal');
-  const geo = new THREE.TubeGeometry(curve, 120, 0.42, 8, false);
+  const geo = new THREE.TubeGeometry(curve, Math.max(120, m.points.length * 2), m.r || 0.42, 8, false);
   const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: m.color, roughness: 0.45, transparent: true }));
   mesh.userData.wire = true;
   return mesh;

@@ -20,11 +20,15 @@ import shutil
 import sys
 from pathlib import Path
 
+import numpy as np
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import display_preview  # noqa: E402
 import drawing  # noqa: E402
+import wiring  # noqa: E402
+
+PINS = {k: v for k, v in wiring.pins().items()} | {"3V3": "3V3", "GND": "GND"}
 
 ROOT = Path(__file__).resolve().parents[1]
 STEPS = ROOT / "site" / "assembly_steps.yaml"
@@ -87,66 +91,229 @@ def part(pid, en, de, groups, meshes):
     return {"id": pid, "name": {"en": en, "de": de}, "groups": groups, "meshes": meshes}
 
 
-def wires_display(p: dict) -> list[dict]:
-    """8 wires from the display connector straight across the back of the display to the ESP32-C3.
+# ESP32-C3 SuperMini, seen from the back with the USB-C socket at the bottom: pin rows from the top end down
+ESP_PINS = {
+    -1: ["GPIO0", "GPIO1", "GPIO2", "GPIO3", "GPIO4", "3V3", "GND", "5V"],  # row on the -x side
+    1: ["GPIO21", "GPIO20", "GPIO10", "GPIO9", "GPIO8", "GPIO7", "GPIO6", "GPIO5"],  # row on the +x side
+}
+DISPLAY_ORDER = ["3V3", "GND", "DIN", "CLK", "CS", "DC", "RST", "BL"]  # PH2.0 connector, from the bottom up
+WIRE_R = 0.42  # radius of the wires in site/assembly.js
+PITCH = 1.0  # display wires side by side in the cable clip
+PITCH_PLUG = 2.0  # contact pitch of the PH2.0 connector
 
-    The bundle runs at CABLE_Y, the path the collision check of the generator keeps free (Dummy DisplayCable).
+
+def esp_pad(p: dict, signal: str) -> np.ndarray:
+    """Pad of a signal on the top face of the ESP32-C3 (the side towards the back)."""
+    gpio = PINS.get(signal, signal)
+    for side, row in ESP_PINS.items():
+        if gpio in row:
+            j = row.index(gpio)
+            x = p["C3_X"] + side * (p["C3_W"] / 2 - 1.3)
+            return np.array([x, p["C3_Y0"] + p["C3_H"] - 1.6 - j * 2.54, p["C3_Z0"] + p["C3_PCB"]])
+    raise KeyError(signal)
+
+
+def _rot(v: np.ndarray, axis: np.ndarray, deg: float) -> np.ndarray:
+    a = np.radians(deg)
+    k = axis / np.linalg.norm(axis)
+    return v * np.cos(a) + np.cross(k, v) * np.sin(a) + k * np.dot(k, v) * (1 - np.cos(a))
+
+
+class Ribbon:
+    """Centre line of a flat cable with the direction s in which its wires lie side by side (a turtle).
+
+    bend() turns about s (out of the plane of the cable), turn() in its plane. A turn with a radius larger
+    than half the cable width keeps every wire on its own concentric arc, so no wire crosses another one.
+    """
+
+    def __init__(self, start, heading, spread):
+        self.p = np.array(start, float)
+        self.t = np.array(heading, float)
+        self.s = np.array(spread, float)
+        self.samples = [(self.p.copy(), self.s.copy())]
+
+    def straight(self, length: float, step: float = 0.8) -> Ribbon:
+        n = max(1, int(np.ceil(length / step)))
+        for _ in range(n):
+            self.p = self.p + self.t * (length / n)
+            self.samples.append((self.p.copy(), self.s.copy()))
+        return self
+
+    def _arc(self, axis: np.ndarray, deg: float, radius: float, towards: np.ndarray) -> Ribbon:
+        centre = self.p + towards * radius
+        n = max(2, int(np.ceil(abs(np.radians(deg)) * radius / 0.6)))
+        r0 = self.p - centre
+        t0, s0 = self.t.copy(), self.s.copy()
+        for k in range(1, n + 1):
+            d = deg * k / n
+            self.p = centre + _rot(r0, axis, d)
+            self.t, self.s = _rot(t0, axis, d), _rot(s0, axis, d)
+            self.samples.append((self.p.copy(), self.s.copy()))
+        return self
+
+    def bend(self, towards, deg: float, radius: float) -> Ribbon:
+        """Turn the heading towards the direction 'towards' (perpendicular to s) about the axis s."""
+        u = np.array(towards, float)
+        axis = np.cross(self.t, u)
+        return self._arc(axis, deg, radius, u)
+
+    def turn(self, towards_spread: bool, deg: float, radius: float) -> Ribbon:
+        """Turn in the plane of the cable, to the side of +s (True) or -s (False)."""
+        u = self.s if towards_spread else -self.s
+        axis = np.cross(self.t, u)
+        return self._arc(axis, deg, radius, u)
+
+    def wires(self, offsets, pitch_start=None, taper=0.0):
+        """Wire polylines: centre + offset * s. With pitch_start the offsets start wider and narrow over taper mm."""
+        out = []
+        steps = zip(self.samples, self.samples[1:], strict=False)
+        dist = np.cumsum([0.0] + [np.linalg.norm(b[0] - a[0]) for a, b in steps])
+        for o in offsets:
+            pts = []
+            for (c, sv), d in zip(self.samples, dist, strict=True):
+                k = 1.0
+                if pitch_start and taper > 0 and d < taper:
+                    u = d / taper
+                    k = pitch_start + (1.0 - pitch_start) * (3 * u * u - 2 * u * u * u)
+                pts.append(c + sv * o * k)
+            out.append(pts)
+        return out
+
+
+def _r(points) -> list[list[float]]:
+    return [[round(float(c), 3) for c in q] for q in points]
+
+
+def _line(a, b, step: float = 0.8) -> list[np.ndarray]:
+    a, b = np.array(a, float), np.array(b, float)
+    n = max(1, int(np.ceil(np.linalg.norm(b - a) / step)))
+    return [a + (b - a) * k / n for k in range(1, n + 1)]
+
+
+def _drop(start, pad, z_cross: float, y_cross: float) -> list[np.ndarray]:
+    """From a point of the cable up over the other wires, across to the pad row and down onto the pad."""
+    x0, y0, _ = start
+    pts = _line(start, [x0, y_cross, z_cross], 0.5)
+    pts += _line(pts[-1], [pad[0], y_cross, z_cross])
+    pts += _line(pts[-1], [pad[0], pad[1], pad[2] + 1.6], 0.5)
+    pts += _line(pts[-1], pad, 0.4)
+    return pts
+
+
+def wires_display(p: dict) -> list[dict]:
+    """The 8 wires of the cable that stays plugged into the display.
+
+    From the plug the flat cable runs along the back of the display to the side wall and bends up, shifting
+    upwards in its own plane while it rises. It bends over towards the ESP32-C3, shifts up a little more
+    (so it passes above the right post of the bridge), turns down in its own plane and runs under the bridge
+    of the sled, over the middle of the board. Every wire leaves the cable at the height of its pad: up over the
+    other wires, across to its pad row and down onto the pad. Every bend in the plane of the cable has a radius
+    larger than half the cable width, so no wire crosses another one.
     """
     lcd_back = p["LIP"] + p["GLASS_T"] + p["LCD_PCB"]
-    x_conn = p["BAY_X0"] + 10.2  # side of the PH2.0 connector
-    z_run = lcd_back + 1.8
-    esp_x = p["C3_X"] - p["C3_W"] / 2 + 1.3
-    esp_top = p["C3_Z0"] + p["C3_PCB"]
-    names = ["3V3", "GND", "DIN", "CLK", "CS", "DC", "RST", "BL"]
+    y_pcb1 = p["LCD_Y"] + p["LCD_H"] / 2
+    yc = y_pcb1 - (p["PH2_Y0"] + p["PH2_Y1"]) / 2
+    zc = lcd_back + 2.9
+    z_bar = p["C3_Z0"] + p["BRIDGE_H"] - p["BRIDGE_BAR"]  # underside of the bar of the bridge
+    z_run = z_bar - WIRE_R - 0.1
+    z_socket = p["C3_Z0"] + p["C3_PCB"] + p["C3_USB_H"]  # top of the USB-C socket
+    z_low = z_socket + WIRE_R + 0.05  # the cable over the board, below the bridge
+    z_cross = z_low + 2 * WIRE_R + 0.1  # wires that leave the cable cross over it here
+    x_plug = p["LCD_X"] + p["LCD_W"] / 2 + 0.5
+    xr = p["LCD_CABLE_X1"] - 1.2  # the riser stays inside the measured 67 mm
+    r_up, r = 1.5, 4.0  # bends out of the plane, turns in the plane (half the cable is 3.5 + 0.42 mm)
+    half = 3.5 * PITCH + WIRE_R
+    post_x0 = p["C3_X"] + p["C3_W"] / 2 + p["C3_PLAY"] + 1.15 + 0.3  # inner face of the right post
+    y_app = p["C3_EXT_Y1"] + half + 0.4  # height of the cable while it passes above the right post
+    rise = z_run - zc - 2 * r_up  # straight part of the riser
+    a1 = float(np.degrees(np.arcsin(min(1.0, rise / (2 * r)))))
+    dy1 = 2 * r * (1 - np.cos(np.radians(a1)))
+    dy2 = y_app - yc - dy1
+    a2 = float(np.degrees(np.arccos(1 - dy2 / (2 * r))))
+    rib = Ribbon([x_plug, yc, zc], [1, 0, 0], [0, 1, 0])
+    rib.straight(xr - r_up - x_plug)
+    rib.bend([0, 0, 1], 90, r_up)
+    rib.turn(True, a1, r).turn(False, a1, r)  # S upwards while rising
+    rib.bend([-1, 0, 0], 90, r_up)
+    rib.turn(True, a2, r).turn(False, a2, r)  # the rest of the way up, done before the post
+    if rib.p[0] < post_x0 + 1.2 + WIRE_R + 0.2:
+        raise SystemExit("display cable: it reaches the right post of the bridge before it is high enough")
+    x_q = p["C3_X"] + r  # start of the quarter turn down
+    rib.straight(rib.p[0] - x_q)
+    rib.turn(False, 90, r)  # down, s becomes -x
+    offsets = [(i - 3.5) * PITCH for i in range(8)]
+    lines = rib.wires(offsets, pitch_start=PITCH_PLUG / PITCH, taper=6.0)
+    y_free = p["BRIDGE_Y0"] - 1.0  # below the bridge the cable drops onto its lower level
+    pads = {n: esp_pad(p, n) for n in DISPLAY_ORDER}
     out = []
-    for i, n in enumerate(names):
-        y0 = p["LCD_Y"] + (i - 3.5) * 2.0
-        yb = p["CABLE_Y"] + (i - 3.5) * 0.38  # bundle of 8 wires, about 3 mm
-        y1 = p["C3_Y0"] + p["C3_H"] - 1.6 - i * 2.54
-        pts = [
-            [x_conn, y0, lcd_back + 3.0],
-            [x_conn + 3, (y0 + yb) / 2, z_run],
-            [x_conn + 7, yb, z_run],
-            [esp_x - 8, yb, z_run],
-            [esp_x - 3, y1, esp_top + 2.5],
-            [esp_x, y1, esp_top + 1.2],
-            [esp_x, y1, esp_top],
-        ]
-        out.append({"color": WIRE[n], "points": pts, "label": n})
+    for i, n in enumerate(DISPLAY_ORDER):
+        pts = lines[i]
+        x = pts[-1][0]
+        pad = pads[n]
+        left = pad[0] < p["C3_X"]
+        y_cross = pad[1] + (0.75 if left else -0.75)
+        pts = pts + _line(pts[-1], [x, y_free, z_run])
+        pts += _line(pts[-1], [x, y_free - 2.0, z_low])
+        pts += _line(pts[-1], [x, y_cross + 0.5, z_low])
+        pts += _line(pts[-1], [x, y_cross, z_cross], 0.4)
+        pts += _line(pts[-1], [pad[0], y_cross, z_cross])
+        pts += _line(pts[-1], [pad[0], y_cross, pad[2] + 1.0], 0.5)
+        pts += _line(pts[-1], pad, 0.4)
+        out.append({"color": WIRE[n], "points": _r(pts), "label": n})
     return out
 
 
+SCD_WIRE_R = 0.3  # AWG 30 silicone wire
+
+
 def wires_scd(p: dict) -> list[dict]:
-    """4 wires from the SCD41 pads through the wire slot of the carrier and its clip channel to the ESP32-C3."""
+    """4 thin wires from the SCD41 pads to the ESP32-C3.
+
+    They leave the pads side by side in the relief groove behind the board, pass the upper board edge and run
+    in front of the left rail to the wire slot, each one on its own level. Side by side through the slot and
+    along the clip channel on the back of the carrier, then up over the left guide of the ESP32-C3 and up beside
+    the board, stacked, until each one turns onto its pad.
+    """
+    r = SCD_WIRE_R
     pad_x = -p["SCD_PAD_X"]
     yc = p["SCD_Y0"] + p["SCD_L"] / 2
     g = 0.15
+    z_lip = p["SCD_ZT"] - p["SCD_PCB"] - g - p["SCD_LIP"]  # front face of the rails
+    x_lip = -(p["SCD_W"] / 2 - p["SCD_LIP"])  # inner edge of the left rail
     slot_x = -(p["SCD_W"] / 2 + g + 1.2 + p["MIN_WALL"] + p["SCD_SLOT_W"] / 2)
-    y_hi = p["Y_DIV_LOW"] - 0.2
     top = p["FLOOR_Z"] + p["FLOOR_T"]
-    y_ch = p["Y_DIV_LOW"] - p["SCD_CHANNEL_W"] / 2  # middle of the clip channel
+    yw = p["Y_DIV_LOW"] - p["SCD_CHANNEL_W"]  # inner face of the clip
     x_ch = p["SPRING_X"] - p["SPRING_W"] / 2 - 1.6  # end of the clip
-    esp_x = p["C3_X"] + p["C3_W"] / 2 - 1.3
-    esp_top = p["C3_Z0"] + p["C3_PCB"]
+    gx = p["C3_X"] - p["C3_W"] / 2 - p["C3_PLAY"] - 0.575  # middle of the left guide
+    z_guide = p["C3_Z0"] + p["C3_PCB_MAX"] + 0.5
+    z_relief = p["SCD_ZT"] + 0.33
+    y_edge = p["SCD_TOP"] + r + 0.05  # just past the upper board edge
     out = []
     for k, n in enumerate(["GND", "3V3", "SCL", "SDA"]):
         y0 = yc + (k - 1.5) * 2.54
-        ys = y_hi - 3.4 + k * 0.85  # the 4 wires in a row in the slot
-        y1 = p["C3_Y0"] + p["C3_H"] - 1.6 - k * 2.54
-        lift = 18.4 + k * 0.45
-        pts = [
-            [pad_x, y0, p["SCD_ZT"] - 0.3],
-            [pad_x, p["SCD_TOP"] + 0.6, p["FLOOR_Z"] - 0.4],
-            [slot_x, ys, p["FLOOR_Z"] - 0.4],
-            [slot_x, ys, top + 0.5],
-            [slot_x + 2, y_ch, top + 0.5 + k * 0.25],
-            [x_ch, y_ch, top + 0.5 + k * 0.25],
-            [p["C3_X"] - 3, p["C3_Y0"] + 4 + k, lift + 0.6],
-            [esp_x + 3, y1, esp_top + 2.5],
-            [esp_x, y1, esp_top + 1.2],
-            [esp_x, y1, esp_top],
-        ]
-        out.append({"color": WIRE[n], "points": pts, "label": n})
+        lane = pad_x + (k - 1.5) * 2 * r  # side by side in the relief groove
+        lane2 = x_lip + r + 0.25 + k * 2 * r  # beside the rail, in front of the carrier
+        z_front = z_lip - r - 0.2 - k * (2 * r + 0.05)  # each wire on its own level in front of the rail
+        cy = yw + r + k * 2 * r  # side by side in the slot and in the clip channel
+        cz = top + 0.45
+        z_up = z_guide + r + 0.15 + k * (2 * r + 0.1)
+        pad = esp_pad(p, n)
+        pts = [np.array([pad_x, y0, p["SCD_ZT"]])]
+        pts += _line(pts[-1], [lane, y0 + 0.8, z_relief], 0.4)
+        pts += _line(pts[-1], [lane, y_edge, z_relief])
+        pts += _line(pts[-1], [lane, y_edge + 0.5, p["SCD_ZT"] - 0.45], 0.3)
+        pts += _line(pts[-1], [lane2, y_edge + 3.0, p["SCD_ZT"] - 0.6], 0.4)
+        pts += _line(pts[-1], [lane2, y_edge + 3.5, z_front], 0.4)
+        pts += _line(pts[-1], [slot_x, cy, z_front])
+        pts += _line(pts[-1], [slot_x, cy, cz])
+        pts += _line(pts[-1], [x_ch, cy, cz])
+        pts += _line(pts[-1], [x_ch + 3.0, cy, z_up])
+        pts += _line(pts[-1], [gx, cy, z_up])
+        pts += _line(pts[-1], [gx, pad[1] - 0.75, z_up])
+        pts += _line(pts[-1], [pad[0], pad[1] - 0.75, z_up])
+        pts += _line(pts[-1], [pad[0], pad[1] - 0.75, pad[2] + 1.0], 0.5)
+        pts += _line(pts[-1], pad, 0.4)
+        out.append({"color": WIRE[n], "points": _r(pts), "label": n, "r": r})
     return out
 
 
@@ -159,8 +326,8 @@ def parts(p: dict) -> list[dict]:
     c3x, c3y, c3z = p["C3_X"], p["C3_Y0"], p["C3_Z0"]
     c3top = c3z + p["C3_PCB"]
     mouth, usb_w = p["C3_MOUTH"], p["C3_USB_W"] / 2
-    lock_y = -p["PLATE"] / 2 + 2.0 + p["INSERT_HOLE_D"] / 2 + 0.2
-    lx0, lx1 = p["LOCK_POINTS"]
+    x_pcb1, y_pcb1 = p["LCD_X"] + p["LCD_W"] / 2, p["LCD_Y"] + p["LCD_H"] / 2
+    yc = y_pcb1 - (p["PH2_Y0"] + p["PH2_Y1"]) / 2
 
     display = [
         box(
@@ -174,7 +341,17 @@ def parts(p: dict) -> list[dict]:
             "glass",
         ),
         box(p["BAY_X0"] + cl, p["BAY_Y0"] + cl, lip + glass_t, p["BAY_X1"] - cl, p["BAY_Y1"] - cl, lcd_back, PCB_BLUE),
-        box(p["BAY_X0"] + 4, p["LCD_Y"] - 10, lcd_back, p["BAY_X0"] + 10, p["LCD_Y"] + 10, lcd_back + 6, "#f1efe8"),
+        # PH2.0 connector and the plug of the cable, the cable leaves towards the side wall
+        box(
+            x_pcb1 - p["PH2_X1"],
+            y_pcb1 - p["PH2_Y1"],
+            lcd_back,
+            x_pcb1 - p["PH2_X0"],
+            y_pcb1 - p["PH2_Y0"],
+            lcd_back + p["LCD_PLUG_H"],
+            "#f1efe8",
+        ),
+        box(x_pcb1 - p["PH2_X0"], yc - 8.6, lcd_back + 0.4, x_pcb1 + 0.5, yc + 8.6, lcd_back + 5.4, "#dcd6c8"),
         {"type": "screen", "centre": [0, p["LCD_Y"], lip - 0.02], "size": [p["ACTIVE_W"], p["ACTIVE_H"]]},
     ]
     scd = [
@@ -188,23 +365,31 @@ def parts(p: dict) -> list[dict]:
         box(c3x - p["C3_W"] / 2, c3y, c3z, c3x + p["C3_W"] / 2, c3y + p["C3_H"], c3top, PCB_BLUE),
         box(c3x - usb_w, mouth, c3top, c3x + usb_w, c3y + 7.0, p["SOCKET_TOP"], STEEL, "metal"),
         # the two buttons next to the socket, the tallest parts on the board
-        box(c3x - 8.0, c3y + 2.5, c3top, c3x - 5.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
-        box(c3x + 5.0, c3y + 2.5, c3top, c3x + 8.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
+        box(c3x - 7.4, c3y + 2.5, c3top, c3x - 5.0, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
+        box(c3x + 5.0, c3y + 2.5, c3top, c3x + 7.4, c3y + 5.5, c3top + p["C3_PARTS_H"], "#2a2d31"),
         box(c3x - 2.5, c3y + 10, c3top, c3x + 2.5, c3y + 15, c3top + 0.8, "#15171a"),
-        box(c3x - 6.5, c3y + p["C3_H"] - 4.5, c3top, c3x + 1.5, c3y + p["C3_H"] - 1.2, c3top + 0.5, "#e8e4da"),
+        box(c3x - 6.0, c3y + p["C3_H"] - 4.5, c3top, c3x + 1.5, c3y + p["C3_H"] - 1.2, c3top + 0.5, "#e8e4da"),
     ]
     for side in (-1, 1):
         for j in range(8):
             y = c3y + p["C3_H"] - 1.6 - j * 2.54
             esp.append(cyl((c3x + side * (p["C3_W"] / 2 - 1.3), y, c3top - 0.02), (0, 0, 1), 0.06, 1.5, GOLD, "brass"))
-    # right-angle plug with a round aluminium body (measured), the cable leaves towards the wall
-    z0 = p["PLUG_Z"] - p["PLUG_CAP"]
-    z1 = z0 + p["PLUG_BODY_L"]
-    plug = [
-        box(c3x - 4.0, p["BOOT_Y"], p["PLUG_Z"] - 2.5, c3x + 4.0, mouth - 0.3, p["PLUG_Z"] + 2.5, RUBBER),
-        cyl((c3x, p["BOOT_Y"], z0), (0, 0, 1), p["PLUG_BODY_L"], p["PLUG_BODY_D"], "#9aa1a9", "metal"),
-        cyl((c3x, p["BOOT_Y"], z1), (0, 0, 1), p["PLUG_BOOT_L"], p["PLUG_BOOT_D"], RUBBER, "rubber"),
-        cyl((c3x, p["BOOT_Y"], z1 + p["PLUG_BOOT_L"]), (0, 0, 1), 8, 3.6, "#3a3d42", "rubber"),
+    # 90 degree USB-C adapter in the socket, its body points to the wall, the cable is plugged in behind it
+    ay = (p["ADAPTER_Y0"] + mouth) / 2
+    a_w = p["ADAPTER_W"] / 2
+    adapter = [
+        box(c3x - a_w, p["ADAPTER_Y0"], p["ADAPTER_Z0"], c3x + a_w, mouth - 0.3, p["ADAPTER_Z1"], "#2b2e33", "metal"),
+        box(
+            c3x - p["PLUG_W"] / 2,
+            ay - p["PLUG_H"] / 2,
+            p["ADAPTER_Z1"],
+            c3x + p["PLUG_W"] / 2,
+            ay + p["PLUG_H"] / 2,
+            p["ADAPTER_Z1"] + 16,
+            RUBBER,
+            "rubber",
+        ),
+        cyl((c3x, ay, p["ADAPTER_Z1"] + 16), (0, 0, 1), 14, 3.6, "#3a3d42", "rubber"),
     ]
     inserts = [insert((x, y, lip + glass_t)) for x, y in p["LCD_HOLES"]]
     inserts += [insert((x, y, p["COVER_Z"])) for x, y in p["COVER_SCREWS"]]
@@ -212,9 +397,15 @@ def parts(p: dict) -> list[dict]:
     display_screws = [m for x, y in p["LCD_HOLES"] for m in screw((x, y, lcd_back), (0, 0, -1))]
     carrier_screws = [m for x, y in p["CARRIER_SCREWS"] for m in screw((x, y, p["FLOOR_Z"] + p["FLOOR_T"]), (0, 0, -1))]
     cover_screws = [m for x, y in p["COVER_SCREWS"] for m in screw((x, y, p["DEPTH"] - p["HEAD_H"]), (0, 0, -1))]
-    y_tab = -p["BODY"] / 2 - 0.2
-    lock_screw_housing = screw((lx0, y_tab - p["HEAD_H"], p["LOCK_Z"]), (0, 1, 0))
-    lock_screw_plate = screw((lx1, lock_y, p["DEPTH"] - p["HEAD_H"]), (0, 0, 1))
+    # M4 screws into wall plugs: pan head in the recess of the plate, shank through the slot
+    z_seat = p["DEPTH"] + 3.0
+    a = p["BOX_SCREW_SPACING"] / 2
+    wall_screws = []
+    for x in (-a, a):
+        wall_screws += [
+            cyl((x, 0, z_seat - 2.8), (0, 0, 1), 2.8, 7.6, STEEL),
+            cyl((x, 0, z_seat), (0, 0, 1), 26, 4.0, STEEL),
+        ]
 
     dev, car, wall = ["device"], ["device", "carrier"], ["wall"]
     return [
@@ -231,33 +422,20 @@ def parts(p: dict) -> list[dict]:
         ),
         part("scd41", "SCD41 sensor", "SCD41-Sensor", car, scd),
         part("esp32", "ESP32-C3 SuperMini", "ESP32-C3 SuperMini", car, esp),
-        part("plug", "USB-C angled plug", "USB-C-Winkelstecker", car, plug),
         part("carrier_screws", "2 screws M2 × 4", "2 Schrauben M2 × 4", dev, carrier_screws),
-        part("wires_display", "Display wires", "Displaylitzen", dev, [{"type": "tube", **w} for w in wires_display(p)]),
+        part("wires_display", "Display cable", "Displaykabel", dev, [{"type": "tube", **w} for w in wires_display(p)]),
         part("wires_scd", "SCD41 wires", "SCD41-Litzen", car, [{"type": "tube", **w} for w in wires_scd(p)]),
-        part("port", "Cable port module (back)", "Kabelport-Modul (hinten)", dev, [stl("cable_port_back", PRINT_MID)]),
-        part("cover", "Back cover", "Rückdeckel", dev, [stl("back_cover", PRINT_MID)]),
+        part("adapter", "USB-C 90° adapter and cable", "USB-C-Winkeladapter mit Kabel", car, adapter),
+        part(
+            "cover",
+            "Back cover",
+            "Rückdeckel",
+            dev,
+            [stl("back_cover", PRINT_MID)],
+        ),
         part("cover_screws", "4 screws M2 × 4", "4 Schrauben M2 × 4", dev, cover_screws),
         part("wall_plate", "Wall plate", "Wandplatte", wall, [stl("wall_plate", PRINT_WHITE)]),
-        part(
-            "lock_insert_housing",
-            "Heat-set insert M2 (housing)",
-            "Einschmelzmutter M2 (Gehäuse)",
-            dev,
-            [insert((lx0, -p["BODY"] / 2, p["LOCK_Z"]), (0, 1, 0))],
-        ),
-        part(
-            "lock_insert_plate",
-            "Heat-set insert M2 (wall plate)",
-            "Einschmelzmutter M2 (Wandplatte)",
-            wall,
-            [insert((lx1, lock_y, p["DEPTH"]), (0, 0, 1))],
-        ),
-        part("lock_tab", "Lock tab (optional)", "Sicherungslasche (optional)", ["lock"], [stl("lock_tab", PRINT_DARK)]),
-        part("lock_screw_housing", "Screw M2 × 4 (housing)", "Schraube M2 × 4 (Gehäuse)", ["lock"], lock_screw_housing),
-        part(
-            "lock_screw_plate", "Screw M2 × 4 (wall plate)", "Schraube M2 × 4 (Wandplatte)", ["lock"], lock_screw_plate
-        ),
+        part("wall_screws", "2 screws M4 with wall plugs", "2 Schrauben M4 mit Dübeln", wall, wall_screws),
     ]
 
 
@@ -273,25 +451,22 @@ STAGES = {
 # motion of site/assembly.js: every path is travelled at constant speed with ease in and out
 TIMING = {"speed": 70.0, "min_time": 0.6, "pause": 0.12}  # mm/s, shortest move in s, pause between parts in s
 
-CARRIER_UNIT = ["carrier", "scd41", "esp32", "plug", "wires_scd"]
+CARRIER_UNIT = ["carrier", "scd41", "esp32", "adapter", "wires_scd"]
 
 # Disassembly for the "take apart" slider, in the order of a real disassembly. One move after the other,
 # every move pulls its parts along a free path (tools/assembly_check.py proves that nothing passes through
 # anything else). The inserts stay in their parts. Only the display leaves through the window to the front.
 DISASSEMBLY = [
-    {"lock_screw_housing": [0, -40, 0], "lock_screw_plate": [0, 0, -30]},
-    {"lock_tab": [0, -22, 0]},
-    {"wall_plate": [0, -15, 0], "lock_insert_plate": [0, -15, 0]},  # the device slides up off the rail
-    {"wall_plate": [0, 0, 110], "lock_insert_plate": [0, 0, 110]},
+    {"wall_plate": [0, -15, 0], "wall_screws": [0, -15, 0]},  # the device slides up off the rail
+    {"wall_plate": [0, 0, 160], "wall_screws": [0, 0, 160]},
     {"cover_screws": [0, 0, 18]},
-    {"cover": [0, 0, 60], "cover_screws": [0, 0, 60]},
-    {"port": [0, 0, 45]},
-    {"port": [45, 0, 0]},
+    {"cover": [0, 0, 100], "cover_screws": [0, 0, 100]},  # past the end of the cable in the adapter
+    {"wires_display": [0, 0, 45]},
     {"carrier_screws": [0, 0, 20]},
     {"carrier_screws": [0, 55, 0]},
     {pid: [0, 0, 40] for pid in CARRIER_UNIT},
     {pid: [0, -50, 0] for pid in CARRIER_UNIT},
-    {"plug": [0, -15, 0]},  # unplugged downwards, the carrier is open below the socket
+    {"adapter": [0, -25, 0]},  # unplugged downwards, the carrier is open below the socket
     {"esp32": [0, 35, 0]},
     {"scd41": [0, 25, 0]},
     {"display_screws": [0, 0, 30]},

@@ -38,7 +38,7 @@ Der Plan wird mit `python tools/wiring.py` direkt aus `esphome/common/base.yaml`
 
 ## Tipps
 
-* **Display:** Das beiliegende PH2.0-Kabel auf ca. 5 cm kürzen und direkt an den ESP löten. Es läuft gerade über die Rückseite des Displays zum oberen Ende des ESP32-C3, diesen Weg hält das Gehäuse frei.
+* **Display:** Das beiliegende PH2.0-Kabel bleibt im Display stecken. Es läuft an der rechten Wand hoch (von hinten gesehen), hinüber zum Schlitten und unter der Brücke durch, dann geht jede Ader zu ihrem Lötpunkt am ESP32-C3. Zuerst einlegen, die Längen an den Lötpunkten anzeichnen, dann kürzen und löten. Zum Ausbauen des Displays nur den Stecker ziehen.
 * **SCD41:** 4 Litzen AWG 30 von ca. 8 cm. Sie liegen nebeneinander im schmalen Kabelschlitz des Sensorträgers und auf der Rückseite unter der Lippe des Kabelclips. Kleber ist nicht nötig.
 * Der SCD41 zieht für wenige Millisekunden bis ca. 200 mA. Der 3,3-V-Regler des SuperMini schafft das, die Versorgungsleitungen trotzdem kurz halten.
 * Alles zuerst auf dem Tisch testen, dann einbauen.

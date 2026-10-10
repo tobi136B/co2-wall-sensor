@@ -19,8 +19,8 @@
     en: The housing
     de: Das Gehäuse
   text:
-    en: Printed front face down. You look at it from the back, the side that later faces the wall.
-    de: Mit der Front nach unten gedruckt. Du schaust von hinten darauf, auf die Seite, die später zur Wand zeigt.
+    en: Printed front face down. You look at it from the back, the side that later faces the wall. Right and left in this guide are always seen from the back, like here.
+    de: Mit der Front nach unten gedruckt. Du schaust von hinten darauf, auf die Seite, die später zur Wand zeigt. Rechts und links sind in dieser Anleitung immer von hinten gesehen, so wie hier.
 
 - new: [inserts]
   from: [0, 0, 25]
@@ -40,19 +40,19 @@
 
 - new: [display, display_screws]
   from: [0, 0, 45]
-  camera: {eye: [-45, 55, 140], target: [0, 6, 8]}
+  camera: {eye: [-45, 55, 140], target: [6, 8, 8]}
   need:
-    en: "Display, 4 screws M2 × 4, hex key 1.3 mm"
-    de: "Display, 4 Schrauben M2 × 4, Innensechskant 1,3 mm"
+    en: "Display with its cable plugged in, 4 screws M2 × 4, hex key 1.3 mm"
+    de: "Display mit eingestecktem Kabel, 4 Schrauben M2 × 4, Innensechskant 1,3 mm"
   tip:
-    en: "Test the electronics on the desk before you build them in: wire everything, flash the firmware and check the display. Keep the protective film on the glass until the end."
-    de: "Die Elektronik vorher auf dem Tisch testen: alles verdrahten, Firmware flashen und das Display prüfen. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen."
+    en: "It fits only one way: the connector on the right, where the bay is longer. The picture then appears upside down on your desk, the firmware turns it. Keep the protective film on the glass until the end."
+    de: "Es passt nur in einer Richtung: Stecker nach rechts, wo der Schacht länger ist. Auf dem Tisch steht das Bild dann auf dem Kopf, die Firmware dreht es. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen."
   title:
     en: Display
     de: Display
   text:
-    en: Glass first into the display bay, then 4 screws M2 × 4 through the corner holes of the display board.
-    de: Mit dem Glas voran in den Displayschacht legen, dann 4 Schrauben M2 × 4 durch die Ecklöcher der Displayplatine.
+    en: Plug the supplied cable into the display first. Then glass first into the display bay, connector to the right, and 4 screws M2 × 4 through the corner holes.
+    de: Zuerst das mitgelieferte Kabel ins Display stecken. Dann mit dem Glas voran in den Displayschacht, Stecker nach rechts, und 4 Schrauben M2 × 4 durch die Ecklöcher.
 
 - new: [carrier]
   from: [0, 0, 55]
@@ -68,8 +68,8 @@
     en: Sensor carrier
     de: Sensorträger
   text:
-    en: The carrier is the removable floor of the sensor chamber. Print the one that matches your SCD41 board, here the 13.5 × 21.75 mm version.
-    de: Der Träger ist der herausnehmbare Boden der Sensorkammer. Drucke den, der zu deiner SCD41-Platine passt, hier die Version 13,5 × 21,75 mm.
+    en: The carrier is the removable floor of the sensor chamber and holds the ESP32-C3 on its back. Print the one that matches your SCD41 board, here the 13.5 × 21.75 mm version.
+    de: Der Träger ist der herausnehmbare Boden der Sensorkammer und hält auf seiner Rückseite den ESP32-C3. Drucke den, der zu deiner SCD41-Platine passt, hier die Version 13,5 × 21,75 mm.
 
 - new: [scd41]
   from: [0, 30, 0]
@@ -85,77 +85,76 @@
     en: SCD41 into the rails
     de: SCD41 in die Schienen
   text:
-    en: Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire slot. The spring tongue clicks over the upper edge. Lay the four wires side by side into the narrow slot from its open end and press them on the back under the lip of the wire clip.
-    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz. Die Federzunge schnappt über die Oberkante. Die vier Litzen nebeneinander von der offenen Seite in den schmalen Schlitz legen und auf der Rückseite unter die Lippe des Kabelclips drücken.
+    en: Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire slot, until the spring tongue clicks over the upper edge.
+    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz, bis die Federzunge über die Oberkante schnappt.
 
-- new: [esp32, plug]
+- new: [esp32]
   from: [0, 35, 0]
-  from_part: {plug: [0, -15, 0]}
   stage: carrier_out
-  camera: {eye: [-125, 50, 245], target: [5, -36, 42]}
+  camera: {eye: [-125, 50, 245], target: [10, -30, 42]}
   need:
-    en: "ESP32-C3 SuperMini, USB cable with right-angle plug"
-    de: "ESP32-C3 SuperMini, USB-Kabel mit Winkelstecker"
+    en: "ESP32-C3 SuperMini"
+    de: "ESP32-C3 SuperMini"
   tip:
-    en: "Back port module: lay the cable into the side slot of the module first. Bottom port module: push the straight plug through the module from outside first."
-    de: "Modul hinten: das Kabel vorher seitlich in den Schlitz des Moduls legen. Modul unten: den geraden Stecker vorher von außen durch das Modul schieben."
+    en: "To take it out again, press the hook down with a small screwdriver and slide the board up."
+    de: "Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben."
   title:
-    en: ESP32-C3 on the back
-    de: ESP32-C3 auf der Rückseite
+    en: ESP32-C3 onto the sled
+    de: ESP32-C3 auf den Schlitten
   text:
-    en: Slide the ESP32-C3 from above between the side guides until it rests on the end stops and slips under the two small lips. Then plug the USB cable in from below, the carrier is open below the socket.
-    de: Den ESP32-C3 von oben zwischen die Seitenführungen schieben, bis er auf den Anschlägen sitzt und unter die beiden kleinen Lippen rutscht. Dann das USB-Kabel von unten einstecken, der Träger ist unter der Buchse offen.
+    en: Chip side up, USB-C socket down. Put it on the top of the sled and slide it down between the guides until it stands on the end stops. The hook clicks behind its upper edge.
+    de: Bauteile nach oben, USB-C-Buchse nach unten. Oben auf den Schlitten legen und zwischen den Führungen nach unten schieben, bis er auf den Anschlägen steht. Der Haken schnappt hinter seine Oberkante.
+
+- new: [adapter]
+  from: [0, -25, 0]
+  stage: carrier_out
+  camera: {eye: [-70, -150, 215], target: [14, -72, 58]}
+  need:
+    en: "USB-C 90° adapter (plug to socket)"
+    de: "USB-C-Winkeladapter 90° (Stecker auf Buchse)"
+  tip:
+    en: "Cable on the wall instead? Leave the adapter out and later plug a straight cable in from below through the window in the bottom of the housing."
+    de: "Lieber ein Kabel auf Putz? Den Adapter weglassen und später ein gerades Kabel von unten durch das Fenster im Gehäuseboden einstecken."
+  title:
+    en: USB-C adapter
+    de: USB-C-Adapter
+  text:
+    en: Push the adapter up into the socket of the ESP32-C3, its body points to the back. The carrier is open below the socket. Later the cable goes straight back into the wall box.
+    de: Den Adapter von unten in die Buchse des ESP32-C3 stecken, sein Körper zeigt nach hinten. Der Träger ist unter der Buchse offen. Später geht das Kabel gerade nach hinten in die Wanddose.
 
 - new: [carrier_screws]
   from: [0, 0, 20]
   stage: carrier_in
-  camera: {eye: [-60, 55, 150], target: [0, -14, 14]}
+  camera: {eye: [-70, 70, 165], target: [6, -10, 14]}
   need:
     en: "2 screws M2 × 4"
     de: "2 Schrauben M2 × 4"
   tip:
-    en: "Nothing to seal: the four SCD41 wires fill the narrow wire slot, so the sensor chamber stays apart from the warm electronics without glue."
-    de: "Nichts abdichten: Die vier SCD41-Litzen füllen den schmalen Kabelschlitz, so bleibt die Sensorkammer ohne Kleber von der warmen Elektronik getrennt."
+    en: "Lay the four SCD41 wires into the narrow wire slot from its open end before, then the sensor chamber stays apart from the warm electronics without glue."
+    de: "Die vier SCD41-Litzen vorher von der offenen Seite in den schmalen Kabelschlitz legen, dann bleibt die Sensorkammer ohne Kleber von der warmen Elektronik getrennt."
   title:
     en: Carrier into the housing
     de: Träger ins Gehäuse
   text:
-    en: Put the carrier onto the ledges in the chin and fix it with 2 screws M2 × 4. It closes the sensor chamber against the warm electronics.
-    de: Den Träger auf die Leisten im Kinn legen und mit 2 Schrauben M2 × 4 festschrauben. Er schließt die Sensorkammer gegen die warme Elektronik ab.
+    en: Put the carrier onto the ledges in the chin, the sled slides over the display connector. Fix it with 2 screws M2 × 4.
+    de: Den Träger auf die Leisten im Kinn legen, der Schlitten gleitet über den Displaystecker. Mit 2 Schrauben M2 × 4 festschrauben.
 
 - new: [wires_display, wires_scd]
   draw: true
   stage: carrier_in
-  camera: {eye: [-30, 60, 135], target: [0, -4, 15]}
+  camera: {eye: [-35, 80, 150], target: [10, -2, 16]}
   need:
-    en: "The cable supplied with the display (shortened), soldering iron, the [wiring diagram](wiring.md)"
-    de: "Das Kabel, das dem Display beiliegt (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
+    en: "The cable of the display (shortened), soldering iron, the [wiring diagram](wiring.md)"
+    de: "Das Kabel des Displays (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
   tip:
-    en: "Shorten the display cable to about 5 cm before soldering. Then it lies flat and straight on the back of the display and cannot touch anything else."
-    de: "Das Displaykabel vor dem Löten auf ca. 5 cm kürzen. Dann liegt es flach und gerade auf der Rückseite des Displays und kann nirgends anstoßen."
+    en: "Push the cable under the bridge first and mark the length of every wire at its pad, then shorten and solder. The cable stays plugged into the display: to take the display out, just pull the plug."
+    de: "Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen, dann kürzen und löten. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen."
   title:
     en: Wiring
     de: Verdrahtung
   text:
-    en: "Display: the 8 wires of the supplied cable run straight from the connector across the back of the display to the upper end of the ESP32-C3. SCD41: 4 wires through the wire slot and along the clip channel of the carrier. Colours as in the wiring diagram."
-    de: "Display: Die 8 Adern des mitgelieferten Kabels laufen vom Stecker gerade über die Rückseite des Displays zum oberen Ende des ESP32-C3. SCD41: 4 Litzen durch den Kabelschlitz und am Kabelclip des Trägers entlang. Farben wie im Verdrahtungsplan."
-
-- new: [port]
-  from: [0, 0, 45]
-  stage: carrier_in
-  camera: {eye: [-70, -60, 170], target: [10, -20, 15]}
-  need:
-    en: "Cable port module: back (right-angle plug) or bottom (straight plug)"
-    de: "Kabelport-Modul: hinten (Winkelstecker) oder unten (gerader Stecker)"
-  tip:
-    en: "Print both modules and decide on site. Swapping later takes four screws."
-    de: "Beide Module drucken und vor Ort entscheiden. Später wechseln kostet vier Schrauben."
-  title:
-    en: Cable port module
-    de: Kabelport-Modul
-  text:
-    en: Slide the module into the opening at the lower back edge. Back module for a right-angle plug into the wall box, bottom module for a cable on the wall.
-    de: Das Modul in die Öffnung an der unteren hinteren Kante schieben. Modul hinten für den Winkelstecker in die Wanddose, Modul unten für ein Kabel auf Putz.
+    en: "Display: the flat cable runs up at the right wall, over to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram."
+    de: "Display: Das Flachkabel läuft an der rechten Wand hoch, hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan."
 
 - new: [cover, cover_screws]
   from: [0, 0, 50]
@@ -165,31 +164,32 @@
     en: "Back cover, 4 screws M2 × 4"
     de: "Rückdeckel, 4 Schrauben M2 × 4"
   tip:
-    en: "Nothing may stick out of the back: the heads sit below the surface, otherwise the device does not slide onto the wall plate."
-    de: "Hinten darf nichts überstehen: Die Köpfe liegen versenkt, sonst lässt sich das Gerät nicht auf die Wandplatte schieben."
+    en: "Nothing may stick out of the back except the adapter: the heads sit below the surface, otherwise the device does not slide onto the wall plate."
+    de: "Hinten darf außer dem Adapter nichts überstehen: Die Köpfe liegen versenkt, sonst lässt sich das Gerät nicht auf die Wandplatte schieben."
   title:
     en: Back cover
     de: Rückdeckel
   text:
-    en: Put the cover into its seat and fix it with 4 screws M2 × 4. The heads sit below the surface, so the cover still slides onto the wall plate.
-    de: Den Deckel in seinen Sitz legen und mit 4 Schrauben M2 × 4 festschrauben. Die Köpfe liegen unter der Oberfläche, der Deckel gleitet trotzdem auf die Wandplatte.
+    en: Put the cover into its seat, the adapter passes through its hole. Fix it with 4 screws M2 × 4.
+    de: Den Deckel in seinen Sitz legen, der Adapter geht durch sein Loch. Mit 4 Schrauben M2 × 4 festschrauben.
 
-- new: [wall_plate]
+- new: [wall_plate, wall_screws]
   from: [0, 0, 60]
+  from_part: {wall_screws: [0, 0, -25]}
   stage: device_away
   camera: {eye: [-150, 80, -190], target: [0, 5, -15]}
   need:
-    en: "Wall plate, the 2 screws of the flush box"
-    de: "Wandplatte, die 2 Schrauben der Hohlwanddose"
+    en: "Wall plate, 2 screws M4 with 6 mm wall plugs (or the 2 screws of a flush box)"
+    de: "Wandplatte, 2 Schrauben M4 mit 6er Dübeln (oder die 2 Schrauben einer Hohlwanddose)"
   tip:
-    en: "Power in the box: a flush mounted USB power module (work on 230 V only by a qualified electrician) or a USB cable inside the wall. Lead the cable through the passage of the plate."
-    de: "Strom in der Dose: ein Unterputz-USB-Netzteil (Arbeiten an 230 V nur durch eine Elektrofachkraft) oder ein USB-Kabel in der Wand. Das Kabel durch den Durchlass der Platte führen."
+    en: "Power in a flush box: a USB power module (work on 230 V only by a qualified electrician) or a USB cable in the wall. Lead the cable through the passage of the plate."
+    de: "Strom in einer Unterputzdose: ein USB-Netzteil (Arbeiten an 230 V nur durch eine Elektrofachkraft) oder ein USB-Kabel in der Wand. Das Kabel durch den Durchlass der Platte führen."
   title:
-    en: Wall plate on the flush box
-    de: Wandplatte auf die Hohlwanddose
+    en: Wall plate
+    de: Wandplatte
   text:
-    en: Screw the wall plate to the two device screws of the flush box (60 mm apart). The slotted holes even out a slightly twisted box.
-    de: Die Wandplatte mit den beiden Geräteschrauben der Hohlwanddose festschrauben (60 mm Abstand). Die Langlöcher gleichen eine leicht verdrehte Dose aus.
+    en: Screw the plate to the wall, label to the wall, 60 mm between the screws. The slots give 3 mm play up and down, the recesses take pan heads and countersunk heads.
+    de: Die Platte an die Wand schrauben, Beschriftung zur Wand, 60 mm Abstand zwischen den Schrauben. Die Langlöcher geben 3 mm Spiel nach oben und unten, die Senkungen nehmen Linsen- und Senkköpfe.
 
 - new: []
   stage: device_slide
@@ -198,28 +198,11 @@
     en: "Nothing"
     de: "Nichts"
   tip:
-    en: "Plug the cable into the device before you put it on the rail."
-    de: "Das Kabel ins Gerät stecken, bevor du es auf die Schiene setzt."
+    en: "Plug the cable into the adapter before you put the device on the rail."
+    de: "Das Kabel in den Adapter stecken, bevor du das Gerät auf die Schiene setzt."
   title:
     en: Slide the device on
     de: Gerät aufsetzen
   text:
     en: Hold the device in front of the plate, put the rail into the hidden window and slide it 15 mm down. Done. To remove it, slide it up and pull it off.
     de: Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen.
-
-- new: [lock_insert_housing, lock_insert_plate, lock_tab, lock_screw_housing, lock_screw_plate]
-  from: [0, -30, 0]
-  from_part: {lock_insert_plate: [0, 0, -20], lock_screw_plate: [0, 0, -25]}
-  camera: {eye: [-110, -125, -150], target: [-8, -28, 15]}
-  need:
-    en: "Lock tab, 2 heat-set inserts and 2 screws M2 × 4"
-    de: "Sicherungslasche, 2 Einschmelzmuttern und 2 Schrauben M2 × 4"
-  tip:
-    en: "Only where needed. To take the device off later, remove the tab first."
-    de: "Nur wo nötig. Zum Abnehmen später zuerst die Lasche abschrauben."
-  title:
-    en: Optional lock tab
-    de: Optionale Sicherungslasche
-  text:
-    en: In an office, a school or with children, press one insert into the bottom of the housing and one into the wall plate, then screw the small tab on from below (2 screws M2 × 4). Then the device cannot be slid off the wall.
-    de: Im Büro, in der Schule oder bei Kindern je eine Mutter unten ins Gehäuse und in die Wandplatte einschmelzen, dann die kleine Lasche von unten anschrauben (2 Schrauben M2 × 4). Dann lässt sich das Gerät nicht mehr von der Wand schieben.

@@ -36,6 +36,7 @@ substitutions:
   txt_night_warning: "Red warning at night"
   txt_show_hint: "Window hint on the display"
   txt_show_outdoor: "Outdoor value on the display"
+  txt_flip_display: "Display upside down"
   txt_temp_correction: "Temperature correction"
   txt_altitude: "Altitude above sea level"
   txt_hint_temp: "Window hint from indoor temperature"

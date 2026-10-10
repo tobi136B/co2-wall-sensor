@@ -33,6 +33,10 @@ HERO = ROOT / "cad" / "fusion" / "hero_motion.json"
 STEP_MM = 0.7  # largest distance a part moves between two samples (thinnest wall: 0.8 mm)
 # the display leaves through the window to the front, as in the README animation (kept on purpose)
 ALLOWED = {frozenset(("display", "housing")), frozenset(("display", "inserts"))}
+# the ESP32-C3 slides over the spring hook of its sled: allowed while it moves along its guides only
+SLIDING = {frozenset(("carrier", "esp32"))}
+WIRE_R = assembly_model.WIRE_R
+WIRE_END = 2.0  # mm at both ends of a wire where it may touch its pad, its plug or the other wire on the same pad
 
 
 def mesh_of(part: dict) -> trimesh.Trimesh | None:
@@ -169,7 +173,7 @@ class Scene:
         self.exact = self._manager(self.meshes)
         self.shrunk = self._manager({pid: eroded(m) for pid, m in self.meshes.items()})
         self.touching = self._pairs(self.exact)
-        self.nested = self._pairs(self.shrunk)
+        self.nested = self._pairs(self.shrunk) | SLIDING
 
     @staticmethod
     def _manager(meshes: dict) -> trimesh.collision.CollisionManager:
@@ -299,10 +303,48 @@ def check_desk_stand(scene: Scene) -> list[str]:
     return sorted(errors)
 
 
+def _wire_samples(points: list, step: float = 0.3) -> tuple[np.ndarray, np.ndarray]:
+    """Points along a wire and their distance from the nearer end."""
+    pts = [np.array(points[0], float)]
+    for q in points[1:]:
+        q = np.array(q, float)
+        n = max(1, int(np.ceil(np.linalg.norm(q - pts[-1]) / step)))
+        a = pts[-1]
+        pts += [a + (q - a) * k / n for k in range(1, n + 1)]
+    pts = np.array(pts)
+    run = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(pts, axis=0), axis=1))])
+    return pts, np.minimum(run, run[-1] - run)
+
+
+def check_wires(scene: Scene) -> list[str]:
+    """In the assembled device every wire keeps its distance to every other wire and to every part."""
+    wires = []
+    for q in scene.data["parts"]:
+        for m in q["meshes"]:
+            if m["type"] == "tube":
+                pts, end = _wire_samples(m["points"])
+                wires.append((f"{q['id']} {m['label']}", pts[end > WIRE_END], m.get("r", WIRE_R)))
+    errors = []
+    for i, (na, a, ra) in enumerate(wires):
+        for nb, b, rb in wires[i + 1 :]:
+            d = np.min(np.linalg.norm(a[:, None, :] - b[None, :, :], axis=2))
+            if d < ra + rb - 0.02:
+                errors.append(f"wires: {na} and {nb} come {d:.2f} mm close (pass through each other)")
+    for pid, mesh in scene.meshes.items():
+        if pid == "desk_stand":
+            continue
+        for name, pts, r in wires:
+            inside = trimesh.proximity.signed_distance(mesh, pts)  # positive inside the part
+            worst = float(np.max(inside))
+            if worst > -(r - 0.05):
+                errors.append(f"wires: {name} runs into {pid} ({worst + r:.2f} mm)")
+    return errors
+
+
 def main() -> int:
     data = assembly_model.model(drawing.load_parameters())
     scene = Scene(data)
-    errors = []
+    errors = check_wires(scene)
     for i in range(len(data["steps"])):
         errors += check_enter(scene, i)
     # the slider in every distinct state: the parts it moves always come in the same order, so a state that

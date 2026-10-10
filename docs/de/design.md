@@ -34,7 +34,7 @@ Die Front hat keine Öffnungen. Staub setzt sich vor allem auf Öffnungen, die n
 
 Eine kurze Schwalbenschwanzschiene am Rückdeckel passt in zwei Adapter:
 
-* **Wandplatte 82 × 82 mm.** Deutsche Hohlwanddosen haben 68 mm Bohrung und einen Rand von ca. 75 mm, das kompakte Gerät allein würde sie nicht verdecken. Die Platte verdeckt die Dose, wird mit den normalen Geräteschrauben (60 mm) befestigt und hat zum Gerät konzentrische Ecken. So entsteht ein gleichmäßiger Rahmen wie bei einem Lichtschalter.
+* **Wandplatte 89,2 × 82 mm.** Sie ist rundum 6,1 mm größer als das Gerät und hat zum Gerät konzentrische Ecken. So entsteht ein gleichmäßiger Rahmen wie bei einem Lichtschalter. Zwei Schrauben M4 mit Dübeln halten sie, 60 mm auseinander in Langlöchern mit 3 mm Spiel nach oben und unten und einer 45°-Senkung für Senkköpfe. Dieselben Langlöcher nehmen die Schrauben einer Hohlwanddose (68 mm Bohrung, Rand ca. 75 mm), die die Platte verdeckt.
 * **Tischständer.** Gleiche Schiene, das Gerät lehnt für bessere Lesbarkeit 12° nach hinten, mit 5 mm Luftspalt unten, damit die Lüftung frei bleibt.
 
 Das Einsetzfenster über der Nut liegt verdeckt hinter dem Gerät. Gerät von vorne einsetzen und 15 mm nach unten schieben. Von außen ist nichts zu sehen, abnehmen geht ohne Werkzeug.
@@ -45,24 +45,25 @@ Kunststoffgewinde nutzen sich nach wenigen Zyklen ab, und selbstschneidende Schr
 
 * **10 × Einschmelzmutter M2 × 3** (Außendurchmesser 3,0 oder 3,2 mm, Bohrung Ø 2,9 × 3,4 mm passt für beide): 4 für das Display, 4 für den Rückdeckel, 2 für den Sensorträger.
 * **10 × Linsenkopfschraube (Halbrundkopf) M2 × 4, ISO 7380.** Ein Innensechskantschlüssel für das ganze Gerät.
-* **Je +2** für die optionale Sicherungslasche, die das Gerät mit der Wandplatte verbindet.
+* **2 × Schraube M4** mit Dübeln für die Wandplatte, die einzigen anderen Schrauben.
 
 Der Rückdeckel wird an vier Punkten gehalten: zwei Dome in den unteren Ecken und zwei Einschmelzmuttern in einem massiven 5 mm Band über dem Displayschacht. Die Linsenköpfe sitzen in 1,3 mm tiefen Senkungen, die Deckelfläche bleibt plan und gleitet sauber auf Wandplatte und Tischständer. Der Deckel hat innen weder Stifte noch Haken und druckt flach ohne Stützmaterial.
 
 ## Nichts ist geklebt
 
 * **SCD41:** Die Platine hat keine Befestigungslöcher. Sie wird von oben in zwei Schienen mit Nut auf der Frontseite des Sensorträgers geschoben und steht auf einem Anschlag. Eine aus dem Träger ausgeschnittene Zunge trägt einen 45° Haken, der über die Oberkante schnappt und die Platine auf den Anschlag drückt. So werden Toleranzen von ±0,4 mm spielfrei ausgeglichen. Nur dieser Träger hängt von der Platine ab: Es gibt einen pro Platinenprofil, siehe [Sensor ausmessen](sensor-ausmessen.md).
-* **ESP32-C3:** Auch er hat keine Befestigungslöcher. Seitenführungen, zwei Anschläge und eine kurze Nut an seiner Unterkante halten ihn. Die Nut sitzt dort, wo die Platine keine Lötpunkte hat, an beiden Längsseiten können also Litzen angelötet werden.
+* **ESP32-C3:** Auch er hat keine Befestigungslöcher. Er gleitet auf einem Schlitten, der ihn auf ganzer Länge trägt, zwischen Seitenführungen mit Quetschrippen nach unten, bis er auf zwei Anschlägen steht und in eine kurze Nut an seiner Unterkante rutscht. Dann schnappt ein Haken auf einer Federzunge hinter seine Oberkante, mit gerader Fläche, damit die Steckkraft die Platine nicht nach oben drückt. Der Schlitten reicht über die Trennwand in den Displayschacht, 0,3 mm über dem Displaystecker. Die Nut sitzt dort, wo die Platine keine Lötpunkte hat, an beiden Längsseiten können also Litzen angelötet werden.
+* **Displaykabel:** Es bleibt im Display stecken. Der Displayschacht ist auf einer Seite länger, das Display passt also nur mit dem Stecker dort hinein, und der Elektronikstreifen des Glases liegt immer hinter dem Rahmen; dafür ist das Gerät 77 mm breit, das Fenster bleibt mittig. Das Flachkabel läuft unter einer mitgedruckten Brücke auf dem Schlitten, der Rückdeckel schließt sie von hinten.
 * **Sensorträger:** zwei Schrauben. Er ist der herausnehmbare Boden der Sensorkammer, der Sensor lässt sich tauschen, ohne das Display anzufassen.
 
-## Kabelaustritt: ein tauschbares Port-Modul
+## Kabelaustritt: dieselben Teile für beide Wege
 
-Der ESP32-C3 sitzt mit der USB-C-Buchse **nach unten**, darunter sind 13 mm frei. Das Kabel verlässt das Gerät durch ein kleines L-förmiges **Kabelport-Modul** an der unteren hinteren Kante:
+Der ESP32-C3 sitzt mit der USB-C-Buchse **nach unten**, darunter sind 12,5 mm frei.
 
-* **PortBack:** Langloch für den runden Körper eines Winkelsteckers (gemessen: Ø 8 × 18,2 mm), 1,5 mm Spiel nach oben und 0,5 mm nach unten für andere Fabrikate. Das Kabel geht direkt in die Hohlwanddose oder durch den Tischständer. Der Kragen des Steckers sitzt unter dem Modul und wirkt so als Zugentlastung.
-* **PortBottom:** Öffnung für einen geraden Stecker, wenn das Kabel auf Putz läuft.
+* **Nach hinten:** ein USB-C-Winkeladapter 90° (Stecker auf Buchse) in der Buchse, sein Körper zeigt zur Wand. Er geht durch ein Loch im Rückdeckel, und ein beliebiges USB-C-Kabel läuft gerade in die Hohlwanddose oder durch den Tischständer. Der Träger ist unter der Buchse offen, der Adapter kommt also mit der Platine, vor dem Träger.
+* **Nach unten:** ein gerader Stecker im Fenster der Bodenwand, das seinen Steckerkörper mit 0,2 mm Spiel hält.
 
-Das Modul wird zwischen Gehäuse und Rückdeckel geklemmt, eine Stufe in der Unterseite und eine Lippe unter dem Deckel halten es. Beide Versionen brauchen je 2 g Filament, man druckt beide und entscheidet vor Ort. Später wechseln kostet vier Schrauben. In v1.2 gab es dafür dünne Ausbrechfelder, die lassen sich nach dem Ausbrechen aber nicht wieder schließen.
+Bis Version 1.8 schloss ein kleines loses Port-Modul in zwei Versionen die Öffnung. Es ließ sich schlecht einsetzen und fiel heraus, bevor der Deckel drauf war, und Winkelstecker unterscheiden sich darin, in welche Richtung sie abknicken. Der Adapter legt die Richtung fest, und Fenster und Loch brauchen kein Zusatzteil. Dünne Ausbrechmembranen wurden vorher ausprobiert (v1.2), lassen sich nach dem Ausbrechen aber nicht wieder schließen.
 
 ## Details für den Druck
 

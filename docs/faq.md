@@ -15,8 +15,8 @@ Placement matters more than size:
 * **At least 1 to 2 m away from people**, so nobody breathes directly at the sensor (not right beside the bed or the desk).
 * **Not next to windows, doors, radiators or ventilation outlets**, and not in direct sunlight.
 
-### What is the hole in the bottom of the housing for?
-It takes a heat-set insert for the optional lock tab. The tab is screwed to the housing and to the wall plate from below, so the device cannot simply be slid off the wall (office, school, children). Without the lock tab the hole stays empty; it is only visible from below. See [assembly](assembly.md#step-13-of-13-optional-lock-tab).
+### What is the window in the bottom of the housing for?
+It takes a straight USB-C plug when the cable runs down the wall. With the 90° adapter and the cable to the back it stays empty; it lies next to the vent mesh and is only visible from below. See [assembly](assembly.md#3-choose-the-cable-exit).
 
 ### Which thresholds are sensible?
 The defaults are 1000 ppm (yellow) and 1400 ppm (red). Values below 1000 ppm are generally considered harmless, above 2000 ppm ventilation is clearly needed. Both thresholds can be changed in Home Assistant at any time.
@@ -33,8 +33,8 @@ Any ST7789 based 240 × 320 SPI display works with small changes. Different oute
 ### Can it run on batteries?
 Not in a useful way. The colour display needs constant power. For a battery device an e-paper display and deep sleep would be required, which is a different design.
 
-### My wall box is mounted vertically.
-The wall plate uses the two horizontal box screws. Most German flush wall boxes offer horizontal and vertical screw positions. If yours only has vertical ones, rotate `ScrewSlots` in the generator by 90°.
+### Wall plugs or flush wall box?
+Both. The wall plate takes two M4 screws with 6 mm wall plugs, 60 mm apart, or the two horizontal screws of a German flush wall box. The slots give 3 mm play up and down. If your box only has vertical screw positions, use wall plugs.
 
 ### Browser installer or my own build?
 Both are first class. The **browser installer** on the [project page](https://tobi136b.github.io/co2-wall-sensor/) flashes a ready firmware without any WiFi credentials inside. After flashing you enter your WiFi in the same browser window (or via the hotspot "CO2 Wall Sensor" that the device opens when it has no WiFi), Home Assistant discovers it, and new releases appear as firmware updates in Home Assistant. If you want to change the configuration, click "Adopt" in the ESPHome dashboard: it pulls the matching YAML from this repository. The **own build** with your `secrets.yaml` gives you API encryption and full control from the start.
@@ -43,28 +43,31 @@ Both are first class. The **browser installer** on the [project page](https://to
 No. The firmware only checks the release manifest on the project page for updates, and only if you look at the update entity or once per day. Measurements never leave your network.
 
 ### Which inserts and screws exactly?
-Generic M2 × 3 heat-set inserts with 3.2 mm outer diameter (the common "M2 x 3 x 3.2" packs) and M2 × 4 button head screws ISO 7380, 10 of each (12 with the optional lock tab). Inserts with a different outer diameter work if you change `INSERT_HOLE_D`.
+Generic M2 × 3 heat-set inserts with 3.0 or 3.2 mm outer diameter (the common "M2 x 3 x 3" or "M2 x 3 x 3.2" packs) and M2 × 4 button head screws ISO 7380, 10 of each. Inserts with a different size work if you change `INSERT_HOLE_D` and `INSERT_HOLE_L`.
 
 ### Cable from below or from the back?
-Both. Print the two cable port modules and use the one you need: back with a right-angle plug for the flush wall box and the desk stand, bottom with a straight plug for a surface mounted cable. Swapping later takes four screws. See [assembly](assembly.md#3-choose-the-cable-exit).
+Both, with the same printed parts. To the back: a 90° USB-C adapter (plug to socket) in the ESP32-C3, the cable goes straight into the flush wall box; always use it on the desk stand. To the bottom: a straight cable through the window in the bottom. See [assembly](assembly.md#3-choose-the-cable-exit).
 
 ### My straight USB-C plug does not fit.
-The bottom port takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or use the back port with a right-angle plug.
+The window in the bottom takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or lead the cable to the back with the 90° adapter.
+
+### The picture on the display is upside down.
+Switch on *Display upside down* in Home Assistant, the picture turns by 180° at once. The housing decides how the display sits: its connector is on the right, seen from the back.
 
 ### My SCD41 board looks different.
 Measure it and compare it with the known profiles. Only the small sensor carrier depends on the board, everything else stays the same. See [measure your sensor](measure-sensor.md).
 
 ### My ESP32-C3 SuperMini is a little different.
-The holder is designed for boards from other batches. Crush ribs in the side guides centre the board, the guides take boards up to 1.2 mm thick, and the upper end is open, so the length does not matter. The cable boot has 1 mm of play up and down. Measured board: 18.2 × 22.71 × 0.74 mm, USB-C socket 9.0 mm wide, 3.5 mm high, 1.5 mm over the lower edge.
+The holder is designed for boards from other batches. The board lies on a sled over its whole length, crush ribs in the side guides centre it, the guides take boards up to 1.2 mm thick, and a spring hook clicks behind its upper edge. Measured board: 18.2 × 22.71 × 0.74 mm, USB-C socket 9.0 mm wide, 3.5 mm high, 1.5 mm over the lower edge.
 
 | Dimension | fits without a new print |
 |-----------|--------------------------|
 | Width | 18.0 to 18.6 mm |
 | Thickness | up to 1.2 mm |
-| Length | any, the holder is open at the top |
+| Length | 22.0 to 22.8 mm (a shorter board has some play) |
 | USB-C socket over the lower edge | 0.5 to 2.5 mm |
 
-Outside these ranges change `C3_W`, `C3_PCB` or `C3_USB_OUT` in the generator and print a new sensor carrier.
+Outside these ranges change `C3_W`, `C3_H`, `C3_PCB` or `C3_USB_OUT` in the generator and print a new sensor carrier.
 
 ### How do I change a dimension?
 Open the generated design in Fusion, go to *Modify > Change Parameters*, change the value and run the script again. It takes over all parameters of the open design, rebuilds every part and checks for interference. With `EXPORT = True` it also writes new STL and STEP files. See [design notes](design.md#parameters-in-fusion).

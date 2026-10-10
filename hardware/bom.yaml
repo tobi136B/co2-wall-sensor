@@ -39,7 +39,7 @@
 - name: "**Waveshare 2inch LCD Module** (ST7789V, 240 × 320)"
   name_de: "**Waveshare 2inch LCD Module** (ST7789V, 240 × 320)"
   qty: 1
-  details: "ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm"
+  details: "ST7789V, 240 x 320, IPS, SPI, 58 x 35 mm, comes with the 8 wire PH2.0 cable that stays plugged in"
   used_for: display
   aliexpress:
     price: "12.49"
@@ -57,8 +57,8 @@
     price: "2.39 (50 pcs, OD 3.2)"
     link: https://de.aliexpress.com/item/1005008575446687.html
   amazon:
-    price: "6.99 (200 pcs, OD 3.0)"
-    link: https://www.amazon.de/dp/B0DZHK4JRC
+    price: "4.69 (205 pcs, OD 3.0)"
+    link: https://www.amazon.de/dp/B0GYPH7X6W
 
 - name: "Button head screw **M2 × 4**, ISO 7380"
   name_de: "Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380"
@@ -69,14 +69,20 @@
     price: "4.79 (60 pcs)"
     link: https://www.amazon.de/dp/B0FVT11R5L
 
-- name: "USB cable with **right-angle USB-C plug** (angled up/down) for the back port"
-  name_de: "USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten"
+- name: "**USB-C 90° adapter** (plug to socket) for the cable to the back"
+  name_de: "**USB-C-Winkeladapter 90°** (Stecker auf Buchse) für das Kabel nach hinten"
   qty: 1
-  details: "USB-A to USB-C, 0.3 m, USB-C end angled 90 degrees with a round body of 8 x 18.2 mm (deleyCON); for the bottom port any straight cable with an overmould up to 12 x 7 mm"
+  details: "USB-C plug to USB-C socket, angled 90 degrees across the plug (sonero); not needed for a straight cable through the bottom window"
   used_for: power
   amazon:
-    price: "5.90 (0.3 m)"
-    link: https://www.amazon.de/dp/B0DGTQD4Y5
+    price: "4.49"
+    link: https://www.amazon.de/dp/B0CVQ8LV5W
+
+- name: USB cable to USB-C, straight plug
+  name_de: USB-Kabel auf USB-C, gerader Stecker
+  qty: 1
+  details: "any cable, the overmould of the USB-C plug at most 12 x 7 mm"
+  used_for: power
 
 - name: "USB power module for the flush wall box (installation by a qualified electrician), or any USB charger"
   name_de: USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät
@@ -95,14 +101,14 @@
     price: "15.49 (8 colours)"
     link: https://www.amazon.de/dp/B0DH2FBWH7
 
-- name: Heat-set insert and screw M2 (optional)
-  name_de: Einschmelzmutter und Schraube M2 (optional)
+- name: Screw M4 with 6 mm wall plug
+  name_de: Schraube M4 mit 6er Dübel
   qty: 2
-  details: same as above
-  used_for: lock tab
+  details: "pan head or countersunk head, about 30 mm; the screws of a flush box fit as well"
+  used_for: wall plate
 
 - name: Filament PETG
   name_de: Filament PETG
   qty: 1
-  details: about 110 g
+  details: about 120 g
   used_for: all printed parts

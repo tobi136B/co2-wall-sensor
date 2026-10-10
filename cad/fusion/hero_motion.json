@@ -2,18 +2,15 @@
   "_comment": "README animation: keyframes [t, [x, y, z]] per Fusion component, t from 0 (assembled) to 1 (apart), offsets in mm. Every part leaves along a free path (tools/assembly_check.py), the animation plays it forwards and backwards.",
   "parts": {
     "Dummy_LCD_2inch": [[0.00, [0, 0, 0]], [0.24, [0, 0, -45]]],
-    "LockTab": [[0.02, [0, 0, 0]], [0.14, [0, -26, 0]], [0.30, [0, -26, 116]]],
-    "WallPlate": [[0.10, [0, 0, 0]], [0.19, [0, -15, 0]], [0.26, [0, -15, 14]], [0.38, [0, 0, 116]]],
-    "BackCover": [[0.36, [0, 0, 0]], [0.52, [0, 0, 84]]],
-    "PortBack": [[0.48, [0, 0, 0]], [0.56, [0, 0, 30]], [0.64, [0, -18, 72]]],
-    "SensorCarrier": [[0.62, [0, 0, 0]], [0.74, [0, 0, 38]], [0.92, [0, 0, 38]], [0.98, [0, -4, 38]]],
-    "Dummy_PlugAngled": [[0.62, [0, 0, 0]], [0.74, [0, 0, 38]], [0.80, [0, -12, 38]], [0.88, [0, -34, 38]]],
-    "Dummy_ESP32_C3": [[0.62, [0, 0, 0]], [0.74, [0, 0, 38]], [0.82, [0, 0, 38]], [0.87, [0, 12, 38]], [0.92, [0, 12, 54]], [0.98, [0, -4, 54]]],
-    "Dummy_SCD41": [[0.62, [0, 0, 0]], [0.74, [0, 0, 38]], [0.80, [0, 0, 38]], [0.87, [0, 25, 38]], [0.92, [0, 25, 22]], [0.98, [0, -4, 22]]]
+    "WallPlate": [[0.04, [0, 0, 0]], [0.13, [0, -15, 0]], [0.20, [0, -15, 14]], [0.32, [0, 0, 116]]],
+    "BackCover": [[0.30, [0, 0, 0]], [0.46, [0, 0, 100]]],
+    "SensorCarrier": [[0.46, [0, 0, 0]], [0.62, [0, 0, 38]], [0.92, [0, 0, 38]], [0.98, [0, -4, 38]]],
+    "Dummy_Adapter": [[0.46, [0, 0, 0]], [0.62, [0, 0, 38]], [0.70, [0, 0, 38]], [0.78, [0, -26, 38]]],
+    "Dummy_ESP32_C3": [[0.46, [0, 0, 0]], [0.62, [0, 0, 38]], [0.78, [0, 0, 38]], [0.86, [0, 34, 38]], [0.92, [0, 34, 54]], [0.98, [0, -4, 54]]],
+    "Dummy_SCD41": [[0.46, [0, 0, 0]], [0.62, [0, 0, 38]], [0.78, [0, 0, 38]], [0.86, [0, 25, 38]], [0.92, [0, 25, 22]], [0.98, [0, -4, 22]]]
   },
   "ids": {
-    "Housing": "housing", "Dummy_LCD_2inch": "display", "LockTab": "lock_tab", "WallPlate": "wall_plate",
-    "BackCover": "cover", "PortBack": "port", "SensorCarrier": "carrier", "Dummy_PlugAngled": "plug",
-    "Dummy_ESP32_C3": "esp32", "Dummy_SCD41": "scd41"
+    "Housing": "housing", "Dummy_LCD_2inch": "display", "WallPlate": "wall_plate", "BackCover": "cover",
+    "Dummy_Adapter": "adapter", "SensorCarrier": "carrier", "Dummy_ESP32_C3": "esp32", "Dummy_SCD41": "scd41"
   }
 }
