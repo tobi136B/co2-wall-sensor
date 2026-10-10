@@ -96,7 +96,7 @@ ESP_PINS = {
     -1: ["GPIO0", "GPIO1", "GPIO2", "GPIO3", "GPIO4", "3V3", "GND", "5V"],  # row on the -x side
     1: ["GPIO21", "GPIO20", "GPIO10", "GPIO9", "GPIO8", "GPIO7", "GPIO6", "GPIO5"],  # row on the +x side
 }
-DISPLAY_ORDER = ["3V3", "GND", "DIN", "CLK", "CS", "DC", "RST", "BL"]  # PH2.0 connector, from the bottom up
+DISPLAY_ORDER = ["BL", "RST", "DC", "CS", "CLK", "DIN", "GND", "3V3"]  # PH2.0 connector, from the bottom up
 WIRE_R = 0.42  # radius of the wires in site/assembly.js
 PITCH = 1.0  # display wires side by side in the cable clip
 PITCH_PLUG = 2.0  # contact pitch of the PH2.0 connector
@@ -203,44 +203,43 @@ def _drop(start, pad, z_cross: float, y_cross: float) -> list[np.ndarray]:
 def wires_display(p: dict) -> list[dict]:
     """The 8 wires of the cable that stays plugged into the display.
 
-    From the plug the flat cable runs along the back of the display to the side wall and bends up, shifting
-    upwards in its own plane while it rises. It bends over towards the ESP32-C3, shifts up a little more
-    (so it passes above the right post of the bridge), turns down in its own plane and runs under the bridge
-    of the sled, over the middle of the board. Every wire leaves the cable at the height of its pad: up over the
-    other wires, across to its pad row and down onto the pad. Every bend in the plane of the cable has a radius
-    larger than half the cable width, so no wire crosses another one.
+    From the plug the flat cable runs along the back of the display to the left side wall (seen from the back)
+    and bends up, then over the back of the display towards the ESP32-C3. In its own plane it turns up and
+    right again, passes above the left post of the bridge, turns down and runs under the bridge of the sled,
+    over the middle of the board. Every wire leaves the cable at the height of its pad: up over the other
+    wires, across to its pad row and down onto the pad. Every turn in the plane of the cable has a radius larger
+    than half the cable width, so no wire crosses another one.
     """
     lcd_back = p["LIP"] + p["GLASS_T"] + p["LCD_PCB"]
-    y_pcb1 = p["LCD_Y"] + p["LCD_H"] / 2
-    yc = y_pcb1 - (p["PH2_Y0"] + p["PH2_Y1"]) / 2
+    y_pcb0 = p["LCD_Y"] - p["LCD_H"] / 2
+    yc = y_pcb0 + (p["PH2_Y0"] + p["PH2_Y1"]) / 2
     zc = lcd_back + 2.9
     z_bar = p["C3_Z0"] + p["BRIDGE_H"] - p["BRIDGE_BAR"]  # underside of the bar of the bridge
     z_run = z_bar - WIRE_R - 0.1
     z_socket = p["C3_Z0"] + p["C3_PCB"] + p["C3_USB_H"]  # top of the USB-C socket
     z_low = z_socket + WIRE_R + 0.05  # the cable over the board, below the bridge
     z_cross = z_low + 2 * WIRE_R + 0.1  # wires that leave the cable cross over it here
-    x_plug = p["LCD_X"] + p["LCD_W"] / 2 + 0.5
-    xr = p["LCD_CABLE_X1"] - 1.2  # the riser stays inside the measured 67 mm
-    r_up, r = 1.5, 4.0  # bends out of the plane, turns in the plane (half the cable is 3.5 + 0.42 mm)
+    x_plug = p["LCD_X"] - p["LCD_W"] / 2 - 0.5
+    xr = p["LCD_CABLE_X0"] + 1.2  # the riser stays inside the measured 67 mm
+    r_up, r = 1.5, 5.0  # bends out of the plane, turns in the plane (half the cable is 3.5 + 0.42 mm)
     half = 3.5 * PITCH + WIRE_R
-    post_x0 = p["C3_X"] + p["C3_W"] / 2 + p["C3_PLAY"] + 1.15 + 0.3  # inner face of the right post
-    y_app = p["C3_EXT_Y1"] + half + 0.4  # height of the cable while it passes above the right post
-    rise = z_run - zc - 2 * r_up  # straight part of the riser
-    a1 = float(np.degrees(np.arcsin(min(1.0, rise / (2 * r)))))
-    dy1 = 2 * r * (1 - np.cos(np.radians(a1)))
-    dy2 = y_app - yc - dy1
-    a2 = float(np.degrees(np.arccos(1 - dy2 / (2 * r))))
-    rib = Ribbon([x_plug, yc, zc], [1, 0, 0], [0, 1, 0])
-    rib.straight(xr - r_up - x_plug)
+    post_x0 = p["C3_X"] - p["C3_W"] / 2 - p["C3_PLAY"] - 1.15 - 0.3 - 1.2  # outer face of the left post
+    y_end = p["C3_EXT_Y1"] + 0.5  # the cable comes down through the bridge from here
+    x_q = p["C3_X"] - r  # start of the quarter turn down
+    x_up = post_x0 - WIRE_R - 0.3 - half - r  # start of the turn up, the cable rises left of the left post
+    if x_up + 2 * r > x_q:
+        raise SystemExit("display cable: no room between the left post of the bridge and the turn down")
+    rib = Ribbon([x_plug, yc, zc], [-1, 0, 0], [0, 1, 0])
+    rib.straight(x_plug - (xr + r_up))
     rib.bend([0, 0, 1], 90, r_up)
-    rib.turn(True, a1, r).turn(False, a1, r)  # S upwards while rising
-    rib.bend([-1, 0, 0], 90, r_up)
-    rib.turn(True, a2, r).turn(False, a2, r)  # the rest of the way up, done before the post
-    if rib.p[0] < post_x0 + 1.2 + WIRE_R + 0.2:
-        raise SystemExit("display cable: it reaches the right post of the bridge before it is high enough")
-    x_q = p["C3_X"] + r  # start of the quarter turn down
-    rib.straight(rib.p[0] - x_q)
-    rib.turn(False, 90, r)  # down, s becomes -x
+    rib.straight(z_run - zc - 2 * r_up)
+    rib.bend([1, 0, 0], 90, r_up)
+    rib.straight(x_up - rib.p[0])
+    rib.turn(True, 90, r)  # up, s becomes -x
+    rib.straight(y_end - yc - r)
+    rib.turn(False, 90, r)  # right again, above the left post
+    rib.straight(x_q - rib.p[0])
+    rib.turn(False, 90, r)  # down, s becomes +x
     offsets = [(i - 3.5) * PITCH for i in range(8)]
     lines = rib.wires(offsets, pitch_start=PITCH_PLUG / PITCH, taper=6.0)
     y_free = p["BRIDGE_Y0"] - 1.0  # below the bridge the cable drops onto its lower level
@@ -326,15 +325,16 @@ def parts(p: dict) -> list[dict]:
     c3x, c3y, c3z = p["C3_X"], p["C3_Y0"], p["C3_Z0"]
     c3top = c3z + p["C3_PCB"]
     mouth, usb_w = p["C3_MOUTH"], p["C3_USB_W"] / 2
-    x_pcb1, y_pcb1 = p["LCD_X"] + p["LCD_W"] / 2, p["LCD_Y"] + p["LCD_H"] / 2
-    yc = y_pcb1 - (p["PH2_Y0"] + p["PH2_Y1"]) / 2
+    x_pcb0, y_pcb0 = p["LCD_X"] - p["LCD_W"] / 2, p["LCD_Y"] - p["LCD_H"] / 2
+    yc = y_pcb0 + (p["PH2_Y0"] + p["PH2_Y1"]) / 2
+    gx = p["LCD_X"] + p["GLASS_DX"]
 
     display = [
         box(
-            p["LCD_X"] - p["GLASS_W"] / 2 + 0.1,
+            gx - p["GLASS_W"] / 2,
             p["LCD_Y"] - p["GLASS_H"] / 2,
             lip,
-            p["LCD_X"] + p["GLASS_W"] / 2 + 0.1,
+            gx + p["GLASS_W"] / 2,
             p["LCD_Y"] + p["GLASS_H"] / 2,
             lip + glass_t,
             "#0d1117",
@@ -343,15 +343,15 @@ def parts(p: dict) -> list[dict]:
         box(p["BAY_X0"] + cl, p["BAY_Y0"] + cl, lip + glass_t, p["BAY_X1"] - cl, p["BAY_Y1"] - cl, lcd_back, PCB_BLUE),
         # PH2.0 connector and the plug of the cable, the cable leaves towards the side wall
         box(
-            x_pcb1 - p["PH2_X1"],
-            y_pcb1 - p["PH2_Y1"],
+            x_pcb0 + p["PH2_X0"],
+            y_pcb0 + p["PH2_Y0"],
             lcd_back,
-            x_pcb1 - p["PH2_X0"],
-            y_pcb1 - p["PH2_Y0"],
+            x_pcb0 + p["PH2_X1"],
+            y_pcb0 + p["PH2_Y1"],
             lcd_back + p["LCD_PLUG_H"],
             "#f1efe8",
         ),
-        box(x_pcb1 - p["PH2_X0"], yc - 8.6, lcd_back + 0.4, x_pcb1 + 0.5, yc + 8.6, lcd_back + 5.4, "#dcd6c8"),
+        box(x_pcb0 - 0.5, yc - 8.6, lcd_back + 0.4, x_pcb0 + p["PH2_X0"], yc + 8.6, lcd_back + 5.4, "#dcd6c8"),
         {"type": "screen", "centre": [0, p["LCD_Y"], lip - 0.02], "size": [p["ACTIVE_W"], p["ACTIVE_H"]]},
     ]
     scd = [

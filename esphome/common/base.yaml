@@ -435,9 +435,9 @@ switch:
     restore_mode: RESTORE_DEFAULT_OFF
     entity_category: config
     on_turn_on:
-      - lambda: id(lcd).set_rotation(display::DISPLAY_ROTATION_90_DEGREES);
-    on_turn_off:
       - lambda: id(lcd).set_rotation(display::DISPLAY_ROTATION_270_DEGREES);
+    on_turn_off:
+      - lambda: id(lcd).set_rotation(display::DISPLAY_ROTATION_90_DEGREES);
 
 button:
   - platform: restart
@@ -556,7 +556,7 @@ display:
     dc_pin: GPIO5
     reset_pin: GPIO3
     invert_colors: true
-    rotation: 270           # connector of the display on the right, seen from the back (housing 2.0)
+    rotation: 90            # display upright: its connector on the left, seen from the back
     update_interval: 5s
     lambda: |-
       // ------------------------------------------------------------ layout 320 x 240

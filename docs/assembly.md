@@ -83,9 +83,9 @@ Press the M2 inserts in with the soldering iron (about 200 to 220 °C). 4 around
 
 **You need:** Display with its cable plugged in, 4 screws M2 × 4, hex key 1.3 mm
 
-Plug the supplied cable into the display first. Then glass first into the display bay, connector to the right, and 4 screws M2 × 4 through the corner holes. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-3))
+Plug the supplied cable into the display first. Then glass first into the display bay, connector to the left, and 4 screws M2 × 4 through the corner holes. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-3))
 
-> **Tip:** It fits only one way: the connector on the right, where the bay is longer. The picture then appears upside down on your desk, the firmware turns it. Keep the protective film on the glass until the end.
+> **Tip:** It fits only one way: the connector on the left, where the bay is longer. Then the picture stands upright and the strip with the electronics hides behind the frame. Keep the protective film on the glass until the end.
 
 ### Step 4 of 12: Sensor carrier
 
@@ -143,7 +143,7 @@ Put the carrier onto the ledges in the chin, the sled slides over the display co
 
 **You need:** The cable of the display (shortened), soldering iron, the [wiring diagram](wiring.md)
 
-Display: the flat cable runs up at the right wall, over to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-9))
+Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-9))
 
 > **Tip:** Push the cable under the bridge first and mark the length of every wire at its pad, then shorten and solder. The cable stays plugged into the display: to take the display out, just pull the plug.
 

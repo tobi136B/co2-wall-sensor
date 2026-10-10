@@ -83,9 +83,9 @@ Die M2-Muttern mit dem Lötkolben eindrücken (ca. 200 bis 220 °C). 4 rund um d
 
 **Du brauchst:** Display mit eingestecktem Kabel, 4 Schrauben M2 × 4, Innensechskant 1,3 mm
 
-Zuerst das mitgelieferte Kabel ins Display stecken. Dann mit dem Glas voran in den Displayschacht, Stecker nach rechts, und 4 Schrauben M2 × 4 durch die Ecklöcher. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-3))
+Zuerst das mitgelieferte Kabel ins Display stecken. Dann mit dem Glas voran in den Displayschacht, Stecker nach links, und 4 Schrauben M2 × 4 durch die Ecklöcher. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-3))
 
-> **Tipp:** Es passt nur in einer Richtung: Stecker nach rechts, wo der Schacht länger ist. Auf dem Tisch steht das Bild dann auf dem Kopf, die Firmware dreht es. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen.
+> **Tipp:** Es passt nur in einer Richtung: Stecker nach links, wo der Schacht länger ist. Dann steht das Bild aufrecht und der Elektronikstreifen verschwindet hinter dem Rahmen. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen.
 
 ### Schritt 4 von 12: Sensorträger
 
@@ -143,7 +143,7 @@ Den Träger auf die Leisten im Kinn legen, der Schlitten gleitet über den Displ
 
 **Du brauchst:** Das Kabel des Displays (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)
 
-Display: Das Flachkabel läuft an der rechten Wand hoch, hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-9))
+Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-9))
 
 > **Tipp:** Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen, dann kürzen und löten. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen.
 
