@@ -7,7 +7,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v1.8-6E7B8B)
+![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.0-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -29,9 +29,9 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 * **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Innen- und Außentemperatur sowie Luftfeuchte.
 * **Fensterhinweis.** Das Display zeigt, wann Lüften den Raum kühlt oder die Luft trocknet. Dafür reicht ein Außensensor oder einfach die Wettervorhersage aus Home Assistant.
 * **Alles in Home Assistant einstellbar.** Nachtzeiten (dimmen oder aus), Nachthelligkeit, Warnung in der Nacht, Temperaturkorrektur, Höhe und Schwellen für den Hinweis, ganz ohne neu zu flashen.
-* **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (verdeckt eine Standard-Hohlwanddose Ø 68 mm) oder den **Tischständer**. Eine optionale Sicherungslasche schraubt es an der Wand fest.
-* **Kabel von hinten oder unten**, entschieden nach dem Druck mit einem kleinen, tauschbaren **Kabelport-Modul**, das gleichzeitig als Zugentlastung dient.
-* **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. Der SCD41 gleitet in Schienen, der ESP32-C3 sitzt in Führungen, die Litzen liegen in einem Kabelschlitz und unter einem mitgedruckten Kabelclip.
+* **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (zwei Schrauben M4 mit Dübeln oder die Schrauben einer Hohlwanddose Ø 68 mm) oder den **Tischständer**.
+* **Kabel von hinten oder unten** mit denselben Teilen: Ein USB-C-Winkeladapter führt das Kabel gerade in die Wand, oder ein gerades Kabel geht durch das Fenster im Boden.
+* **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. SCD41 und ESP32-C3 gleiten in Schienen und rasten hinter Federhaken ein, das Displaykabel bleibt gesteckt und läuft unter einer mitgedruckten Brücke.
 * **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer unterhalb der Elektronik, Frischluft kommt von unten, die Front bleibt geschlossen.
 * **Vollständig parametrisches CAD.** Jedes Maß ist ein Fusion-Benutzerparameter. Wert ändern, Skript starten, neue STL, STEP, Druckplatten und Zeichnung.
 * **Zweisprachig.** Firmware, Doku, Zeichnungen und Projektseite auf Englisch und Deutsch.
@@ -58,15 +58,15 @@ Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisie
 
 | | |
 |---|---|
-| Gerät | 69,8 × 69,8 × 24 mm (+ 3 mm Schiene) |
-| Wandplatte | 82 × 82 × 7 mm, passt auf Hohlwanddosen Ø 68 mm mit 60 mm Schraubabstand |
+| Gerät | 77 × 69,8 × 24 mm (+ 3 mm Schiene) |
+| Wandplatte | 89,2 × 82 × 7 mm, Langlöcher für M4 mit 60 mm Abstand, passt auch auf Hohlwanddosen Ø 68 mm |
 | Displayfenster | 41,8 × 31,6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 bis 5000 ppm, ±(50 ppm + 5 % vom Messwert) |
 | Raumgröße | ein Sensor pro Raum; in offenen Räumen bis etwa 500 m² ([FAQ](docs/de/faq.md#wie-groß-darf-der-raum-für-einen-sensor-sein)) |
 | Versorgung | 5 V über USB-C, ca. 0,5 W |
-| Kabelaustritt | hinten (Winkelstecker) oder unten (gerader Stecker), tauschbares Port-Modul |
-| Verbindungselemente | 10 Einschmelzmuttern M2 × 3 (AD 3,2), 10 Schrauben M2 × 4 ISO 7380 (+ je 2 für die Sicherungslasche) |
-| Druckmaterial | PETG (PLA möglich), ca. 110 g |
+| Kabelaustritt | hinten (USB-C-Winkeladapter) oder unten (gerader Stecker), dieselben Teile |
+| Verbindungselemente | 10 Einschmelzmuttern M2 × 3 (AD 3,0 bis 3,2), 10 Schrauben M2 × 4 ISO 7380, 2 Schrauben M4 für die Wand |
+| Druckmaterial | PETG (PLA möglich), ca. 120 g |
 
 Technische Zeichnung (A3, ISO Methode 1): [Deutsch (PDF)](docs/drawing/co2_wall_sensor_drawing_de.pdf) | [Englisch (PDF)](docs/drawing/co2_wall_sensor_drawing_en.pdf)
 
@@ -85,12 +85,12 @@ Die Gesamtkosten für ein Gerät stehen in der letzten Zeile der Tabelle. Die Li
 | 1 | Sensirion **SCD41** Platine, **13,5 × 21,75 mm** oder **15 × 20 mm** ² | [21,19 €](https://de.aliexpress.com/item/1005009740863220.html) | *nur AliExpress* |
 | 1 | **ESP32-C3 SuperMini** | [2,79 €](https://de.aliexpress.com/item/1005007479144456.html) | [4,30 € (2 Stk.: 8,59 €)](https://www.amazon.de/dp/B0HDCHXHMT) |
 | 1 | **Waveshare 2inch LCD Module** (ST7789V, 240 × 320) | [12,49 €](https://de.aliexpress.com/item/1005008772378337.html) | [16,31 €](https://www.amazon.de/dp/B081Q79X2F) |
-| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm, Länge 3 mm | [2,39 € (50 Stk., AD 3,2)](https://de.aliexpress.com/item/1005008575446687.html) | [6,99 € (200 Stk., AD 3,0)](https://www.amazon.de/dp/B0DZHK4JRC) |
+| 10 | Einschmelzmutter **M2 × 3**, Außendurchmesser 3,0 oder 3,2 mm, Länge 3 mm | [2,39 € (50 Stk., AD 3,2)](https://de.aliexpress.com/item/1005008575446687.html) | [4,69 € (205 Stk., AD 3,0)](https://www.amazon.de/dp/B0GYPH7X6W) |
 | 10 | Linsenkopfschraube (Halbrundkopf) **M2 × 4**, ISO 7380 | *nur Amazon* | [4,79 € (60 Stk.)](https://www.amazon.de/dp/B0FVT11R5L) |
-| 1 | USB-Kabel mit **USB-C Winkelstecker** (nach oben/unten gewinkelt) für den Port hinten | *nur Amazon* | [5,90 € (0,3 m)](https://www.amazon.de/dp/B0DGTQD4Y5) |
+| 1 | **USB-C-Winkeladapter 90°** (Stecker auf Buchse) für das Kabel nach hinten | *nur Amazon* | [4,49 €](https://www.amazon.de/dp/B0CVQ8LV5W) |
 | 1 | USB-Netzteil für die Hohlwanddose (Einbau durch eine Elektrofachkraft) oder ein beliebiges USB-Ladegerät | *nur Amazon* | [4,80 € (2 Stk.: 9,59 €)](https://www.amazon.de/dp/B0GVWPHKJM) |
 |  | Silikonlitze AWG 30 | *nur Amazon* | [15,49 € (8 Farben)](https://www.amazon.de/dp/B0DH2FBWH7) |
-| | **Summe** (ein Gerät, jedes Teil aus diesem Shop, falls vorhanden, sonst aus dem anderen; ohne Litze und Filament) | **54,35 €** | **64,28 €** |
+| | **Summe** (ein Gerät, jedes Teil aus diesem Shop, falls vorhanden, sonst aus dem anderen; ohne Litze und Filament) | **52,94 €** | **60,57 €** |
 <!-- bom:end -->
 
 ² Shops zeigen oft eine andere Platine als die, die geliefert wird. Nach dem Auspacken nachmessen und den passenden Träger drucken.
@@ -129,6 +129,7 @@ Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Sho
 | Display in der Nacht, Nachthelligkeit | Auswahl, Zahl | dimmen (Standard 8 %) oder aus |
 | Rote Warnung auch nachts | Schalter | das Display geht an, solange der CO2-Wert rot ist |
 | Fensterhinweis auf dem Display, Außenwert auf dem Display | Schalter | ein- oder ausblenden |
+| Display auf dem Kopf | Schalter | dreht das Bild um 180°, falls es auf dem Kopf steht |
 | Fensterhinweis ab Innentemperatur, Fensterhinweis: draußen kühler um | Zahl | Standard 24 °C und 3 °C |
 | Temperaturkorrektur | Zahl | Eigenerwärmung an deiner Wand: mit einem Referenzthermometer vergleichen |
 | Höhe über dem Meer | Zahl | Druckausgleich für den CO2-Wert (Standard 300 m) |
@@ -197,7 +198,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * **Versionen:** Die Releasenummer (z. B. 1.9.0) zählt jede Änderung, auch an Firmware und Doku. Die **Gehäuseversion** (Badge oben, auf jedem gedruckten Teil eingeprägt) ändert sich nur, wenn sich die Druckteile ändern. Teile mit derselben Gehäuseversion passen zusammen, egal aus welchem Release sie stammen.
 * **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md). Andere Platinen: [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html).
 * **Display:** Alle Maße des Waveshare 2inch LCD Module sind mit dem Messschieber nachgemessen (Platine 58,2 × 35,3 × 1,62 mm, Glas 47,7 × 34,6 mm, Platine und Glas zusammen 4,43 mm). Andere Chargen können leicht abweichen: `LCD_*` und `GLASS_*` prüfen.
-* **Stand der Hardware:** Gehäuse und Firmware sind im CAD und in der CI geprüft. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
+* **Stand der Hardware:** Gehäuse 2.0 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Der USB-C-Winkeladapter ist noch nicht nachgemessen, sein Loch ist großzügig. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 
 ## Ausblick
 
@@ -208,6 +209,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * [x] Außentemperatur auf dem Display, mit Hinweis wenn Lüften hilft (v1.8)
 * [x] Saubere Kabelführung ohne Kleber: Kabelschlitz und Kabelclip am Sensorträger, freier Kabelweg hinter dem Display (v1.9)
 * [x] [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html): Sensorträger als STL aus den Maßen der Platine ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
+* [x] Gehäuse 2.0 nach dem ersten Druck: Displaykabel bleibt gesteckt, ESP32-C3 auf einem Schlitten mit Federhaken, Winkeladapter statt losem Port-Modul, Wandplatte für M4-Schrauben (v2.0)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 
 ## Mitmachen

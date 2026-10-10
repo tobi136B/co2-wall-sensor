@@ -34,7 +34,7 @@ The front has no openings. Dust settles mostly on openings that face up or forwa
 
 A short dovetail rail on the back cover fits two adapters:
 
-* **Wall plate 82 × 82 mm.** German flush wall boxes have a 68 mm hole and a rim of about 75 mm, so the compact device alone could not cover them. The plate covers the box, is screwed to the standard box screws (60 mm) and has corners concentric to the device, which creates an even frame like a light switch.
+* **Wall plate 89.2 × 82 mm.** It is 6.1 mm larger than the device on every side and has corners concentric to the device, which creates an even frame like a light switch. Two M4 screws with wall plugs hold it, 60 mm apart in slots with 3 mm play up and down and a 45° seat for countersunk heads. The same slots take the screws of a German flush wall box (68 mm hole, rim about 75 mm), which the plate covers.
 * **Desk stand.** Same rail, device leans back by 12° for better readability, with a 5 mm air gap below so the vents stay free.
 
 The insertion window above the slot is hidden behind the device. You insert the device from the front and slide it 15 mm down. Nothing is visible from outside and the device can be removed without tools.
@@ -45,24 +45,25 @@ Plastic threads wear out after a few cycles and self-tapping screws crack thin b
 
 * **10 × heat-set insert M2 × 3** (outer diameter 3.0 or 3.2 mm, hole Ø 2.9 × 3.4 mm fits both): 4 for the display, 4 for the back cover, 2 for the sensor carrier.
 * **10 × button head screw M2 × 4, ISO 7380.** One hex key for the whole device.
-* **+2 of each** for the optional lock tab that ties the device to the wall plate.
+* **2 × screw M4** with wall plugs for the wall plate, the only other screws.
 
 The back cover is held at four points: two bosses in the bottom corners and two inserts in a solid 5 mm band above the display bay. The button heads sit in 1.3 mm counterbores, so the cover surface stays flat and slides cleanly onto the wall plate and desk stand. The cover has no pins or hooks on its inside and prints flat without supports.
 
 ## Nothing is glued
 
 * **SCD41:** the breakout has no mounting holes. It slides from the top into two rails with a groove on the front of the sensor carrier and stands on an end stop. A tongue cut out of the carrier carries a 45° hook that springs over the upper edge and presses the board onto the stop, so tolerances of ±0.4 mm are taken up without play. Only this carrier depends on the board: there is one per board profile, see [measure your sensor](measure-sensor.md).
-* **ESP32-C3:** it has no mounting holes either. Side guides, two end stops and a short groove at its lower edge hold it. The groove sits where the board has no solder pads, so wires can be soldered along both edges.
+* **ESP32-C3:** it has no mounting holes either. It slides down on a sled that carries it over its whole length, between side guides with crush ribs, until it stands on two end stops and slips into a short groove at its lower edge. Then a hook on a spring tongue clicks behind its upper edge, with a straight face, so the plug force cannot push the board up. The sled reaches over the divider into the display bay, 0.3 mm above the display connector. The groove sits where the board has no solder pads, so wires can be soldered along both edges.
+* **Display cable:** it stays plugged into the display. The display bay is longer on one side, so the display only fits with its connector there and the electronics strip of the glass always sits behind the frame; the device is 77 mm wide for this, the window stays centred. The flat cable runs under a printed bridge on the sled, the back cover closes it from behind.
 * **Sensor carrier:** two screws. It is the removable floor of the sensor chamber, so the sensor can be replaced without touching the display.
 
-## Cable exit: a swappable port module
+## Cable exit: the same parts for both ways
 
-The ESP32-C3 sits with its USB-C socket pointing **down**, with 13 mm of free space below it. The cable leaves through a small L-shaped **cable port module** at the lower back edge:
+The ESP32-C3 sits with its USB-C socket pointing **down**, with 12.5 mm of free space below it.
 
-* **PortBack:** oblong hole for the round body of a right-angle plug (measured: Ø 8 × 18.2 mm), 1.5 mm play up and 0.5 mm down for other makes. The cable goes straight into the flush wall box or through the desk stand. The collar of the plug sits under the module, which works as strain relief.
-* **PortBottom:** opening for a straight plug, if the cable runs on the wall surface.
+* **To the back:** a 90° USB-C adapter (plug to socket) in the socket, its body points to the wall. It leaves through a hole in the back cover, and any USB-C cable goes straight into the flush wall box or through the desk stand. The carrier is open below the socket, so the adapter goes in with the board, before the carrier.
+* **To the bottom:** a straight plug in the window of the bottom wall, which holds its overmould with 0.2 mm play.
 
-The module is clamped between housing and back cover, a step in the bottom wall and a lip under the cover hold it. Both versions take 2 g of filament, so you print both and decide on site. Changing it later takes four screws. Thin knock-out membranes were tried before (v1.2), but they cannot be closed again once broken out.
+Up to version 1.8 a small loose port module closed the opening, in two versions. It was hard to insert and fell out before the cover was on, and right-angle plugs differ in which way they bend. The adapter fixes the direction, and the window and the hole need no extra part. Thin knock-out membranes were tried before (v1.2), but they cannot be closed again once broken out.
 
 ## Printing details
 

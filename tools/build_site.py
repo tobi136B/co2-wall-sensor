@@ -73,8 +73,8 @@ TEXT = {
         "t_s4": "Stay up to date",
         "t_s4_text": "New releases appear as a firmware update in Home Assistant. One click installs them.",
         "t_display_title": "Everything on one screen",
-        "t_display_text": "Air quality, CO2 with a three hour trend, temperature, humidity and the time. "
-        "The display dims at night and can be switched off from Home Assistant.",
+        "t_display_text": "Air quality, CO2 with a three hour trend, indoor and outdoor temperature, humidity, the time "
+        "and a hint when an open window cools or dries the room. At night it dims or switches off, as set in Home Assistant.",
         "t_display_alt": "The display in the three air quality levels",
         "t_print_title": "Print the enclosure",
         "t_print_text": "The plates contain every part in its print orientation. Open them in PrusaSlicer, OrcaSlicer, "
@@ -87,10 +87,10 @@ TEXT = {
         "t_guide_text": "Every step in 3D: turn the device, take it apart and see which part comes next.",
         "t_configurator": "Sensor carrier configurator",
         "t_configurator_text": "Another SCD41 board? Enter its dimensions and download the matching carrier.",
-        "t_cap_exploded": "Housing, sensor carrier, cable port and back cover",
-        "t_cap_back": "Cable to the back, into the wall box",
-        "t_cap_bottom": "Cable to the bottom, on the wall surface",
-        "t_cap_interior": "Inside: display, ESP32-C3 and cable port",
+        "t_cap_exploded": "Housing, sensor carrier with ESP32-C3, USB-C adapter and back cover",
+        "t_cap_back": "Cable to the back through a 90° adapter, into the wall box",
+        "t_cap_bottom": "Straight cable through the bottom window, on the wall surface",
+        "t_cap_interior": "Inside: display, ESP32-C3 and USB-C adapter",
         "t_cap_carrier": "The SCD41 slides into rails",
         "t_cap_desk": "On the desk stand",
         "t_parts_title": "What you need",
@@ -146,8 +146,9 @@ TEXT = {
         "t_s4": "Aktuell bleiben",
         "t_s4_text": "Neue Versionen erscheinen in Home Assistant als Firmware-Update. Ein Klick installiert sie.",
         "t_display_title": "Alles auf einem Bildschirm",
-        "t_display_text": "Luftqualität, CO2 mit Drei-Stunden-Verlauf, Temperatur, Luftfeuchte und Uhrzeit. "
-        "Nachts wird das Display gedimmt, aus Home Assistant lässt es sich ganz ausschalten.",
+        "t_display_text": "Luftqualität, CO2 mit Drei-Stunden-Verlauf, Innen- und Außentemperatur, Luftfeuchte, Uhrzeit "
+        "und ein Hinweis, wann ein offenes Fenster kühlt oder die Luft trocknet. Nachts dimmt es oder geht aus, "
+        "wie in Home Assistant eingestellt.",
         "t_display_alt": "Das Display in den drei Luftqualitätsstufen",
         "t_print_title": "Gehäuse drucken",
         "t_print_text": "Die Druckplatten enthalten alle Teile in ihrer Drucklage. In PrusaSlicer, OrcaSlicer, "
@@ -160,10 +161,10 @@ TEXT = {
         "t_guide_text": "Jeder Schritt in 3D: Gerät drehen, zerlegen und sehen, welches Teil als Nächstes kommt.",
         "t_configurator": "Sensorträger-Konfigurator",
         "t_configurator_text": "Andere SCD41-Platine? Maße eingeben und den passenden Träger herunterladen.",
-        "t_cap_exploded": "Gehäuse, Sensorträger, Kabelport und Rückdeckel",
-        "t_cap_back": "Kabel nach hinten, in die Hohlwanddose",
-        "t_cap_bottom": "Kabel nach unten, auf Putz",
-        "t_cap_interior": "Innen: Display, ESP32-C3 und Kabelport",
+        "t_cap_exploded": "Gehäuse, Sensorträger mit ESP32-C3, USB-C-Adapter und Rückdeckel",
+        "t_cap_back": "Kabel nach hinten über einen Winkeladapter, in die Wanddose",
+        "t_cap_bottom": "Gerades Kabel durch das Fenster unten, auf Putz",
+        "t_cap_interior": "Innen: Display, ESP32-C3 und USB-C-Adapter",
         "t_cap_carrier": "Der SCD41 gleitet in Schienen",
         "t_cap_desk": "Auf dem Tischständer",
         "t_parts_title": "Das brauchst du",

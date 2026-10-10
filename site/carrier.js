@@ -100,14 +100,9 @@ export function buildCarrier(wasm, base, board) {
   cut(box(p.SPRING_X - hw, p.TONGUE_ROOT + 1.0, p.FLOOR_Z + p.SPRING_T, p.SPRING_X + hw, p.TONGUE_TIP + 0.1, p.FLOOR_Z + p.FLOOR_T + 1));
   add(prismX([[p.HOOK_B, p.FLOOR_Z + 0.01], [p.HOOK_C, p.FLOOR_Z - p.SPRING_HOOK], [p.HOOK_A, p.FLOOR_Z + 0.01]],
     p.SPRING_X - hw, p.SPRING_X + hw));
-  // notch for the boss of the lock insert
-  const lx = p.LOCK_POINTS[0];
-  r = p.BOSS_D / 2 + p.CLEARANCE;
-  cut(box(lx - r, yLo - 0.1, p.FLOOR_Z - 0.5, lx + r, p.LOCK_BOSS_Y1 + p.CLEARANCE, p.FLOOR_Z + p.FLOOR_T + 0.5));
-  // pocket for the round body of the right-angle plug
-  r = p.PLUG_BODY_D / 2 + 0.5;
-  cut(box(p.C3_X - r, p.BOOT_Y - r - 0.5, p.FLOOR_Z + p.FLOOR_T - 1.0, p.C3_X + r,
-    Math.min(p.BOOT_Y + r + p.BOOT_PLAY, p.C3_Y0 - 1.3), p.FLOOR_Z + p.FLOOR_T + 1.0));
+  // pocket for the body of the 90 degree adapter
+  r = p.ADAPTER_W / 2 + 0.5;
+  cut(box(p.C3_X - r, yLo - 0.1, p.FLOOR_Z + p.MIN_WALL, p.C3_X + r, p.C3_Y0 - 1.3, p.FLOOR_Z + p.FLOOR_T + 1.0));
   // SCD41 wires: narrow slot and wire channel with snap lip
   const slotX = -(p.SCD_W / 2 + g + 1.2 + p.MIN_WALL + p.SCD_SLOT_W / 2);
   cut(box(slotX - p.SCD_SLOT_W / 2, yHi - 4.0, p.FLOOR_Z - 0.5, slotX + p.SCD_SLOT_W / 2, yHi + 0.1, p.FLOOR_Z + p.FLOOR_T + 0.5));
@@ -119,17 +114,18 @@ export function buildCarrier(wasm, base, board) {
     add(box(cx0, yw - 0.01, top + hc - p.CLIP_LIP, cx1, yw + p.CLIP_LIP, top + hc));
   }
 
-  // ESP32-C3 holder
+  // ESP32-C3: ribs, sled above the divider, guides over the whole length, end stops, grooves
   top = p.FLOOR_Z + p.FLOOR_T;
-  for (const x of [p.C3_X - 6, p.C3_X + 6]) add(box(x - 0.75, p.C3_Y0, top, x + 0.75, yHi, p.C3_Z0));
   const gx = p.C3_W / 2 + p.C3_PLAY, wall = 1.15;
+  for (const x of [p.C3_X - 6, p.C3_X + 6]) add(box(x - 0.75, p.C3_Y0, top, x + 0.75, yHi, p.C3_Z0));
+  add(box(p.C3_X - gx - wall, yHi - 0.01, p.EXT_Z0, p.C3_X + gx + wall, p.C3_EXT_Y1, p.C3_Z0));
   const zGuide = p.C3_Z0 + p.C3_PCB_MAX + 0.5;
   for (const [x0, x1] of [[p.C3_X - gx - wall, p.C3_X - gx], [p.C3_X + gx, p.C3_X + gx + wall]])
-    add(box(x0, p.C3_Y0 - 1.2, top, x1, yHi, zGuide));
+    add(box(x0, p.C3_Y0 - 1.2, p.EXT_Z0, x1, p.C3_TOP + 0.5, zGuide));
   const rr = 0.6;
   const ribs = [];
-  for (const sx of [-1, 1]) for (const y of [p.C3_Y0 + 4.0, yHi - 3.0]) ribs.push([p.C3_X + sx * (gx - p.C3_RIB + rr), y]);
-  add(cylZ(ribs, 2 * rr, top, zGuide));
+  for (const sx of [-1, 1]) for (const y of [p.C3_Y0 + 4.0, p.C3_TOP - 3.0]) ribs.push([p.C3_X + sx * (gx - p.C3_RIB + rr), y]);
+  add(cylZ(ribs, 2 * rr, p.EXT_Z0, zGuide));
   for (const [x0, x1] of [[p.C3_X - gx, p.C3_X - p.C3_W / 2 + 1.5], [p.C3_X + p.C3_W / 2 - 1.5, p.C3_X + gx]])
     add(box(x0, p.C3_Y0 - 1.2, top, x1, p.C3_Y0 - 0.05, p.C3_Z0 + p.C3_PCB));
   const zl = p.C3_Z0 + p.C3_PCB_MAX + 0.1;
@@ -139,6 +135,23 @@ export function buildCarrier(wasm, base, board) {
     const la = p.C3_X + sx * (p.C3_W / 2 - 0.6), lb = p.C3_X + sx * (gx + wall);
     add(box(Math.min(la, lb), p.C3_Y0 - 0.05, zl, Math.max(la, lb), p.C3_Y0 + 1.2, zl + p.MIN_WALL + 0.1));
   }
+  // spring tongue with hook behind the upper board edge
+  const h3 = p.SPRING_W / 2;
+  for (const [x0, x1] of [[p.C3_X - h3 - 0.6, p.C3_X - h3], [p.C3_X + h3, p.C3_X + h3 + 0.6]])
+    cut(box(x0, p.C3_ROOT, p.EXT_Z0 - 1, x1, p.C3_TIP + 0.6, p.C3_Z0 + 1));
+  cut(box(p.C3_X - h3 - 0.6, p.C3_TIP, p.EXT_Z0 - 1, p.C3_X + h3 + 0.6, p.C3_TIP + 0.6, p.C3_Z0 + 1));
+  cut(box(p.C3_X - h3, p.C3_ROOT + 1.0, p.EXT_Z0 - 1, p.C3_X + h3, p.C3_TIP + 0.1, p.C3_Z0 - p.SPRING_T));
+  add(prismX([[p.C3_HOOK_Y, p.C3_Z0 - 0.01], [p.C3_HOOK_Y, p.C3_Z0 + p.C3_HOOK], [p.C3_HOOK_Y + 0.3, p.C3_Z0 + p.C3_HOOK],
+    [p.C3_HOOK_Y + 0.31 + p.C3_HOOK, p.C3_Z0 - 0.01]], p.C3_X - h3, p.C3_X + h3));
+  // bridge for the display cable
+  const zc = p.C3_Z0 + p.BRIDGE_H, xp = gx + wall + 0.3;
+  add(box(p.C3_X - xp - 1.2, p.BRIDGE_Y0, p.EXT_Z0, p.C3_X + xp + 1.2, p.C3_EXT_Y1, p.C3_Z0));
+  const post = [[p.BRIDGE_Y0, p.C3_Z0 - 0.01], [p.BRIDGE_Y0 + p.BRIDGE_H, zc], [p.C3_EXT_Y1, zc], [p.C3_EXT_Y1, p.C3_Z0 - 0.01]];
+  for (const sx of [-1, 1]) {
+    const xa = p.C3_X + sx * xp, xb = p.C3_X + sx * (xp + 1.2);
+    add(prismX(post, Math.min(xa, xb), Math.max(xa, xb)));
+  }
+  add(box(p.C3_X - xp - 0.01, p.BRIDGE_Y0 + p.BRIDGE_H, zc - p.BRIDGE_BAR, p.C3_X + xp + 0.01, p.C3_EXT_Y1, zc));
   return body;
 }
 

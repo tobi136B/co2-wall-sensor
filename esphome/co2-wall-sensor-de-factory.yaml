@@ -39,6 +39,7 @@ substitutions:
   txt_night_warning: "Rote Warnung auch nachts"
   txt_show_hint: "Fensterhinweis auf dem Display"
   txt_show_outdoor: "Außenwert auf dem Display"
+  txt_flip_display: "Display auf dem Kopf"
   txt_temp_correction: "Temperaturkorrektur"
   txt_altitude: "Höhe über dem Meer"
   txt_hint_temp: "Fensterhinweis ab Innentemperatur"

@@ -13,27 +13,24 @@ import os
 import adsk.core
 import adsk.fusion
 
-DEVICE = {'Housing', 'BackCover', 'PortBack', 'Dummy_LCD_2inch'}
+DEVICE = {'Housing', 'BackCover', 'Dummy_LCD_2inch'}
 TILT = math.radians(12.0)   # desk stand: device leans back by TILT
 
 # name: (visible components, view direction (eye - target), target in mm, zoom after fit, tilted with the stand)
 VIEWS = {
     'hero_wall': (DEVICE | {'WallPlate'}, (-0.55, 0.30, -0.78), (0, 0, 15), 1.0, False),
-    'desk_stand': (DEVICE | {'DeskStand', 'Dummy_PlugAngled'}, (-0.55, 0.22, -0.80), (0, -15, 25), 1.0, True),
-    'interior': ({'Housing', 'SensorCarrier', 'PortBack', 'Dummy_LCD_2inch', 'Dummy_SCD41', 'Dummy_ESP32_C3',
-                  'Dummy_PlugAngled'}, (-0.20, 0.17, 0.96), (0, 0, 12), 1.0, False),
+    'desk_stand': (DEVICE | {'DeskStand', 'Dummy_Adapter'}, (-0.55, 0.22, -0.80), (0, -15, 25), 1.0, True),
+    'interior': ({'Housing', 'SensorCarrier', 'Dummy_LCD_2inch', 'Dummy_SCD41', 'Dummy_ESP32_C3', 'Dummy_Adapter'},
+                 (-0.20, 0.17, 0.96), (0, 0, 12), 1.0, False),
     'sensor_carrier_front': ({'SensorCarrier', 'Dummy_SCD41'}, (-0.55, 0.40, -0.73), (-3, -21, 10), 1.0, False),
-    'sensor_carrier_back': ({'SensorCarrier', 'Dummy_ESP32_C3'}, (-0.30, 0.45, 0.84), (0, -21, 14), 1.0, False),
-    'lock_tab': (DEVICE | {'WallPlate', 'LockTab', 'Dummy_PlugAngled'}, (-0.45, -0.70, -0.55), (-10, -38, 20),
-                 0.5, False),
-    'cable_port_back': ({'Housing', 'BackCover', 'PortBack', 'Dummy_PlugAngled'}, (-0.40, -0.45, 0.80), (0, 0, 12),
-                        0.9, False),
-    'cable_port_bottom': ({'Housing', 'BackCover', 'PortBottom', 'Dummy_PlugStraight'}, (-0.35, -0.75, 0.56),
+    'sensor_carrier_back': ({'SensorCarrier', 'Dummy_ESP32_C3'}, (-0.30, 0.45, 0.84), (0, -12, 14), 1.0, False),
+    'cable_port_back': ({'Housing', 'BackCover', 'Dummy_Adapter'}, (-0.40, -0.45, 0.80), (0, 0, 12), 0.9, False),
+    'cable_port_bottom': ({'Housing', 'BackCover', 'Dummy_PlugStraight'}, (-0.35, -0.75, 0.56),
                           (0, 0, 12), 0.9, False),
-    'vent_mesh': ({'Housing', 'BackCover', 'PortBack'}, (-0.25, -0.85, -0.46), (0, -34, 8), 0.8, False),
+    'vent_mesh': ({'Housing', 'BackCover'}, (-0.25, -0.85, -0.46), (0, -34, 8), 0.8, False),
 }
 
-EXPLODE_VIEW = ((-0.90, 0.30, -0.32), (0, -5, 40), 1.0)
+EXPLODE_VIEW = ((-0.90, 0.30, -0.32), (0, -5, 40), 1.15)
 
 
 def _design():
