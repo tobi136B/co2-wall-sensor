@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.0.1](https://github.com/tobi136B/co2-wall-sensor/compare/v2.0.0...v2.0.1) (2026-10-10)
+
+
+### Fixed
+
+* **enclosure:** display upright, connector on the left ([#29](https://github.com/tobi136B/co2-wall-sensor/issues/29)) ([e591637](https://github.com/tobi136B/co2-wall-sensor/commit/e591637dd768fa35e4f41f24d67eabfb728befc0))
+
 ## [2.0.0](https://github.com/tobi136B/co2-wall-sensor/compare/v1.9.0...v2.0.0) (2026-10-10)
 
 
