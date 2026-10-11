@@ -43,7 +43,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '2.1'          # enclosure version, engraved into every part
+VERSION = '2.2'          # enclosure version, engraved into every part
 LABEL_FONT = 'Arial Black'  # labels: heavy strokes (about a fifth of the height) print as clean lines
 
 # ===================== PARAMETERS =====================
@@ -218,9 +218,9 @@ def derive():
     C3_Z0 = FLOOR_Z + FLOOR_T + RIB_H                # underside of the ESP32-C3 PCB
     PLUG_Z = C3_Z0 + C3_PCB + C3_USB_H / 2           # centre of the USB-C socket
     SOCKET_TOP = C3_Z0 + C3_PCB + C3_USB_H
-    # boss centre distance from the inner walls: the bosses merge 0.55 mm deep into the walls, a clean joint
-    # without slivers where a boss only grazes a wall or the divider
-    B = BOSS_D / 2 - 0.55
+    # boss centre distance from the inner walls. The bosses in the corners grow into columns that fill the corner
+    # (see corner_column), so every insert sits in solid material with a full ring around it
+    B = 3.0
     COVER_SCREWS = [(XL + B, Y_CHIN_LOW + B), (XR - B, Y_CHIN_LOW + B),
                     (-20.0, Y_TOP_IN - TOP_BAND / 2), (20.0, Y_TOP_IN - TOP_BAND / 2)]
     CARRIER_SCREWS = [(XL + B, Y_DIV_LOW - B), (XR - B, Y_DIV_LOW - B)]
@@ -742,6 +742,17 @@ def vent_mesh(comp, plane, centres, to3d, depth, body, name):
 
 
 # ----------------------------------------------------------------------------- parts
+def corner_column(comp, body, x, y, x_wall, y_wall, z0, z1, name):
+    """Fill the corner between a boss and its two walls: a column with one rounded edge, no thin slivers."""
+    JOIN = adsk.fusion.FeatureOperations.JoinFeatureOperation
+    r = BOSS_D / 2
+    xa, xb = sorted((x, x_wall))
+    ya, yb = sorted((y, y_wall))
+    box(comp, xa, y - r, z0, xb, y + r, z1, JOIN, name, body)
+    box(comp, x - r, ya, z0, x + r, yb, z1, JOIN, name, body)
+    box(comp, xa, ya, z0, xb, yb, z1, JOIN, name, body)
+
+
 def build_housing(root, ops):
     NEW, CUT, JOIN = ops
     comp = new_component(root, 'Housing')
@@ -773,6 +784,10 @@ def build_housing(root, ops):
     # bosses: 2 full height (cover screws at the bottom), 2 up to the carrier (carrier screws)
     cylinders(comp, COVER_SCREWS[:2], BOSS_D, WALL, COVER_Z, JOIN, 'CoverBossesBottom', body)
     cylinders(comp, CARRIER_SCREWS, BOSS_D, WALL, FLOOR_Z, JOIN, 'CarrierBosses', body)
+    for x, y in COVER_SCREWS[:2]:
+        corner_column(comp, body, x, y, XL if x < 0 else XR, Y_CHIN_LOW, WALL, COVER_Z, 'CoverColumn')
+    for x, y in CARRIER_SCREWS:
+        corner_column(comp, body, x, y, XL if x < 0 else XR, Y_DIV_LOW, WALL, FLOOR_Z, 'CarrierColumn')
     boss_fillets(comp, body, COVER_SCREWS[:2] + CARRIER_SCREWS, BOSS_D, WALL, 'BossRootFillets')
     insert_holes(comp, COVER_SCREWS, COVER_Z, body)
     insert_holes(comp, CARRIER_SCREWS, FLOOR_Z, body)

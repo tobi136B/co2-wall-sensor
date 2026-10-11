@@ -26,6 +26,9 @@ substitutions:
   outdoor_temperature_entity: sensor.outdoor_temperature
   outdoor_humidity_entity: sensor.outdoor_humidity
   weather_entity: weather.forecast_home
+  # window contact(s) of the room: best a binary sensor group helper in Home Assistant (on = a window is open),
+  # then more windows are added in Home Assistant, without new firmware
+  window_entity: binary_sensor.co2_wall_sensor_window
 
 esphome:
   name: ${name}
@@ -239,8 +242,18 @@ sensor:
       const float minutes = (red - c) / trend * 60.0f;
       return minutes > 240 ? NAN : minutes;
 
+binary_sensor:
+  # window contact (or a group of them) from Home Assistant
+  - platform: homeassistant
+    id: window_open
+    entity_id: ${window_entity}
+    internal: true
+    on_state:
+      - component.update: window_hint
+
 text_sensor:
-  # window hint: only when opening the window really helps (or would make it worse)
+  # window hint: only when opening the window really helps (or would make it worse). With a window contact it
+  # follows the open window: how long it has been airing, and when the air is fresh again, to close it.
   - platform: template
     id: window_hint
     name: "${txt_window_hint}"
@@ -250,7 +263,25 @@ text_sensor:
       // hysteresis: a hint that is shown stays until its condition is clearly gone (0.5 K, 0.5 g/m3),
       // so it does not flicker while the temperatures hover around a threshold
       static std::string last = "${txt_hint_none}";
+      static uint32_t opened = 0;
       const float ti = id(temperature).state, hi = id(humidity).state;
+      if (id(window_open).has_state() && id(window_open).state) {
+        if (opened == 0) opened = millis() | 1;
+        // fresh: clearly below the yellow threshold (300 ppm, at least 600 ppm), 30 ppm hysteresis
+        const float fresh = std::max(600.0f, id(threshold_yellow).state - 300.0f);
+        const bool was = last == "${txt_hint_close}";
+        if (id(co2).has_state() && id(co2).state <= fresh + (was ? 30.0f : 0.0f)) {
+          last = "${txt_hint_close}";
+          return last;
+        }
+        const int minutes = (millis() - opened) / 60000;
+        if (minutes < 1) { last = "${txt_hint_open}"; return last; }
+        char buf[48];
+        snprintf(buf, sizeof(buf), "${txt_hint_airing}", minutes);
+        last = buf;
+        return last;
+      }
+      opened = 0;
       const float to = id(outdoor_temperature).state, ho = id(outdoor_humidity).state;
       if (std::isnan(ti) || std::isnan(to)) { last = "${txt_hint_none}"; return last; }
       auto keep = [&](const char *h) { return last == h ? 0.5f : 0.0f; };
@@ -523,6 +554,7 @@ font:
       - "\U000F058E" # mdi-water-percent
       - "\U000F05A9" # mdi-wifi
       - "\U000F05AA" # mdi-wifi-off
+      - "\U000F11DC" # mdi-window-open-variant
   - file:
       type: web
       url: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/master/fonts/materialdesignicons-webfont.ttf"
@@ -583,6 +615,9 @@ display:
       const bool online = wifi::global_wifi_component->is_connected();
       it.print(W - 12, 10, id(icons), online ? id(col_muted) : id(col_red), TextAlign::TOP_RIGHT,
                online ? "\U000F05A9" : "\U000F05AA");
+      // open window (contact in Home Assistant) left of the WiFi symbol
+      if (id(window_open).has_state() && id(window_open).state)
+        it.print(W - 42, 10, id(icons), id(col_cool), TextAlign::TOP_RIGHT, "\U000F11DC");
 
       // status pill
       const int pw = 140, ph = 26, px = (W - pw) / 2, py = 9;
@@ -620,6 +655,7 @@ display:
         const std::string h = id(window_hint).state;
         Color hc = id(col_cool);
         if (h == "${txt_hint_warm}" || h == "${txt_hint_short}") hc = id(col_warm);
+        if (h == "${txt_hint_close}") hc = id(col_green);
         if (h != "${txt_hint_none}") {
           int bx, by, bw, bh;
           it.get_text_bounds(27, 196, h.c_str(), id(font_hint), TextAlign::BOTTOM_LEFT, &bx, &by, &bw, &bh);

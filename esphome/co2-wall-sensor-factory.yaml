@@ -52,6 +52,9 @@ substitutions:
   txt_hint_warm: "Keep it shut: warmer outside"
   txt_hint_short: "Air briefly: warmer outside"
   txt_hint_none: "None"
+  txt_hint_open: "Window open: airing"
+  txt_hint_airing: "Airing for %d min"
+  txt_hint_close: "Fresh air: close the window"
   txt_label_hum: "HUMIDITY"
   # Optional overrides (defaults in common/base.yaml)
   # co2_yellow_default: "1000"

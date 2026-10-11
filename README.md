@@ -7,7 +7,7 @@ It covers a flush wall box or stands on your desk.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Enclosure](https://img.shields.io/badge/enclosure-v2.1-6E7B8B)
+![Enclosure](https://img.shields.io/badge/enclosure-v2.2-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -146,6 +146,14 @@ The display shows the outdoor temperature under **OUT**, and the window hint com
 * **Without anything to set up** the device takes `weather.forecast_home`, the weather entity Home Assistant creates for your home location (integration *Meteorologisk institutt (Met.no)*).
 * **A real outdoor sensor wins.** Pair it as usual (Zigbee, Homematic IP, Shelly, ...), open it under *Settings > Devices & services > Entities*, click the gear and set the **entity ID** to `sensor.outdoor_temperature` (humidity: `sensor.outdoor_humidity`). A few seconds later the display shows it. No new firmware needed.
 
+### Window contacts
+
+With a window contact the device knows when you are airing. A window symbol appears at the top, the hint line counts the minutes (*Airing for 6 min*) and turns green when the air is fresh again (*Fresh air: close the window*, at 300 ppm below the yellow threshold, at least 600 ppm).
+
+* In Home Assistant open *Settings > Devices & services > Helpers > Create helper > Group > Binary sensor group*, name it **CO2 Wall Sensor Window** (German firmware: **CO2 Wandsensor Fenster**) and add the window contacts of the room. The entity ID becomes `binary_sensor.co2_wall_sensor_window` (`binary_sensor.co2_wandsensor_fenster`), exactly what the firmware listens to.
+* The group is on as soon as one window is open. A second window later? Just add it to the group, no new firmware needed.
+* Several devices in different rooms: give each device its own group and set `window_entity` in its device file.
+
 **Ventilation reminder:** a ready blueprint notifies your phone when the CO2 level stays high and again when the air is good.
 
 [![Open your Home Assistant instance and show the blueprint import dialog](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ftobi136B%2Fco2-wall-sensor%2Fblob%2Fmain%2Fhomeassistant%2Fblueprints%2Fco2_ventilation_reminder.yaml)
@@ -198,7 +206,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * **Versions:** the release number (e.g. 1.9.0) counts every change, firmware and docs included. The **enclosure version** (badge at the top, engraved on every printed part) only changes when the printed parts change. Parts with the same enclosure version fit together, whatever release they came from.
 * **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md). Other boards: [online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html).
 * **Display:** all dimensions of the Waveshare 2inch LCD Module are measured with a caliper (PCB 58.2 × 35.3 × 1.62 mm, glass 47.7 × 34.6 mm, PCB and glass 4.43 mm thick). Other batches may differ slightly: check `LCD_*` and `GLASS_*`.
-* **Hardware status:** enclosure 2.1 contains the lessons of the first printed device and is verified in CAD and CI. The 90° USB-C adapter is not measured yet, its hole is generous. Photos and measurements of a printed device are welcome.
+* **Hardware status:** enclosure 2.2 contains the lessons of the first printed device and is verified in CAD and CI. The 90° USB-C adapter is not measured yet, its hole is generous. Photos and measurements of a printed device are welcome.
 
 ## Roadmap
 
@@ -211,6 +219,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * [x] [Online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html): sensor carrier STL from the dimensions of the board ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
 * [x] Enclosure 2.0 after the first print: display cable stays plugged, ESP32-C3 on a sled with a spring hook, 90° adapter instead of the loose port module, wall plate for M4 screws (v2.0)
 * [x] Enclosure 2.1: more play in every fit (0.4 mm), clean bottom blank or closed back cover for the unused cable opening, lead-ins, pull tab on the carrier, 2 mm air for the display cable (v2.1)
+* [x] Window contacts from Home Assistant: window symbol, airing time and a hint to close the window (v2.2)
 * [ ] Verify display layout and thermals on real hardware, add photos
 
 ## Contributing
