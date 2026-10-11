@@ -113,8 +113,8 @@
     en: "USB-C 90° adapter (plug to socket)"
     de: "USB-C-Winkeladapter 90° (Stecker auf Buchse)"
   tip:
-    en: "Cable on the wall instead? Leave the adapter out and later plug a straight cable in from below through the window in the bottom of the housing."
-    de: "Lieber ein Kabel auf Putz? Den Adapter weglassen und später ein gerades Kabel von unten durch das Fenster im Gehäuseboden einstecken."
+    en: "Cable on the wall instead? Leave the adapter out, lay a straight plug into the slot in the bottom from the back and use the closed back cover."
+    de: "Lieber ein Kabel auf Putz? Den Adapter weglassen, einen geraden Stecker von hinten in den Schlitz im Boden legen und den geschlossenen Rückdeckel nehmen."
   title:
     en: USB-C adapter
     de: USB-C-Adapter
@@ -155,6 +155,23 @@
   text:
     en: "Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram."
     de: "Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan."
+
+- new: [blank]
+  from: [0, 0, 40]
+  stage: carrier_in
+  camera: {eye: [-60, -120, 120], target: [14, -30, 18]}
+  need:
+    en: "Bottom blank"
+    de: "Bodenblende"
+  tip:
+    en: "Cable to the bottom with a straight plug instead? Leave the blank out, lay the plug into the slot from the back and use the closed back cover."
+    de: "Kabel lieber gerade nach unten? Dann die Blende weglassen, den Stecker von hinten in den Schlitz legen und den geschlossenen Rückdeckel nehmen."
+  title:
+    en: Bottom blank
+    de: Bodenblende
+  text:
+    en: Slide the blank into the slot of the bottom wall from the back until it stops, its lug points inwards. Its slanted flanks keep it from falling out, the back cover keeps it in place.
+    de: Die Blende von hinten in den Schlitz im Boden schieben bis zum Anschlag, ihre Nase zeigt nach innen. Die schrägen Flanken halten sie nach außen, der Rückdeckel hält sie an ihrem Platz.
 
 - new: [cover, cover_screws]
   from: [0, 0, 50]

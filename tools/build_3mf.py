@@ -5,7 +5,9 @@ Print-ready 3MF plates: every part in its print orientation, arranged on a 220 x
 Open the 3MF in PrusaSlicer, OrcaSlicer, Bambu Studio or Cura, choose your printer and PETG, slice.
 
 Usage:   python tools/build_3mf.py
-Output:  cad/3mf/co2_wall_sensor_device.3mf   housing, sensor carrier (14x22 board), back cover, desk stand
+Output:  cad/3mf/co2_wall_sensor_device.3mf   housing, sensor carrier (14x22 board), back cover, bottom blank,
+                                              desk stand (cable to the back)
+         cad/3mf/back_cover_closed.3mf        closed back cover instead (cable to the bottom, no blank)
          cad/3mf/sensor_carrier_15x20.3mf     sensor carrier for the 15 x 20 mm board
          cad/3mf/co2_wall_sensor_mounts.3mf   wall plate, desk stand
 """
@@ -32,12 +34,16 @@ PLATES = {
     "co2_wall_sensor_device": [
         ("housing", FLAT),
         ("back_cover", FLAT),
+        ("bottom_blank", ON_EDGE),  # outer face down
         ("sensor_carrier_14x22", ON_EDGE),
         ("desk_stand", ON_SIDE),  # on the plate as well, delete it in the slicer for a wall mount
     ],
     "co2_wall_sensor_mounts": [
         ("wall_plate", FLAT),
         ("desk_stand", ON_SIDE),
+    ],
+    "back_cover_closed": [
+        ("back_cover_closed", FLAT),
     ],
     "sensor_carrier_15x20": [
         ("sensor_carrier_15x20", ON_EDGE),

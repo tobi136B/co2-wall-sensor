@@ -52,18 +52,19 @@ The back cover is held at four points: two bosses in the bottom corners and two 
 ## Nothing is glued
 
 * **SCD41:** the breakout has no mounting holes. It slides from the top into two rails with a groove on the front of the sensor carrier and stands on an end stop. A tongue cut out of the carrier carries a 45° hook that springs over the upper edge and presses the board onto the stop, so tolerances of ±0.4 mm are taken up without play. Only this carrier depends on the board: there is one per board profile, see [measure your sensor](measure-sensor.md).
-* **ESP32-C3:** it has no mounting holes either. It slides down on a sled that carries it over its whole length, between side guides with crush ribs, until it stands on two end stops and slips into a short groove at its lower edge. Then a hook on a spring tongue clicks behind its upper edge, with a straight face, so the plug force cannot push the board up. The sled reaches over the divider into the display bay, 0.3 mm above the display connector. The groove sits where the board has no solder pads, so wires can be soldered along both edges.
-* **Display cable:** it stays plugged into the display. The display bay is longer on one side, so the display only fits with its connector there and the electronics strip of the glass always sits behind the frame; the device is 77 mm wide for this, the window stays centred. The flat cable runs under a printed bridge on the sled, the back cover closes it from behind.
+* **ESP32-C3:** it has no mounting holes either. It slides down on a sled that carries it over its whole length, between side guides with crush ribs, until it stands on two end stops and slips into a short groove at its lower edge. Then a hook on a spring tongue clicks behind its upper edge, with a straight face, so the plug force cannot push the board up. The sled reaches over the divider into the display bay, 0.8 mm above the display connector. The groove sits where the board has no solder pads, so wires can be soldered along both edges.
+* **Display cable:** it stays plugged into the display. The display bay is longer on one side, so the display only fits with its connector there and the electronics strip of the glass always sits behind the frame; the device is 79.6 mm wide for this, so the bent cable keeps 2 mm air at the wall, and the window stays centred. The flat cable runs under a printed bridge on the sled, the back cover closes it from behind.
 * **Sensor carrier:** two screws. It is the removable floor of the sensor chamber, so the sensor can be replaced without touching the display.
 
-## Cable exit: the same parts for both ways
+## Cable exit: one housing for both ways
 
 The ESP32-C3 sits with its USB-C socket pointing **down**, with 12.5 mm of free space below it.
 
 * **To the back:** a 90° USB-C adapter (plug to socket) in the socket, its body points to the wall. It leaves through a hole in the back cover, and any USB-C cable goes straight into the flush wall box or through the desk stand. The carrier is open below the socket, so the adapter goes in with the board, before the carrier.
-* **To the bottom:** a straight plug in the window of the bottom wall, which holds its overmould with 0.2 mm play.
+* **To the bottom:** a straight plug in a slot of the bottom wall, 0.4 mm play around its overmould. The slot is open to the back, so the plug is laid in from behind, and a closed back cover keeps the back clean.
+* **The unused opening is always closed by a clean part:** with the cable to the back a bottom blank fills the slot flush. The inner half of the slot widens at 45 degrees, so the blank cannot fall out; it slides in from the back, and a lug in front of the back cover keeps it there. No screw, no glue, and both the blank and the slot print without support.
 
-Up to version 1.8 a small loose port module closed the opening, in two versions. It was hard to insert and fell out before the cover was on, and right-angle plugs differ in which way they bend. The adapter fixes the direction, and the window and the hole need no extra part. Thin knock-out membranes were tried before (v1.2), but they cannot be closed again once broken out.
+Up to version 1.8 a small loose port module closed the opening, in two versions. It was hard to insert and fell out before the cover was on, and right-angle plugs differ in which way they bend. The adapter fixes the direction, and since v2.1 the opening you do not use gets a part of its own that closes it flush. Thin knock-out membranes were tried before (v1.2), but they cannot be closed again once broken out.
 
 ## Printing details
 

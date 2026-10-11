@@ -62,6 +62,8 @@ export function buildCarrier(wasm, base, board) {
   const prismX = (pts, x0, x1) =>
     Manifold.extrude(new CrossSection([ccw(pts)]), x1 - x0)
       .transform([0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, x0, 0, 0, 1]);
+  // polygon (x, y) in the XY plane, extruded along z from z0 to z1
+  const prismZ = (pts, z0, z1) => Manifold.extrude(new CrossSection([ccw(pts)]), z1 - z0).translate([0, 0, z0]);
   const cylZ = (centres, d, z0, z1) =>
     Manifold.union(centres.map(([x, y]) => Manifold.cylinder(z1 - z0, d / 2, d / 2, SEG).translate([x, y, z0])));
 
@@ -126,6 +128,13 @@ export function buildCarrier(wasm, base, board) {
   const ribs = [];
   for (const sx of [-1, 1]) for (const y of [p.C3_Y0 + 4.0, p.C3_TOP - 3.0]) ribs.push([p.C3_X + sx * (gx - p.C3_RIB + rr), y]);
   add(cylZ(ribs, 2 * rr, p.EXT_Z0, zGuide));
+  // 45 degree lead-in at the upper end of both guides
+  const yt = p.C3_TOP + 0.5;
+  for (const sx of [-1, 1]) {
+    const xi = p.C3_X + sx * gx;
+    cut(prismZ([[xi, yt + 0.01], [xi + sx * (p.LEAD_IN + 0.01), yt + 0.01], [xi, yt - p.LEAD_IN - 0.01]],
+      p.EXT_Z0 - 0.01, zGuide + 0.01));
+  }
   for (const [x0, x1] of [[p.C3_X - gx, p.C3_X - p.C3_W / 2 + 1.5], [p.C3_X + p.C3_W / 2 - 1.5, p.C3_X + gx]])
     add(box(x0, p.C3_Y0 - 1.2, top, x1, p.C3_Y0 - 0.05, p.C3_Z0 + p.C3_PCB));
   const zl = p.C3_Z0 + p.C3_PCB_MAX + 0.1;
@@ -152,6 +161,10 @@ export function buildCarrier(wasm, base, board) {
     add(prismX(post, Math.min(xa, xb), Math.max(xa, xb)));
   }
   add(box(p.C3_X - xp - 0.01, p.BRIDGE_Y0 + p.BRIDGE_H, zc - p.BRIDGE_BAR, p.C3_X + xp + 0.01, p.C3_EXT_Y1, zc));
+  // pull tab with a hole for a finger nail or a screwdriver
+  const tx = p.XL + p.B + p.BOSS_D / 2 + 0.3 + p.BOSS_FILLET + 1.5, ty = yLo + 1.5;
+  add(box(tx, ty, top - 0.01, tx + p.TAB_T, ty + p.TAB_L, top + p.TAB_H));
+  cut(box(tx - 0.1, ty + p.TAB_L / 2 - 2.0, top + p.TAB_H - 3.6, tx + p.TAB_T + 0.1, ty + p.TAB_L / 2 + 2.0, top + p.TAB_H - 1.2));
   return body;
 }
 

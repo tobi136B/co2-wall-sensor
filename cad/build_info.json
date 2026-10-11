@@ -1,8 +1,10 @@
 {
-  "enclosure_version": "2.0",
-  "parameters_sha256": "e4dfde95b3c93a81f28c3ed25cc52b6b9ff1c77f5423d3c127b239c911ea2c77",
+  "enclosure_version": "2.1",
+  "parameters_sha256": "f80c8c9a5640b95ea3e7b5dc77d4f3b6d67ad41b0d981338d26fb2371137d531",
   "parts": [
     "back_cover",
+    "back_cover_closed",
+    "bottom_blank",
     "desk_stand",
     "housing",
     "sensor_carrier_14x22",

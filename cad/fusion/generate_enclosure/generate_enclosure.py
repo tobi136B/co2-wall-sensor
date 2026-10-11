@@ -64,7 +64,7 @@ TOP_BAND = 5.0          # solid band above the display bay, holds two cover inse
 INSERT_HOLE_D = 2.9     # hole for M2 x 3 heat-set inserts, takes both outer diameters 3.0 and 3.2
 INSERT_HOLE_L = 3.4     # hole depth (insert length 3.0 + 0.4)
 INSERT_LEAD = 0.4       # entry chamfer, centres the insert while pressing
-BOSS_D = 5.0            # boss around an insert
+BOSS_D = 5.6            # boss around an insert
 BOSS_FILLET = 0.6       # fillet at the root of the bosses
 SCREW_CLEAR_D = 2.4     # clearance hole for M2
 HEAD_D, HEAD_H = 4.2, 1.3   # counterbore for M2 ISO 7380 button head (head 3.5 x 1.1)
@@ -218,9 +218,9 @@ def derive():
     C3_Z0 = FLOOR_Z + FLOOR_T + RIB_H                # underside of the ESP32-C3 PCB
     PLUG_Z = C3_Z0 + C3_PCB + C3_USB_H / 2           # centre of the USB-C socket
     SOCKET_TOP = C3_Z0 + C3_PCB + C3_USB_H
-    # boss centre distance from the inner walls: the bosses merge 0.6 mm deep into the walls, a clean joint
+    # boss centre distance from the inner walls: the bosses merge 0.55 mm deep into the walls, a clean joint
     # without slivers where a boss only grazes a wall or the divider
-    B = BOSS_D / 2 - 0.6
+    B = BOSS_D / 2 - 0.55
     COVER_SCREWS = [(XL + B, Y_CHIN_LOW + B), (XR - B, Y_CHIN_LOW + B),
                     (-20.0, Y_TOP_IN - TOP_BAND / 2), (20.0, Y_TOP_IN - TOP_BAND / 2)]
     CARRIER_SCREWS = [(XL + B, Y_DIV_LOW - B), (XR - B, Y_DIV_LOW - B)]
@@ -667,7 +667,29 @@ def boss_fillets(comp, body, points, dia, z_base, name):
     def at(c):
         return abs(c.z - cm(z_base)) < 1e-4 and any(abs(c.x - cm(x)) < 1e-4 and abs(c.y - cm(y)) < 1e-4
                                                       for x, y in points)
-    try_fillet(comp, circular_edges(body, dia / 2, at), BOSS_FILLET, name)
+    # one fillet per arc: an arc that ends against a wall may fail alone without taking the others along
+    def key(e):
+        q = e.pointOnEdge
+        return round(q.x, 4), round(q.y, 4), round(q.z, 4)
+    failed, done = set(), 0
+    while True:   # the edges are collected again after every fillet, the body changes
+        todo = [e for e in circular_edges(body, dia / 2, at) if key(e) not in failed]
+        if not todo:
+            break
+        if _quiet_fillet(comp, [todo[0]], BOSS_FILLET, name):
+            done += 1
+        else:
+            failed.add(key(todo[0]))
+    if failed:
+        log(f'note: {name} {done} filleted, {len(failed)} skipped')
+
+
+def _quiet_fillet(comp, edges, radius, name):
+    try:
+        fillet(comp, edges, radius, name)
+        return True
+    except RuntimeError:
+        return False
 
 
 def screw_holes(comp, points, z_face, body, counterbore=True):
@@ -941,7 +963,10 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     box(comp, tx - 0.1, ty + TAB_L / 2 - 2.0, top + TAB_H - 3.6, tx + TAB_T + 0.1, ty + TAB_L / 2 + 2.0,
         top + TAB_H - 1.2, CUT, 'PullTabHole', body)
 
-    label(comp, body, top, tx + TAB_T + 1.5, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 6.5,
+    x1 = SPRING_X - hw - 2.0
+    if abs(SCD_PAD_X) > 1e-6 and -SCD_PAD_X < x1:
+        x1 = min(x1, -SCD_PAD_X - 1.2 - 1.3)      # keep the letters off the relief behind the solder pads
+    label(comp, body, top, tx + TAB_T + 1.5, Y_CHIN_LOW + 4, x1, y_hi - 6.5,
           f'v{VERSION}\n{profile or "custom"}', name='Label')
     return comp
 
