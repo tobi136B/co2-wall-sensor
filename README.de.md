@@ -7,7 +7,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.0-6E7B8B)
+![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.1-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -30,7 +30,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 * **Fensterhinweis.** Das Display zeigt, wann Lüften den Raum kühlt oder die Luft trocknet. Dafür reicht ein Außensensor oder einfach die Wettervorhersage aus Home Assistant.
 * **Alles in Home Assistant einstellbar.** Nachtzeiten (dimmen oder aus), Nachthelligkeit, Warnung in der Nacht, Temperaturkorrektur, Höhe und Schwellen für den Hinweis, ganz ohne neu zu flashen.
 * **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (zwei Schrauben M4 mit Dübeln oder die Schrauben einer Hohlwanddose Ø 68 mm) oder den **Tischständer**.
-* **Kabel von hinten oder unten** mit denselben Teilen: Ein USB-C-Winkeladapter führt das Kabel gerade in die Wand, oder ein gerades Kabel geht durch das Fenster im Boden.
+* **Kabel von hinten oder unten** mit demselben Gehäuse: Ein USB-C-Winkeladapter führt das Kabel gerade in die Wand, oder ein gerades Kabel geht durch den Schlitz im Boden. Die Öffnung, die du nicht brauchst, verschließt ein sauberes gedrucktes Teil.
 * **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. SCD41 und ESP32-C3 gleiten in Schienen und rasten hinter Federhaken ein, das Displaykabel bleibt gesteckt und läuft unter einer mitgedruckten Brücke.
 * **Durchdachte Thermik.** Der Sensor sitzt in einer eigenen Kammer unterhalb der Elektronik, Frischluft kommt von unten, die Front bleibt geschlossen.
 * **Vollständig parametrisches CAD.** Jedes Maß ist ein Fusion-Benutzerparameter. Wert ändern, Skript starten, neue STL, STEP, Druckplatten und Zeichnung.
@@ -58,7 +58,7 @@ Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisie
 
 | | |
 |---|---|
-| Gerät | 77 × 69,8 × 24 mm (+ 3 mm Schiene) |
+| Gerät | 79,6 × 69,8 × 24 mm (+ 3 mm Schiene) |
 | Wandplatte | 89,2 × 82 × 7 mm, Langlöcher für M4 mit 60 mm Abstand, passt auch auf Hohlwanddosen Ø 68 mm |
 | Displayfenster | 41,8 × 31,6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 bis 5000 ppm, ±(50 ppm + 5 % vom Messwert) |
@@ -198,7 +198,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * **Versionen:** Die Releasenummer (z. B. 1.9.0) zählt jede Änderung, auch an Firmware und Doku. Die **Gehäuseversion** (Badge oben, auf jedem gedruckten Teil eingeprägt) ändert sich nur, wenn sich die Druckteile ändern. Teile mit derselben Gehäuseversion passen zusammen, egal aus welchem Release sie stammen.
 * **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md). Andere Platinen: [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html).
 * **Display:** Alle Maße des Waveshare 2inch LCD Module sind mit dem Messschieber nachgemessen (Platine 58,2 × 35,3 × 1,62 mm, Glas 47,7 × 34,6 mm, Platine und Glas zusammen 4,43 mm). Andere Chargen können leicht abweichen: `LCD_*` und `GLASS_*` prüfen.
-* **Stand der Hardware:** Gehäuse 2.0 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Der USB-C-Winkeladapter ist noch nicht nachgemessen, sein Loch ist großzügig. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
+* **Stand der Hardware:** Gehäuse 2.1 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Der USB-C-Winkeladapter ist noch nicht nachgemessen, sein Loch ist großzügig. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 
 ## Ausblick
 
@@ -210,6 +210,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * [x] Saubere Kabelführung ohne Kleber: Kabelschlitz und Kabelclip am Sensorträger, freier Kabelweg hinter dem Display (v1.9)
 * [x] [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html): Sensorträger als STL aus den Maßen der Platine ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
 * [x] Gehäuse 2.0 nach dem ersten Druck: Displaykabel bleibt gesteckt, ESP32-C3 auf einem Schlitten mit Federhaken, Winkeladapter statt losem Port-Modul, Wandplatte für M4-Schrauben (v2.0)
+* [x] Gehäuse 2.1: mehr Spiel in jeder Passung (0,4 mm), saubere Bodenblende oder geschlossener Rückdeckel für die ungenutzte Kabelöffnung, Einführschrägen, Zuglasche am Träger, 2 mm Luft für das Displaykabel (v2.1)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 
 ## Mitmachen

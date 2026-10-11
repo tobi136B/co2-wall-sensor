@@ -16,7 +16,8 @@ Jedes Teil trägt auf einer verdeckten Fläche die Gehäuseversion als kräftige
 |------|-------|-------------|----------|
 | Gehäuse | [`housing.stl`](../../cad/stl/housing.stl) | Front nach unten | Die Front liegt auf dem Druckbett (eine strukturierte PEI-Platte sieht super aus). Ein 45° Fuß an der Frontkante verhindert den Elefantenfuß. Kein Stützmaterial. |
 | Sensorträger | [`sensor_carrier_14x22.stl`](../../cad/stl/sensor_carrier_14x22.stl) oder [`sensor_carrier_15x20.stl`](../../cad/stl/sensor_carrier_15x20.stl) | stehend auf der Unterkante | **Passend zu deiner SCD41-Platine**, siehe [Sensor ausmessen](sensor-ausmessen.md). Stehend gedruckt werden die Schienen zu senkrechten Kanälen, beide Federzungen wachsen nach oben und die Kabelbrücke druckt ohne Stützmaterial. 5 mm Brim verwenden. |
-| Rückdeckel | [`back_cover.stl`](../../cad/stl/back_cover.stl) | Innenseite nach unten | Beschriftung "FACE DOWN". Schiene zeigt nach oben, kein Stützmaterial. Derselbe Deckel für beide Kabelausgänge. |
+| Rückdeckel | [`back_cover.stl`](../../cad/stl/back_cover.stl) (Kabel nach hinten) oder [`back_cover_closed.stl`](../../cad/stl/back_cover_closed.stl) (Kabel nach unten) | Innenseite nach unten | Beschriftung "FACE DOWN". Schiene zeigt nach oben, kein Stützmaterial. |
+| Bodenblende | [`bottom_blank.stl`](../../cad/stl/bottom_blank.stl) | Außenseite nach unten | Nur für das Kabel nach hinten: verschließt den Schlitz im Boden bündig. |
 | Wandplatte | [`wall_plate.stl`](../../cad/stl/wall_plate.stl) | **Sichtseite nach unten** | Die Front bekommt die Oberfläche des Druckbetts. Andersherum müsste die 78 mm große Aussparung für den Dosenrand frei überbrückt werden. |
 | Tischständer | [`desk_stand.stl`](../../cad/stl/desk_stand.stl) | auf der Seite | Auf der Seite gedruckt ist die Schiene am stabilsten. |
 
@@ -24,7 +25,7 @@ Jedes Teil trägt auf einer verdeckten Fläche die Gehäuseversion als kräftige
 
 **Zwei Farben:** Gehäuse in Mattschwarz oder Anthrazit, Wandplatte in der Farbe der Lichtschalter (meist Reinweiß). Das Ergebnis wirkt wie ein Schaltereinsatz im Rahmen.
 
-**Passung zu stramm oder zu locker?** Alle Schiebe- und Steckpassungen hängen an einem Wert, `FIT` (0,3 mm je Seite). In Fusion unter *Ändern > Parameter ändern* anpassen, Skript erneut starten und das betroffene Teil neu drucken. Siehe [Designnotizen](design.md#parameter-in-fusion).
+**Passung zu stramm oder zu locker?** Alle Schiebe- und Steckpassungen hängen an einem Wert, `FIT` (0,4 mm je Seite). In Fusion unter *Ändern > Parameter ändern* anpassen, Skript erneut starten und das betroffene Teil neu drucken. Siehe [Designnotizen](design.md#parameter-in-fusion).
 
 ## 2. Verbindungselemente: eine Schraubensorte für alles
 
@@ -38,18 +39,18 @@ Die Wandplatte hat 5 mm breite Langlöcher mit 3 mm Spiel nach oben und unten un
 
 ## 3. Kabelaustritt wählen
 
-Beide Wege gehen mit denselben gedruckten Teilen:
+Beide Wege nutzen dasselbe Gehäuse, nur der Rückdeckel ist ein anderer:
 
 | Kabel | Was du brauchst | Einsatz |
 |-------|-----------------|---------|
-| **Nach hinten** | USB-C-Winkeladapter 90° (Stecker auf Buchse) in der Buchse des ESP32-C3, darin ein beliebiges USB-C-Kabel | Hohlwanddose und **immer auf dem Tischständer** |
-| **Nach unten** | gerader USB-C-Stecker, Steckerkörper höchstens 12 × 7 mm | Kabel auf Putz, Powerbank unter dem Gerät |
+| **Nach hinten** | USB-C-Winkeladapter 90° (Stecker auf Buchse) in der Buchse des ESP32-C3, darin ein beliebiges USB-C-Kabel, Rückdeckel mit Loch, Bodenblende | Hohlwanddose und **immer auf dem Tischständer** |
+| **Nach unten** | gerader USB-C-Stecker, Steckerkörper höchstens 12 × 7 mm, geschlossener Rückdeckel | Kabel auf Putz, Powerbank unter dem Gerät |
 
 <img src="../images/cable_port_back.png" width="49%" alt="Kabel nach hinten"> <img src="../images/cable_port_bottom.png" width="49%" alt="Kabel nach unten">
 
-Der Adapter zeigt zur Wand und geht durch das Loch im Rückdeckel, das Kabel läuft gerade durch den Durchlass der Wandplatte in die Dose. Ein gerader Stecker sitzt im Fenster in der Bodenwand, das ihn stramm hält. Mit dem Stecker unten bleibt das Loch im Rückdeckel einfach leer, es zeigt ja zur Wand.
+Der Adapter zeigt zur Wand und geht durch das Loch im Rückdeckel, das Kabel läuft gerade durch den Durchlass der Wandplatte in die Dose. Den Schlitz im Boden verschließt dann die Bodenblende: Sie wird von hinten eingeschoben, ihre schrägen Flanken halten sie nach außen und der Rückdeckel hält sie an ihrem Platz. Ein gerader Stecker wird stattdessen von hinten in diesen Schlitz gelegt, und der geschlossene Rückdeckel hält die Rückseite sauber.
 
-Das Loch ist großzügig (Adapterkörper 14 × 8 mm plus 0,6 mm Spiel). Für einen größeren Adapter `ADAPTER_W`, `ADAPTER_T` und `ADAPTER_L` in Fusion ändern, siehe [Designnotizen](design.md#parameter-in-fusion).
+Das Loch ist großzügig (Adapterkörper 14 × 8 mm plus 1 mm Spiel). Für einen größeren Adapter `ADAPTER_W`, `ADAPTER_T` und `ADAPTER_L` in Fusion ändern, siehe [Designnotizen](design.md#parameter-in-fusion).
 
 ## 4. Schritt für Schritt
 
@@ -57,7 +58,7 @@ Das Loch ist großzügig (Adapterkörper 14 × 8 mm plus 0,6 mm Spiel). Für ein
 
 <!-- steps:start (generated from site/assembly_steps.yaml) -->
 
-### Schritt 1 von 12: Das Gehäuse
+### Schritt 1 von 13: Das Gehäuse
 
 <img src="../images/steps/step_01.png" width="60%" alt="Das Gehäuse">
 
@@ -67,7 +68,7 @@ Mit der Front nach unten gedruckt. Du schaust von hinten darauf, auf die Seite, 
 
 > **Tipp:** Kein Stützmaterial nötig. Den Rand (Brim) entfernen und prüfen, dass die vier Deckelsitze in den Ecken sauber sind.
 
-### Schritt 2 von 12: 10 Einschmelzmuttern
+### Schritt 2 von 13: 10 Einschmelzmuttern
 
 <img src="../images/steps/step_02.png" width="60%" alt="10 Einschmelzmuttern">
 
@@ -77,7 +78,7 @@ Die M2-Muttern mit dem Lötkolben eindrücken (ca. 200 bis 220 °C). 4 rund um d
 
 > **Tipp:** Mutter auf das Loch setzen, mit dem Lötkolben antippen und unter Eigengewicht einsinken lassen, bis sie bündig ist. Nicht drücken. Hinter den 4 Displaydomen ist die Front nur 1,1 mm dick: wenig Hitze, kein Druck.
 
-### Schritt 3 von 12: Display
+### Schritt 3 von 13: Display
 
 <img src="../images/steps/step_03.png" width="60%" alt="Display">
 
@@ -87,7 +88,7 @@ Zuerst das mitgelieferte Kabel ins Display stecken. Dann mit dem Glas voran in d
 
 > **Tipp:** Es passt nur in einer Richtung: Stecker nach links, wo der Schacht länger ist. Dann steht das Bild aufrecht und der Elektronikstreifen verschwindet hinter dem Rahmen. Die Schutzfolie auf dem Glas bis zum Schluss drauflassen.
 
-### Schritt 4 von 12: Sensorträger
+### Schritt 4 von 13: Sensorträger
 
 <img src="../images/steps/step_04.png" width="60%" alt="Sensorträger">
 
@@ -97,7 +98,7 @@ Der Träger ist der herausnehmbare Boden der Sensorkammer und hält auf seiner R
 
 > **Tipp:** Unsicher, welche Platine du hast? Siehe [Sensor ausmessen](sensor-ausmessen.md).
 
-### Schritt 5 von 12: SCD41 in die Schienen
+### Schritt 5 von 13: SCD41 in die Schienen
 
 <img src="../images/steps/step_05.png" width="60%" alt="SCD41 in die Schienen">
 
@@ -107,7 +108,7 @@ Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von o
 
 > **Tipp:** Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken.
 
-### Schritt 6 von 12: ESP32-C3 auf den Schlitten
+### Schritt 6 von 13: ESP32-C3 auf den Schlitten
 
 <img src="../images/steps/step_06.png" width="60%" alt="ESP32-C3 auf den Schlitten">
 
@@ -117,7 +118,7 @@ Bauteile nach oben, USB-C-Buchse nach unten. Oben auf den Schlitten legen und zw
 
 > **Tipp:** Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben.
 
-### Schritt 7 von 12: USB-C-Adapter
+### Schritt 7 von 13: USB-C-Adapter
 
 <img src="../images/steps/step_07.png" width="60%" alt="USB-C-Adapter">
 
@@ -125,9 +126,9 @@ Bauteile nach oben, USB-C-Buchse nach unten. Oben auf den Schlitten legen und zw
 
 Den Adapter von unten in die Buchse des ESP32-C3 stecken, sein Körper zeigt nach hinten. Der Träger ist unter der Buchse offen. Später geht das Kabel gerade nach hinten in die Wanddose. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-7))
 
-> **Tipp:** Lieber ein Kabel auf Putz? Den Adapter weglassen und später ein gerades Kabel von unten durch das Fenster im Gehäuseboden einstecken.
+> **Tipp:** Lieber ein Kabel auf Putz? Den Adapter weglassen, einen geraden Stecker von hinten in den Schlitz im Boden legen und den geschlossenen Rückdeckel nehmen.
 
-### Schritt 8 von 12: Träger ins Gehäuse
+### Schritt 8 von 13: Träger ins Gehäuse
 
 <img src="../images/steps/step_08.png" width="60%" alt="Träger ins Gehäuse">
 
@@ -137,7 +138,7 @@ Den Träger auf die Leisten im Kinn legen, der Schlitten gleitet über den Displ
 
 > **Tipp:** Die vier SCD41-Litzen vorher von der offenen Seite in den schmalen Kabelschlitz legen, dann bleibt die Sensorkammer ohne Kleber von der warmen Elektronik getrennt.
 
-### Schritt 9 von 12: Verdrahtung
+### Schritt 9 von 13: Verdrahtung
 
 <img src="../images/steps/step_09.png" width="60%" alt="Verdrahtung">
 
@@ -147,33 +148,43 @@ Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter
 
 > **Tipp:** Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen, dann kürzen und löten. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen.
 
-### Schritt 10 von 12: Rückdeckel
+### Schritt 10 von 13: Bodenblende
 
-<img src="../images/steps/step_10.png" width="60%" alt="Rückdeckel">
+<img src="../images/steps/step_10.png" width="60%" alt="Bodenblende">
+
+**Du brauchst:** Bodenblende
+
+Die Blende von hinten in den Schlitz im Boden schieben bis zum Anschlag, ihre Nase zeigt nach innen. Die schrägen Flanken halten sie nach außen, der Rückdeckel hält sie an ihrem Platz. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-10))
+
+> **Tipp:** Kabel lieber gerade nach unten? Dann die Blende weglassen, den Stecker von hinten in den Schlitz legen und den geschlossenen Rückdeckel nehmen.
+
+### Schritt 11 von 13: Rückdeckel
+
+<img src="../images/steps/step_11.png" width="60%" alt="Rückdeckel">
 
 **Du brauchst:** Rückdeckel, 4 Schrauben M2 × 4
 
-Den Deckel in seinen Sitz legen, der Adapter geht durch sein Loch. Mit 4 Schrauben M2 × 4 festschrauben. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-10))
+Den Deckel in seinen Sitz legen, der Adapter geht durch sein Loch. Mit 4 Schrauben M2 × 4 festschrauben. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-11))
 
 > **Tipp:** Hinten darf außer dem Adapter nichts überstehen: Die Köpfe liegen versenkt, sonst lässt sich das Gerät nicht auf die Wandplatte schieben.
 
-### Schritt 11 von 12: Wandplatte
+### Schritt 12 von 13: Wandplatte
 
-<img src="../images/steps/step_11.png" width="60%" alt="Wandplatte">
+<img src="../images/steps/step_12.png" width="60%" alt="Wandplatte">
 
 **Du brauchst:** Wandplatte, 2 Schrauben M4 mit 6er Dübeln (oder die 2 Schrauben einer Hohlwanddose)
 
-Die Platte an die Wand schrauben, Beschriftung zur Wand, 60 mm Abstand zwischen den Schrauben. Die Langlöcher geben 3 mm Spiel nach oben und unten, die Senkungen nehmen Linsen- und Senkköpfe. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-11))
+Die Platte an die Wand schrauben, Beschriftung zur Wand, 60 mm Abstand zwischen den Schrauben. Die Langlöcher geben 3 mm Spiel nach oben und unten, die Senkungen nehmen Linsen- und Senkköpfe. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-12))
 
 > **Tipp:** Strom in einer Unterputzdose: ein USB-Netzteil (Arbeiten an 230 V nur durch eine Elektrofachkraft) oder ein USB-Kabel in der Wand. Das Kabel durch den Durchlass der Platte führen.
 
-### Schritt 12 von 12: Gerät aufsetzen
+### Schritt 13 von 13: Gerät aufsetzen
 
-<img src="../images/steps/step_12.png" width="60%" alt="Gerät aufsetzen">
+<img src="../images/steps/step_13.png" width="60%" alt="Gerät aufsetzen">
 
 **Du brauchst:** Nichts
 
-Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-12))
+Gerät vor die Platte halten, die Schiene in das verdeckte Fenster stecken und 15 mm nach unten schieben. Fertig. Zum Abnehmen nach oben schieben und abziehen. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-13))
 
 > **Tipp:** Das Kabel in den Adapter stecken, bevor du das Gerät auf die Schiene setzt.
 

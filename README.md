@@ -7,7 +7,7 @@ It covers a flush wall box or stands on your desk.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Enclosure](https://img.shields.io/badge/enclosure-v2.0-6E7B8B)
+![Enclosure](https://img.shields.io/badge/enclosure-v2.1-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -30,7 +30,7 @@ It covers a flush wall box or stands on your desk.**
 * **Window hint.** The display tells you when opening the window cools the room or dries the air, using an outdoor sensor or simply your Home Assistant weather forecast.
 * **Everything adjustable in Home Assistant.** Night schedule (dim or off), night brightness, warnings at night, temperature correction, altitude and hint thresholds, no reflashing needed.
 * **One device, two mounts.** A dovetail rail slides onto the **wall plate** (two M4 screws with wall plugs, or the screws of a 68 mm flush wall box) or the **desk stand**.
-* **Cable from the back or from below** with the same parts: a 90° USB-C adapter leads the cable straight into the wall, or a straight cable leaves through the window in the bottom.
+* **Cable from the back or from below** with the same housing: a 90° USB-C adapter leads the cable straight into the wall, or a straight cable leaves through the slot in the bottom. The opening you do not use is closed by a clean printed part.
 * **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 and the ESP32-C3 slide into rails and click behind spring hooks, the display cable stays plugged in and runs under a printed bridge.
 * **Thought-through thermals.** The sensor lives in its own chamber below the electronics, fresh air enters from below, the front stays closed.
 * **Fully parametric CAD.** Every dimension is a Fusion user parameter. Change a value, run the script, get new STL, STEP, print plates and drawing.
@@ -58,7 +58,7 @@ Every 30 seconds the SCD41 delivers a new reading. The ESP32-C3 updates the disp
 
 | | |
 |---|---|
-| Device | 77 × 69.8 × 24 mm (+ 3 mm rail) |
+| Device | 79.6 × 69.8 × 24 mm (+ 3 mm rail) |
 | Wall plate | 89.2 × 82 × 7 mm, slots for M4 screws 60 mm apart, also fits flush wall boxes Ø 68 mm |
 | Display window | 41.8 × 31.6 mm, 320 × 240 px IPS |
 | Sensor | Sensirion SCD41, 400 to 5000 ppm, ±(50 ppm + 5 % of reading) |
@@ -198,7 +198,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * **Versions:** the release number (e.g. 1.9.0) counts every change, firmware and docs included. The **enclosure version** (badge at the top, engraved on every printed part) only changes when the printed parts change. Parts with the same enclosure version fit together, whatever release they came from.
 * **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md). Other boards: [online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html).
 * **Display:** all dimensions of the Waveshare 2inch LCD Module are measured with a caliper (PCB 58.2 × 35.3 × 1.62 mm, glass 47.7 × 34.6 mm, PCB and glass 4.43 mm thick). Other batches may differ slightly: check `LCD_*` and `GLASS_*`.
-* **Hardware status:** enclosure 2.0 contains the lessons of the first printed device and is verified in CAD and CI. The 90° USB-C adapter is not measured yet, its hole is generous. Photos and measurements of a printed device are welcome.
+* **Hardware status:** enclosure 2.1 contains the lessons of the first printed device and is verified in CAD and CI. The 90° USB-C adapter is not measured yet, its hole is generous. Photos and measurements of a printed device are welcome.
 
 ## Roadmap
 
@@ -210,6 +210,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * [x] Clean cable routing without glue: wire slot and wire clip on the sensor carrier, free cable path behind the display (v1.9)
 * [x] [Online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html): sensor carrier STL from the dimensions of the board ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
 * [x] Enclosure 2.0 after the first print: display cable stays plugged, ESP32-C3 on a sled with a spring hook, 90° adapter instead of the loose port module, wall plate for M4 screws (v2.0)
+* [x] Enclosure 2.1: more play in every fit (0.4 mm), clean bottom blank or closed back cover for the unused cable opening, lead-ins, pull tab on the carrier, 2 mm air for the display cable (v2.1)
 * [ ] Verify display layout and thermals on real hardware, add photos
 
 ## Contributing

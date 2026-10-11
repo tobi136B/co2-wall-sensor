@@ -43,12 +43,12 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '2.0'          # enclosure version, engraved into every part
+VERSION = '2.1'          # enclosure version, engraved into every part
 LABEL_FONT = 'Arial Black'  # labels: heavy strokes (about a fifth of the height) print as clean lines
 
 # ===================== PARAMETERS =====================
 # --- device ---
-BODY_W = 77.0           # outer width: room for the plugged display cable, the window stays centred
+BODY_W = 79.6           # outer width: the plugged display cable gets 2 mm air at the wall, the window stays centred
 BODY_H = 69.8           # outer height
 WALL = 2.0              # wall thickness
 LIP = 2.0               # front lip in front of the display glass
@@ -57,13 +57,14 @@ COVER_T = 2.5           # back cover thickness
 R_CORNER = 4.0          # outer corner radius
 R_FRONT = 2.5           # soft front edge, ends in a 45 degree foot on the print bed
 WINDOW_CHAMFER = 0.8    # chamfer around the display window
-FIT = 0.3               # fit clearance per side for all sliding and plugged parts
+FIT = 0.4               # fit clearance per side for all sliding and plugged parts (forgiving on any printer)
+LEAD_IN = 0.5           # 45 degree lead-in on the edges where parts are pushed in
 TOP_BAND = 5.0          # solid band above the display bay, holds two cover inserts
 # --- fasteners: one insert type, one screw type ---
 INSERT_HOLE_D = 2.9     # hole for M2 x 3 heat-set inserts, takes both outer diameters 3.0 and 3.2
 INSERT_HOLE_L = 3.4     # hole depth (insert length 3.0 + 0.4)
 INSERT_LEAD = 0.4       # entry chamfer, centres the insert while pressing
-BOSS_D = 5.0            # boss around an insert
+BOSS_D = 5.6            # boss around an insert
 BOSS_FILLET = 0.6       # fillet at the root of the bosses
 SCREW_CLEAR_D = 2.4     # clearance hole for M2
 HEAD_D, HEAD_H = 4.2, 1.3   # counterbore for M2 ISO 7380 button head (head 3.5 x 1.1)
@@ -81,6 +82,7 @@ LCD_BOSS_D = 4.6        # slightly smaller boss, sits right next to the glass
 # (seen from the back: left), the electronics strip of the glass on the +x side behind the frame
 LCD_CABLE_SPAN = 67.0   # measured: from the PCB edge without connector to the bend of the plugged cable
 LCD_PLUG_H = 5.77       # measured: connector above the back of the PCB, the highest part
+LCD_PLUG_AIR = 0.8      # air above the connector (and its plugged cable) up to the ESP32-C3 sled
 PH2_X0, PH2_X1 = 5.9, 13.4      # connector from the -x PCB edge (from a photo, only for the dummy)
 PH2_Y0, PH2_Y1 = 5.9, 24.7      # connector from the lower PCB edge (from a photo, only for the dummy)
 # --- chin: sensor chamber in front, ESP32-C3 behind ---
@@ -101,10 +103,12 @@ C3_HOOK = 0.7           # spring hook behind the upper board edge (board 0.74 th
 C3_TONGUE_L = 10.0      # free length of the spring tongue below the ESP32-C3
 PLUG_SPACE = 12.5       # free space below the mouth of the USB-C socket for the plug
 PLUG_W, PLUG_H = 12.0, 7.0      # overmould of a straight USB-C plug
+PLUG_PLAY = 0.4         # play around the overmould in the slot of the bottom wall
+BLANK_FIT = 0.2         # the blank that closes this slot (cable to the back): play per side in the slot
 # 90 degree USB-C adapter (plug to socket, sonero), the cable leaves to the back. Not measured yet: generous
 ADAPTER_W, ADAPTER_T, ADAPTER_L = 14.0, 8.0, 25.0  # body across, along the board, towards the wall
 ADAPTER_FRONT = 4.5     # from the axis of its USB-C plug to the front end of the body
-ADAPTER_PLAY = 0.6      # play around the adapter in the back cover and the wall plate
+ADAPTER_PLAY = 1.0      # play around the adapter in the back cover and the wall plate
 # SCD41 board as mounted: W across the rails, L in the slide direction. Defaults: profile '14x22'.
 # Offsets are seen from the front of the device: right and up are positive (right is -x in the model).
 SCD_W, SCD_L, SCD_PCB = 21.75, 13.51, 1.53      # SCD41 breakout board
@@ -125,6 +129,7 @@ SCD_CHANNEL_W = 2.4     # wire channel on the back of the carrier, between clip 
 CLIP_LIP = 0.8          # snap lip over the wire channel
 BRIDGE_H = 5.6          # bridge for the display cable over the ESP32-C3 sled: height of its upper face
 BRIDGE_BAR = 1.0        # thickness of its bar, the cable runs below it
+TAB_T, TAB_L, TAB_H = 1.6, 8.0, 5.5   # pull tab on the back of the carrier: thickness, length, height
 # --- dovetail rail ---
 RAIL_FOOT, RAIL_HEAD, RAIL_H, RAIL_L = 12.0, 16.0, 3.0, 14.0
 RAIL_Y0 = -10.0         # lower end of the rail
@@ -213,7 +218,9 @@ def derive():
     C3_Z0 = FLOOR_Z + FLOOR_T + RIB_H                # underside of the ESP32-C3 PCB
     PLUG_Z = C3_Z0 + C3_PCB + C3_USB_H / 2           # centre of the USB-C socket
     SOCKET_TOP = C3_Z0 + C3_PCB + C3_USB_H
-    B = 2.4                                          # boss centre distance from the inner walls
+    # boss centre distance from the inner walls: the bosses merge 0.55 mm deep into the walls, a clean joint
+    # without slivers where a boss only grazes a wall or the divider
+    B = BOSS_D / 2 - 0.55
     COVER_SCREWS = [(XL + B, Y_CHIN_LOW + B), (XR - B, Y_CHIN_LOW + B),
                     (-20.0, Y_TOP_IN - TOP_BAND / 2), (20.0, Y_TOP_IN - TOP_BAND / 2)]
     CARRIER_SCREWS = [(XL + B, Y_DIV_LOW - B), (XR - B, Y_DIV_LOW - B)]
@@ -221,7 +228,7 @@ def derive():
     LCD_BACK = LIP + GLASS_T + LCD_PCB               # back of the display PCB
     LCD_PCB_X1 = LCD_X + LCD_W / 2                   # PCB edge without connector
     LCD_CABLE_X0 = LCD_PCB_X1 - LCD_CABLE_SPAN       # bend of the plugged display cable
-    EXT_Z0 = LCD_BACK + LCD_PLUG_H + 0.3             # the ESP32-C3 sled passes over the display connector
+    EXT_Z0 = LCD_BACK + LCD_PLUG_H + LCD_PLUG_AIR    # the ESP32-C3 sled passes over the display connector
     # 90 degree adapter in the USB-C socket, its body points to the wall
     ADAPTER_Y0 = C3_MOUTH - ADAPTER_T
     ADAPTER_Z0 = PLUG_Z - ADAPTER_FRONT
@@ -446,6 +453,13 @@ def prism_x(comp, points_yz, x0, x1, op, name, body=None):
     return extrude(comp, sk, x1 - x0, op, name, body)
 
 
+def prism_z(comp, points_xy, z0, z1, op, name, body=None):
+    """Polygon in the XY plane, extruded along z."""
+    zm = (z0 + z1) / 2
+    sk = poly_sketch(comp, plane_z(comp, zm), [(x, y, zm) for x, y in points_xy], name)
+    return extrude(comp, sk, z1 - z0, op, name, body)
+
+
 def prism_y(comp, points_xz, y0, y1, op, name, body=None):
     """Polygon in the XZ plane, extruded along y."""
     ym = (y0 + y1) / 2
@@ -653,7 +667,29 @@ def boss_fillets(comp, body, points, dia, z_base, name):
     def at(c):
         return abs(c.z - cm(z_base)) < 1e-4 and any(abs(c.x - cm(x)) < 1e-4 and abs(c.y - cm(y)) < 1e-4
                                                       for x, y in points)
-    try_fillet(comp, circular_edges(body, dia / 2, at), BOSS_FILLET, name)
+    # one fillet per arc: an arc that ends against a wall may fail alone without taking the others along
+    def key(e):
+        q = e.pointOnEdge
+        return round(q.x, 4), round(q.y, 4), round(q.z, 4)
+    failed, done = set(), 0
+    while True:   # the edges are collected again after every fillet, the body changes
+        todo = [e for e in circular_edges(body, dia / 2, at) if key(e) not in failed]
+        if not todo:
+            break
+        if _quiet_fillet(comp, [todo[0]], BOSS_FILLET, name):
+            done += 1
+        else:
+            failed.add(key(todo[0]))
+    if failed:
+        log(f'note: {name} {done} filleted, {len(failed)} skipped')
+
+
+def _quiet_fillet(comp, edges, radius, name):
+    try:
+        fillet(comp, edges, radius, name)
+        return True
+    except RuntimeError:
+        return False
 
 
 def screw_holes(comp, points, z_face, body, counterbore=True):
@@ -750,12 +786,44 @@ def build_housing(root, ops):
     for xp in (-BODY_W / 2 + WALL / 2, BODY_W / 2 - WALL / 2):
         vent_mesh(comp, plane_x(comp, xp), VENT_SIDE, lambda u, v, xp=xp: (xp, u, v), WALL + 1, body, 'SideVents')
 
-    # window in the bottom wall for a straight USB-C plug, it holds the overmould with a snug fit
-    g = 0.2
-    box(comp, C3_X - PLUG_W / 2 - g, -BODY_H / 2 - 1, PLUG_Z - PLUG_H / 2 - g, C3_X + PLUG_W / 2 + g, Y_CHIN_LOW + 0.01,
-        PLUG_Z + PLUG_H / 2 + g, CUT, 'PlugWindow', body)
+    # slot in the bottom wall, open to the back: a straight USB-C plug sits in it (cable to the bottom), or the
+    # BottomBlank closes it flush (cable to the back). Its inner half widens at 45 degrees, so the blank cannot
+    # fall out; it slides in from the back and the back cover keeps it there.
+    prism_z(comp, plug_slot_profile(0.0), PLUG_Z - PLUG_H / 2 - PLUG_PLAY, DEPTH + 1, CUT, 'PlugSlot', body)
+    # lead-in on the edges of the back opening: back cover, carrier and blank find their way in
+    back = planar_face_at_z(body, DEPTH)
+    try_chamfer(comp, [e for lp in back.loops if not lp.isOuter for e in lp.edges], LEAD_IN, 'BackLeadIn')
 
     label(comp, body, COVER_Z, -17, BAY_Y1 + 0.6, 17, Y_TOP_IN - 0.6, f'CO2 v{VERSION}', name='Label')
+    return comp
+
+
+def plug_slot_profile(inset):
+    """Cross-section (x, y) of the slot in the bottom wall, made smaller by inset on every side (the blank)."""
+    a = PLUG_W / 2 + PLUG_PLAY - inset             # half width of the outer half
+    y_out, y_mid = -BODY_H / 2 - (1.0 if inset == 0 else 0.0), -BODY_H / 2 + WALL / 2
+    y_in = Y_CHIN_LOW + (0.01 if inset == 0 else -0.05)
+    w = (y_in - y_mid)                             # the inner half widens at 45 degrees
+    return [(C3_X - a, y_out), (C3_X + a, y_out), (C3_X + a, y_mid), (C3_X + a + w, y_in),
+            (C3_X - a - w, y_in), (C3_X - a, y_mid)]
+
+
+def build_bottom_blank(root, ops):
+    """Closes the slot in the bottom wall when the cable leaves to the back.
+
+    Flush with the bottom outside. It slides in from the back until it stands at the front end of the slot; a lug
+    on its inner face stands just in front of the back cover, so with the cover screwed on it cannot slide out.
+    Print it with the outer face down.
+    """
+    NEW, CUT, JOIN = ops
+    comp = new_component(root, 'BottomBlank')
+    z0 = PLUG_Z - PLUG_H / 2 - PLUG_PLAY + BLANK_FIT
+    body = prism_z(comp, plug_slot_profile(BLANK_FIT), z0, DEPTH - 0.1, NEW, 'Blank').bodies.item(0)
+    body.name = 'BottomBlank'
+    y_in = Y_CHIN_LOW - 0.05
+    zb = COVER_Z - 0.3                               # face towards the cover, slanted so it prints standing
+    lug = [(y_in - 0.01, zb - 3.0), (y_in - 0.01, zb), (y_in + 1.5, zb - 1.5), (y_in + 1.5, zb - 3.0)]
+    prism_x(comp, lug, C3_X - 4.0, C3_X + 4.0, JOIN, 'Lug', body)
     return comp
 
 
@@ -847,6 +915,12 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     r = 0.6
     ribs = [(C3_X + sx * (gx - C3_RIB + r), y) for sx in (-1, 1) for y in (C3_Y0 + 4.0, C3_TOP - 3.0)]
     cylinders(comp, ribs, 2 * r, EXT_Z0, z_guide, JOIN, 'C3CrushRib', body)
+    # 45 degree lead-in at the upper end of both guides, the board finds its way in
+    yt = C3_TOP + 0.5
+    for sx in (-1, 1):
+        xi = C3_X + sx * gx
+        prism_z(comp, [(xi, yt + 0.01), (xi + sx * (LEAD_IN + 0.01), yt + 0.01), (xi, yt - LEAD_IN - 0.01)],
+                EXT_Z0 - 0.01, z_guide + 0.01, CUT, 'C3GuideLeadIn', body)
     for x0, x1 in ((C3_X - gx, C3_X - C3_W / 2 + 1.5), (C3_X + C3_W / 2 - 1.5, C3_X + gx)):
         box(comp, x0, C3_Y0 - 1.2, top, x1, C3_Y0 - 0.05, C3_Z0 + C3_PCB, JOIN, 'C3EndStop', body)
     # short groove at the lower end (no solder pads there): floor below and lip above the board edge
@@ -882,27 +956,37 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     box(comp, C3_X - xp - 0.01, BRIDGE_Y0 + BRIDGE_H, zc - BRIDGE_BAR, C3_X + xp + 0.01, C3_EXT_Y1, zc, JOIN,
         'BridgeBar', body)
 
-    label(comp, body, top, XL + 4, Y_CHIN_LOW + 4, SPRING_X - hw - 2.0, y_hi - 6.5,
+    # pull tab: grip it (or hook a screwdriver into its hole) to lift the carrier out of the housing
+    tx = XL + B + BOSS_D / 2 + 0.3 + BOSS_FILLET + 1.5
+    ty = y_lo + 1.5
+    box(comp, tx, ty, top - 0.01, tx + TAB_T, ty + TAB_L, top + TAB_H, JOIN, 'PullTab', body)
+    box(comp, tx - 0.1, ty + TAB_L / 2 - 2.0, top + TAB_H - 3.6, tx + TAB_T + 0.1, ty + TAB_L / 2 + 2.0,
+        top + TAB_H - 1.2, CUT, 'PullTabHole', body)
+
+    x1 = SPRING_X - hw - 2.0
+    if abs(SCD_PAD_X) > 1e-6 and -SCD_PAD_X < x1:
+        x1 = min(x1, -SCD_PAD_X - 1.2 - 1.3)      # keep the letters off the relief behind the solder pads
+    label(comp, body, top, tx + TAB_T + 1.5, Y_CHIN_LOW + 4, x1, y_hi - 6.5,
           f'v{VERSION}\n{profile or "custom"}', name='Label')
     return comp
 
 
-def build_back_cover(root, ops):
-    """Back cover with the dovetail rail and a hole for the 90 degree adapter, which points to the wall.
-
-    The same cover for both cable exits: with a straight plug in the bottom window the hole faces the wall
-    and stays empty. Print it with the inner face down, the rail points up.
+def build_back_cover(root, ops, name='BackCover', hole=True):
+    """Back cover with the dovetail rail. Two variants: with a hole for the 90 degree adapter (cable to the back,
+    BackCover) or closed (cable to the bottom through the slot, BackCoverClosed). Print it with the inner face
+    down, the rail points up.
     """
     NEW, CUT, JOIN = ops
-    comp = new_component(root, 'BackCover')
+    comp = new_component(root, name)
     s = 0.2
     body = box(comp, XL + s, Y_CHIN_LOW + s, COVER_Z, XR - s, Y_TOP_IN - s, DEPTH, NEW, 'Cover').bodies.item(0)
-    body.name = 'BackCover'
+    body.name = name
     screw_holes(comp, COVER_SCREWS, DEPTH, body)
     open_head_recesses(comp, COVER_SCREWS, DEPTH, (XL + s, Y_CHIN_LOW + s, XR - s, Y_TOP_IN - s), body)
-    r = ADAPTER_PLAY
-    box(comp, C3_X - ADAPTER_W / 2 - r, ADAPTER_Y0 - r, COVER_Z - 1, C3_X + ADAPTER_W / 2 + r, C3_MOUTH + r,
-        DEPTH + 1, CUT, 'AdapterHole', body)
+    if hole:
+        r = ADAPTER_PLAY
+        box(comp, C3_X - ADAPTER_W / 2 - r, ADAPTER_Y0 - r, COVER_Z - 1, C3_X + ADAPTER_W / 2 + r, C3_MOUTH + r,
+            DEPTH + 1, CUT, 'AdapterHole', body)
     dovetail(comp, DEPTH, RAIL_FOOT, RAIL_HEAD, RAIL_H, RAIL_Y0, RAIL_Y0 + RAIL_L, JOIN, 'Rail', body)
     edges = [e for e in body.edges if _edge_in_plane(e, 'y', RAIL_Y0)
              and _edge_within(e, lambda p: p.z > cm(DEPTH) + 1e-4)]
@@ -1058,8 +1142,8 @@ def apply_appearances(design, root):
 def add_joints(root):
     """Device parts move together and slide on the wall plate (0 = mounted, 15 mm = released)."""
     occ = {o.component.name: o for o in root.occurrences}
-    device = ['Housing', 'SensorCarrier', 'BackCover', 'Dummy_LCD_2inch', 'Dummy_SCD41', 'Dummy_ESP32_C3',
-              'Dummy_Adapter']
+    device = ['Housing', 'SensorCarrier', 'BackCover', 'BackCoverClosed', 'BottomBlank', 'Dummy_LCD_2inch',
+              'Dummy_SCD41', 'Dummy_ESP32_C3', 'Dummy_Adapter', 'Dummy_PlugStraight']
     group = adsk.core.ObjectCollection.create()
     for n in device:
         group.add(occ[n])
@@ -1106,7 +1190,8 @@ def check_interference(design, root, components):
     return count
 
 
-PRINT_PARTS = {'Housing': 'housing', 'BackCover': 'back_cover', 'WallPlate': 'wall_plate', 'DeskStand': 'desk_stand'}
+PRINT_PARTS = {'Housing': 'housing', 'BackCover': 'back_cover', 'BackCoverClosed': 'back_cover_closed',
+               'BottomBlank': 'bottom_blank', 'WallPlate': 'wall_plate', 'DeskStand': 'desk_stand'}
 
 
 def check_scd_fit():
@@ -1208,21 +1293,24 @@ def run(_context: str):
     build_housing(root, ops)
     build_sensor_carrier(root, ops, profile=active_profile())
     build_back_cover(root, ops)
+    build_back_cover(root, ops, 'BackCoverClosed', hole=False)
+    build_bottom_blank(root, ops)
     build_wall_plate(root, ops, CABLE)
     build_desk_stand(root, ops, CABLE)
     build_dummies(root, ops)
 
-    device = {'Housing', 'SensorCarrier', 'BackCover', 'Dummy_LCD_2inch', 'Dummy_SCD41', 'Dummy_ESP32_C3'}
-    wall = check_interference(design, root, device | {'Dummy_Adapter', 'WallPlate'})
-    bottom = check_interference(design, root, device | {'Dummy_PlugStraight', 'WallPlate'})
-    desk = check_interference(design, root, device | {'Dummy_Adapter', 'DeskStand'})
+    device = {'Housing', 'SensorCarrier', 'Dummy_LCD_2inch', 'Dummy_SCD41', 'Dummy_ESP32_C3'}
+    back_exit = device | {'BackCover', 'BottomBlank', 'Dummy_Adapter'}
+    wall = check_interference(design, root, back_exit | {'WallPlate'})
+    bottom = check_interference(design, root, device | {'BackCoverClosed', 'Dummy_PlugStraight', 'WallPlate'})
+    desk = check_interference(design, root, back_exit | {'DeskStand'})
     add_joints(root)
     try:
         apply_appearances(design, root)
     except RuntimeError as e:
         print('note: appearances skipped', e)
     for occ in root.occurrences:
-        if occ.component.name in ('DeskStand', 'Dummy_PlugStraight'):
+        if occ.component.name in ('DeskStand', 'Dummy_PlugStraight', 'BackCoverClosed'):
             occ.isLightBulbOn = False
     root.isJointsFolderLightBulbOn = False
     for comp in design.allComponents:

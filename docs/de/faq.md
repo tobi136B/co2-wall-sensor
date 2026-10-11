@@ -15,8 +15,8 @@ Wichtiger als die Größe ist der Platz:
 * **Mindestens 1 bis 2 m Abstand zu Personen**, damit niemand den Sensor direkt anatmet (nicht direkt neben Bett oder Schreibtisch).
 * **Nicht neben Fenster, Tür, Heizkörper oder Lüftungsauslass** und nicht in direkte Sonne.
 
-### Wofür ist das Fenster unten im Gehäuse?
-Dort sitzt ein gerader USB-C-Stecker, wenn das Kabel auf Putz nach unten läuft. Mit dem Winkeladapter und dem Kabel nach hinten bleibt es leer; es liegt neben dem Lüftungsgitter und ist nur von unten sichtbar. Siehe [Aufbau](aufbau.md#3-kabelaustritt-wählen).
+### Wofür ist der Schlitz unten im Gehäuse?
+Dort sitzt ein gerader USB-C-Stecker, wenn das Kabel auf Putz nach unten läuft; er wird von hinten eingelegt. Mit dem Winkeladapter und dem Kabel nach hinten verschließt ihn die Bodenblende bündig. Siehe [Aufbau](aufbau.md#3-kabelaustritt-wählen).
 
 ### Welche Schwellen sind sinnvoll?
 Standard sind 1000 ppm (Gelb) und 1400 ppm (Rot). Werte unter 1000 ppm gelten allgemein als unbedenklich, über 2000 ppm sollte dringend gelüftet werden. Beide Schwellen lassen sich jederzeit in Home Assistant ändern.
@@ -46,10 +46,10 @@ Nein. Die Firmware prüft nur das Release-Manifest auf der Projektseite auf Upda
 Handelsübliche Einschmelzmuttern M2 × 3 mit 3,0 oder 3,2 mm Außendurchmesser (die verbreiteten Packungen „M2 x 3 x 3“ oder „M2 x 3 x 3,2“) und Linsenkopfschrauben M2 × 4 nach ISO 7380, je 10 Stück. Muttern in anderer Größe gehen, wenn `INSERT_HOLE_D` und `INSERT_HOLE_L` angepasst werden.
 
 ### Kabel von unten oder von hinten?
-Beides, mit denselben gedruckten Teilen. Nach hinten: ein USB-C-Winkeladapter 90° (Stecker auf Buchse) im ESP32-C3, das Kabel geht gerade in die Hohlwanddose; auf dem Tischständer immer so. Nach unten: ein gerades Kabel durch das Fenster im Boden. Siehe [Aufbau](aufbau.md#3-kabelaustritt-wählen).
+Beides, mit demselben Gehäuse. Nach hinten: ein USB-C-Winkeladapter 90° (Stecker auf Buchse) im ESP32-C3, das Kabel geht gerade in die Hohlwanddose; auf dem Tischständer immer so. Nach unten: ein gerades Kabel durch den Schlitz im Boden und der geschlossene Rückdeckel. Siehe [Aufbau](aufbau.md#3-kabelaustritt-wählen).
 
 ### Mein gerader USB-C-Stecker passt nicht.
-Das Fenster im Boden nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder das Kabel mit dem Winkeladapter nach hinten führen.
+Der Schlitz im Boden nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder das Kabel mit dem Winkeladapter nach hinten führen.
 
 ### Das Bild auf dem Display steht auf dem Kopf.
 In Home Assistant *Display auf dem Kopf* einschalten, das Bild dreht sich sofort um 180°. Wie das Display sitzt, gibt das Gehäuse vor: Sein Stecker ist links, von hinten gesehen, und das Bild steht aufrecht. Der Schalter ist nur eine Reserve.

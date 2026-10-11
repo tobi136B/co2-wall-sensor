@@ -70,7 +70,10 @@ TEXT = {
         "airflow": "Air enters from below\nthrough the sensor\nchamber (SCD41)",
         "cover_screws": "4x Ø{c}\ncounterbore Ø{d} x {h}\nscrew M2 x 4 ISO 7380\ninsert M2 x 3 in housing",
         "cable_exit": "Hole {w} × {h} for the\n90° USB-C adapter\n(cable to the back)",
-        "bottom_ko": "Window {w} × {h} for a\nstraight USB-C plug\n(cable to the bottom)",
+        "bottom_ko": (
+            "Slot {w} wide, open to the back:\nstraight USB-C plug (cable to the bottom)\n"
+            "or the bottom blank (cable to the back)"
+        ),
         "fasteners": "Fasteners (one screw type only)\n"
         "10 heat-set inserts M2 x 3, OD 3.0 to 3.2, hole Ø{hd} x {hl}\n"
         "10 button head screws M2 x 4, ISO 7380\n"
@@ -124,7 +127,10 @@ TEXT = {
         "airflow": "Luft strömt von unten\ndurch die Sensorkammer\n(SCD41)",
         "cover_screws": "4x Ø{c}\nSenkung Ø{d} x {h}\nSchraube M2 x 4 ISO 7380\nEinschmelzmutter M2 x 3",
         "cable_exit": "Loch {w} × {h} für den\nUSB-C-Winkeladapter\n(Kabel nach hinten)",
-        "bottom_ko": "Fenster {w} × {h} für einen\ngeraden USB-C-Stecker\n(Kabel nach unten)",
+        "bottom_ko": (
+            "Schlitz {w} breit, nach hinten offen:\ngerader USB-C-Stecker (Kabel nach unten)\n"
+            "oder Bodenblende (Kabel nach hinten)"
+        ),
         "fasteners": "Verbindungselemente (nur eine Schraubensorte)\n"
         "10 Einschmelzmuttern M2 x 3, AD 3,0 bis 3,2, Bohrung Ø{hd} x {hl}\n"
         "10 Linsenkopfschrauben M2 x 4, ISO 7380\n"
@@ -367,9 +373,11 @@ def sheet_device(sh: Sheet):
     vs = [c[1] for c in p["VENT_BOTTOM"]]
     sh.rect(cx - p["RAIL_HEAD"] / 2, uy - D - rail_h, p["RAIL_HEAD"], rail_h, lw=0.4)
     # seen from below the model +x axis points to the left, like in the front view
-    pw, ph = p["PLUG_W"] + 0.4, p["PLUG_H"] + 0.4
+    pw = p["PLUG_W"] + 2 * p["PLUG_PLAY"]
+    z_slot = p["PLUG_Z"] - p["PLUG_H"] / 2 - p["PLUG_PLAY"]
+    ph = D - z_slot
     bx0 = cx - p["C3_X"] - pw / 2
-    sh.rect(bx0, uy - p["PLUG_Z"] - ph / 2, pw, ph, lw=0.4)
+    sh.rect(bx0, uy - D, pw, ph, lw=0.4)
     sh.dim_h(
         cx + min(us) - hv,
         cx + max(us) + hv,
@@ -380,7 +388,7 @@ def sheet_device(sh: Sheet):
         ),
     )
     sh.dim_v(uy - min(vs) + hv, uy - max(vs) - hv, cx + W / 2, cx + W / 2 + 8, txt=sh.num(max(vs) - min(vs) + 2 * hv))
-    sh.note(bx0 + 1, uy - p["PLUG_Z"], cx - W / 2 - 30, uy - D - 14, t["bottom_ko"].format(w=sh.num(pw), h=sh.num(ph)))
+    sh.note(bx0 + 1, uy - p["PLUG_Z"], cx - W / 2 - 30, uy - D - 14, t["bottom_ko"].format(w=sh.num(pw)))
     sh.text(cx + W / 2 + 18, uy - 8, t["airflow"], size=6.5, color="0.35")
 
     # rear view

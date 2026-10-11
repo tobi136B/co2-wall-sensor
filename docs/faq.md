@@ -15,8 +15,8 @@ Placement matters more than size:
 * **At least 1 to 2 m away from people**, so nobody breathes directly at the sensor (not right beside the bed or the desk).
 * **Not next to windows, doors, radiators or ventilation outlets**, and not in direct sunlight.
 
-### What is the window in the bottom of the housing for?
-It takes a straight USB-C plug when the cable runs down the wall. With the 90° adapter and the cable to the back it stays empty; it lies next to the vent mesh and is only visible from below. See [assembly](assembly.md#3-choose-the-cable-exit).
+### What is the slot in the bottom of the housing for?
+It takes a straight USB-C plug when the cable runs down the wall, laid in from the back. With the 90° adapter and the cable to the back the bottom blank closes it flush. See [assembly](assembly.md#3-choose-the-cable-exit).
 
 ### Which thresholds are sensible?
 The defaults are 1000 ppm (yellow) and 1400 ppm (red). Values below 1000 ppm are generally considered harmless, above 2000 ppm ventilation is clearly needed. Both thresholds can be changed in Home Assistant at any time.
@@ -46,10 +46,10 @@ No. The firmware only checks the release manifest on the project page for update
 Generic M2 × 3 heat-set inserts with 3.0 or 3.2 mm outer diameter (the common "M2 x 3 x 3" or "M2 x 3 x 3.2" packs) and M2 × 4 button head screws ISO 7380, 10 of each. Inserts with a different size work if you change `INSERT_HOLE_D` and `INSERT_HOLE_L`.
 
 ### Cable from below or from the back?
-Both, with the same printed parts. To the back: a 90° USB-C adapter (plug to socket) in the ESP32-C3, the cable goes straight into the flush wall box; always use it on the desk stand. To the bottom: a straight cable through the window in the bottom. See [assembly](assembly.md#3-choose-the-cable-exit).
+Both, with the same housing. To the back: a 90° USB-C adapter (plug to socket) in the ESP32-C3, the cable goes straight into the flush wall box; always use it on the desk stand. To the bottom: a straight cable through the slot in the bottom and the closed back cover. See [assembly](assembly.md#3-choose-the-cable-exit).
 
 ### My straight USB-C plug does not fit.
-The window in the bottom takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or lead the cable to the back with the 90° adapter.
+The slot in the bottom takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or lead the cable to the back with the 90° adapter.
 
 ### The picture on the display is upside down.
 Switch on *Display upside down* in Home Assistant, the picture turns by 180° at once. The housing decides how the display sits: its connector is on the left, seen from the back, and the picture stands upright. The switch is only a fallback.

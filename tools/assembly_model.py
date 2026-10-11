@@ -427,6 +427,13 @@ def parts(p: dict) -> list[dict]:
         part("wires_scd", "SCD41 wires", "SCD41-Litzen", car, [{"type": "tube", **w} for w in wires_scd(p)]),
         part("adapter", "USB-C 90° adapter and cable", "USB-C-Winkeladapter mit Kabel", car, adapter),
         part(
+            "blank",
+            "Bottom blank (cable to the back)",
+            "Bodenblende (Kabel nach hinten)",
+            dev,
+            [stl("bottom_blank", PRINT_MID)],
+        ),
+        part(
             "cover",
             "Back cover",
             "Rückdeckel",
@@ -461,6 +468,8 @@ DISASSEMBLY = [
     {"wall_plate": [0, 0, 160], "wall_screws": [0, 0, 160]},
     {"cover_screws": [0, 0, 18]},
     {"cover": [0, 0, 100], "cover_screws": [0, 0, 100]},  # past the end of the cable in the adapter
+    {"blank": [0, 0, 12]},  # slides out of the bottom slot to the back ...
+    {"blank": [0, -40, 0]},  # ... and away below, out of the way of the carrier
     {"wires_display": [0, 0, 45]},
     {"carrier_screws": [0, 0, 20]},
     {"carrier_screws": [0, 55, 0]},
