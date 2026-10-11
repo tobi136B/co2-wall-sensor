@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.2.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.1.0...v2.2.0) (2026-10-11)
+
+
+### Added
+
+* window contacts, insert bosses as corner columns (enclosure 2.2) ([#35](https://github.com/tobi136B/co2-wall-sensor/issues/35)) ([16455d2](https://github.com/tobi136B/co2-wall-sensor/commit/16455d2e1f8e67a3c98ac862f88c4589245dc63f))
+
 ## [2.1.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.0.2...v2.1.0) (2026-10-11)
 
 
