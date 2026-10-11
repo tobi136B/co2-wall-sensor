@@ -52,6 +52,11 @@ substitutions:
   txt_hint_warm: "Fenster zu: außen wärmer"
   txt_hint_short: "Kurz stoßlüften: außen wärmer"
   txt_hint_none: "Keiner"
+  txt_hint_open: "Fenster offen: lüftet"
+  txt_hint_airing: "Lüftet seit %d min"
+  txt_hint_close: "Luft frisch: Fenster zu"
+  # Fensterkontakt in Home Assistant (am besten eine Binärsensor-Gruppe)
+  window_entity: binary_sensor.co2_wandsensor_fenster
   txt_label_hum: "FEUCHTE"
   # Optionale Anpassungen (Standardwerte in common/base.yaml)
   # co2_yellow_default: "1000"

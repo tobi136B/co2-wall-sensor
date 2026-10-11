@@ -70,6 +70,7 @@ Bis Version 1.8 schloss ein kleines loses Port-Modul in zwei Versionen die Öffn
 
 * **45° Fuß an Kanten auf dem Druckbett.** Eine Rundung, die tangential auf dem Druckbett beginnt, druckt schlecht: Die untersten Schichten sind fast waagrecht, und die erste Schicht quillt seitlich heraus (Elefantenfuß). Die weiche Frontkante endet deshalb in einer kurzen 45° Schräge, die tangential in die Rundung übergeht. Sie sieht rund aus, druckt aber sauber.
 * **Einführschrägen** an allen Mutterlöchern zentrieren die Mutter und geben dem verdrängten Kunststoff Platz.
+* **Dome in den Ecken sind Säulen.** Ein runder Dom, der eine Wand nur streift, hinterlässt dünne Splitter, und die Mutter kommt nah an die Kante. Die Dome an den Wänden füllen ihre Ecke deshalb ganz aus, mit einer runden Kante zum Raum hin, und jede Mutter hat mindestens 1,4 mm volles Material um sich.
 * **Verrundungen am Fuß der Dome** machen sie stabiler, sie brechen beim Eindrücken der Muttern nicht ab.
 * **Einführschräge an der Schiene**, damit das Gerät die Nut leicht findet.
 * **Eingeprägte Beschriftung** auf verdeckten Flächen: die Gehäuseversion in kräftiger Schrift, 0,6 mm tief und mindestens 2,4 mm hoch, damit jeder Strich mindestens eine saubere Linie einer 0,4 mm Düse ergibt. Der Generator verkleinert jeden Text, bis er in sein Feld passt.

@@ -70,6 +70,7 @@ Up to version 1.8 a small loose port module closed the opening, in two versions.
 
 * **45° foot on bed edges.** A fillet that starts tangent to the print bed prints badly: the lowest layers are almost horizontal and the first layer squeezes out (elephant foot). The soft front edge therefore ends in a short 45° chamfer that is tangent to the fillet. It looks round, but prints clean.
 * **Entry chamfers** on all insert holes centre the insert and give the displaced plastic room.
+* **Bosses in the corners are columns.** A round boss that only grazes a wall leaves thin slivers and lets the insert come close to the edge. The bosses next to the walls therefore fill their corner completely, with one rounded edge towards the room, and every insert has at least 1.4 mm of solid material around it.
 * **Fillets at the root of the bosses** make them stronger, they do not crack while pressing inserts.
 * **Lead-in chamfer** on the rail, so the device finds the slot easily.
 * **Engraved labels** on hidden faces: the enclosure version in heavy letters, 0.6 mm deep and at least 2.4 mm high, so every stroke prints as at least one clean line of a 0.4 mm nozzle. The generator shrinks each text until it fits its field.

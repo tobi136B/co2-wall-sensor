@@ -7,7 +7,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.1-6E7B8B)
+![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.2-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -146,6 +146,14 @@ Das Display zeigt die Außentemperatur unter **OUT**, der Fensterhinweis verglei
 * **Ohne Einrichtung** nimmt das Gerät `weather.forecast_home`, die Wetter-Entität, die Home Assistant für den eigenen Standort anlegt (Integration *Meteorologisk institutt (Met.no)*).
 * **Ein echter Außenfühler hat Vorrang.** Wie gewohnt anlernen (Zigbee, Homematic IP, Shelly, ...), unter *Einstellungen > Geräte & Dienste > Entitäten* öffnen, auf das Zahnrad klicken und die **Entitäts-ID** auf `sensor.outdoor_temperature` ändern (Luftfeuchte: `sensor.outdoor_humidity`). Wenige Sekunden später zeigt ihn das Display. Keine neue Firmware nötig.
 
+### Fensterkontakte
+
+Mit einem Fensterkontakt weiß das Gerät, wann du lüftest. Oben erscheint ein Fenstersymbol, die Hinweiszeile zählt die Minuten (*Lüftet seit 6 min*) und wird grün, sobald die Luft wieder frisch ist (*Luft frisch: Fenster zu*, bei 300 ppm unter der gelben Schwelle, mindestens 600 ppm).
+
+* In Home Assistant *Einstellungen > Geräte & Dienste > Helfer > Helfer erstellen > Gruppe > Binärsensor-Gruppe* öffnen, **CO2 Wandsensor Fenster** nennen (englische Firmware: **CO2 Wall Sensor Window**) und die Fensterkontakte des Raums hinzufügen. Die Entitäts-ID wird `binary_sensor.co2_wandsensor_fenster` (`binary_sensor.co2_wall_sensor_window`), genau darauf hört die Firmware.
+* Die Gruppe ist an, sobald ein Fenster offen ist. Später ein zweites Fenster? Einfach zur Gruppe hinzufügen, keine neue Firmware nötig.
+* Mehrere Geräte in verschiedenen Räumen: Jedes Gerät bekommt seine eigene Gruppe, `window_entity` in seiner Gerätedatei setzen.
+
 **Lüftungserinnerung:** Ein fertiger Blueprint schickt eine Nachricht aufs Handy, wenn der CO2-Wert hoch bleibt, und noch einmal, wenn die Luft wieder gut ist.
 
 [![Blueprint in Home Assistant importieren](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ftobi136B%2Fco2-wall-sensor%2Fblob%2Fmain%2Fhomeassistant%2Fblueprints%2Fco2_ventilation_reminder.yaml)
@@ -198,7 +206,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * **Versionen:** Die Releasenummer (z. B. 1.9.0) zählt jede Änderung, auch an Firmware und Doku. Die **Gehäuseversion** (Badge oben, auf jedem gedruckten Teil eingeprägt) ändert sich nur, wenn sich die Druckteile ändern. Teile mit derselben Gehäuseversion passen zusammen, egal aus welchem Release sie stammen.
 * **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md). Andere Platinen: [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html).
 * **Display:** Alle Maße des Waveshare 2inch LCD Module sind mit dem Messschieber nachgemessen (Platine 58,2 × 35,3 × 1,62 mm, Glas 47,7 × 34,6 mm, Platine und Glas zusammen 4,43 mm). Andere Chargen können leicht abweichen: `LCD_*` und `GLASS_*` prüfen.
-* **Stand der Hardware:** Gehäuse 2.1 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Der USB-C-Winkeladapter ist noch nicht nachgemessen, sein Loch ist großzügig. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
+* **Stand der Hardware:** Gehäuse 2.2 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Der USB-C-Winkeladapter ist noch nicht nachgemessen, sein Loch ist großzügig. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 
 ## Ausblick
 
@@ -211,6 +219,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * [x] [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html): Sensorträger als STL aus den Maßen der Platine ([#8](https://github.com/tobi136B/co2-wall-sensor/issues/8), v1.9)
 * [x] Gehäuse 2.0 nach dem ersten Druck: Displaykabel bleibt gesteckt, ESP32-C3 auf einem Schlitten mit Federhaken, Winkeladapter statt losem Port-Modul, Wandplatte für M4-Schrauben (v2.0)
 * [x] Gehäuse 2.1: mehr Spiel in jeder Passung (0,4 mm), saubere Bodenblende oder geschlossener Rückdeckel für die ungenutzte Kabelöffnung, Einführschrägen, Zuglasche am Träger, 2 mm Luft für das Displaykabel (v2.1)
+* [x] Fensterkontakte aus Home Assistant: Fenstersymbol, Lüftungsdauer und Hinweis zum Schließen (v2.2)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 
 ## Mitmachen
