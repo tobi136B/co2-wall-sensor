@@ -1,93 +1,178 @@
 blueprint:
   name: CO2 ventilation reminder / Lüftungserinnerung
   description: >-
-    Sends a notification to your phone when the CO2 level stays above a threshold, and
-    once more when the air is good again. Made for the CO2 Wall Sensor
-    (https://github.com/tobi136B/co2-wall-sensor) but works with any CO2 sensor.
+    Notifications on your phone that follow the window: ventilate when the CO2 level stays high and the
+    window is shut, close the window when the air is fresh again or when the room cools down too much.
+    The thresholds come straight from the CO2 Wall Sensor (https://github.com/tobi136B/co2-wall-sensor):
+    change them on the device in Home Assistant, the blueprint follows. Every message can be switched off.
 
 
-    Schickt eine Benachrichtigung aufs Handy, wenn der CO2-Wert eine Zeit lang über einer
-    Schwelle liegt, und noch einmal, wenn die Luft wieder gut ist.
+    Benachrichtigungen aufs Handy, die dem Fenster folgen: lüften, wenn der CO2-Wert hoch bleibt und das
+    Fenster zu ist, Fenster schließen, wenn die Luft wieder frisch ist oder der Raum zu stark auskühlt.
+    Die Grenzwerte kommen direkt vom CO2-Wandsensor: am Gerät in Home Assistant ändern, der Blueprint
+    folgt. Jede Nachricht lässt sich abschalten.
   domain: automation
+  homeassistant:
+    min_version: 2024.6.0
   source_url: https://github.com/tobi136B/co2-wall-sensor/blob/main/homeassistant/blueprints/co2_ventilation_reminder.yaml
   input:
-    co2_sensor:
-      name: CO2 sensor
-      selector:
-        entity:
-          filter:
-            - domain: sensor
-              device_class: carbon_dioxide
-    threshold:
-      name: Ventilate above / Lüften ab
-      default: 1400
-      selector:
-        number:
-          min: 600
-          max: 3000
-          step: 50
-          unit_of_measurement: ppm
-    good_level:
-      name: Air is good again below / Luft wieder gut unter
-      default: 900
-      selector:
-        number:
-          min: 400
-          max: 2000
-          step: 50
-          unit_of_measurement: ppm
-    delay:
-      name: Only after / Erst nach
-      description: The level has to stay above the threshold this long.
-      default:
-        minutes: 5
-      selector:
-        duration:
-    notify_device:
-      name: Phone / Handy
-      description: Device with the Home Assistant companion app.
-      selector:
-        device:
-          filter:
-            - integration: mobile_app
-    title:
-      name: Title
-      default: "Ventilate! / Lüften!"
-      selector:
-        text:
-    good_message:
-      name: Message when the air is good again
-      default: "Air is good again, you can close the window. / Luft ist wieder gut, Fenster kann zu."
-      selector:
-        text:
+    device_values:
+      name: CO2 Wall Sensor / CO2-Wandsensor
+      description: Sensors and thresholds of the device. / Sensoren und Grenzwerte des Geräts.
+      input:
+        co2_sensor:
+          name: CO2
+          selector:
+            entity:
+              filter:
+                - domain: sensor
+                  device_class: carbon_dioxide
+        temperature_sensor:
+          name: Temperature / Temperatur
+          selector:
+            entity:
+              filter:
+                - domain: sensor
+                  device_class: temperature
+        red_threshold:
+          name: CO2 threshold red / CO2 Schwelle Rot
+          description: Ventilate above this value. / Lüften über diesem Wert.
+          selector:
+            entity:
+              filter:
+                - domain: number
+        fresh_level:
+          name: Fresh air below / Luft frisch unter
+          selector:
+            entity:
+              filter:
+                - domain: number
+        cool_temp:
+          name: Window warning below / Fensterwarnung unter
+          selector:
+            entity:
+              filter:
+                - domain: number
+    window_section:
+      name: Window / Fenster
+      input:
+        window:
+          name: Window contact or group / Fensterkontakt oder Gruppe
+          description: >-
+            Optional. The same binary sensor group the device uses (on = a window is open). Without it you
+            only get the ventilation message. / Optional. Dieselbe Binärsensor-Gruppe wie am Gerät (an = ein
+            Fenster ist offen). Ohne sie gibt es nur die Lüftungsnachricht.
+          default: ""
+          selector:
+            entity:
+              filter:
+                - domain: binary_sensor
+    messages:
+      name: Messages / Nachrichten
+      input:
+        notify_device:
+          name: Phone / Handy
+          description: Device with the Home Assistant companion app.
+          selector:
+            device:
+              filter:
+                - integration: mobile_app
+        delay:
+          name: Ventilate only after / Lüften erst nach
+          description: The level has to stay above the red threshold this long.
+          default:
+            minutes: 5
+          selector:
+            duration:
+        send_ventilate:
+          name: "Message: ventilate / Nachricht: lüften"
+          default: true
+          selector:
+            boolean:
+        send_fresh:
+          name: "Message: fresh air, close the window / Nachricht: Luft frisch, Fenster zu"
+          default: true
+          selector:
+            boolean:
+        send_cold:
+          name: "Message: room cools down / Nachricht: Raum kühlt aus"
+          default: true
+          selector:
+            boolean:
+        text_ventilate:
+          name: Text ventilate / Text lüften
+          default: "Ventilate! / Lüften!"
+          selector:
+            text:
+        text_fresh:
+          name: Text fresh air / Text Luft frisch
+          default: "Fresh air, you can close the window. / Luft frisch, Fenster kann zu."
+          selector:
+            text:
+        text_cold:
+          name: Text room cools down / Text Raum kühlt aus
+          default: "Close the window, the room cools down. / Fenster zu, der Raum kühlt aus."
+          selector:
+            text:
 
-mode: single
+mode: queued
+max: 5
 max_exceeded: silent
 
 trigger:
   - platform: numeric_state
+    id: high
     entity_id: !input co2_sensor
-    above: !input threshold
+    above: !input red_threshold
     for: !input delay
+  - platform: numeric_state
+    id: fresh
+    entity_id: !input co2_sensor
+    below: !input fresh_level
+  - platform: numeric_state
+    id: cold
+    entity_id: !input temperature_sensor
+    below: !input cool_temp
 
 variables:
-  sensor: !input co2_sensor
-  threshold: !input threshold
+  co2: !input co2_sensor
+  window: !input window
+  open: "{{ window != '' and is_state(window, 'on') }}"
+  name: "{{ state_attr(co2, 'friendly_name') or co2 }}"
+  send_ventilate: !input send_ventilate
+  send_fresh: !input send_fresh
+  send_cold: !input send_cold
 
 action:
-  - domain: mobile_app
-    type: notify
-    device_id: !input notify_device
-    title: !input title
-    message: "{{ state_attr(sensor, 'friendly_name') or sensor }}: {{ states(sensor) | int(0) }} ppm (> {{ threshold | int }} ppm)"
-  - wait_for_trigger:
-      - platform: numeric_state
-        entity_id: !input co2_sensor
-        below: !input good_level
-    timeout:
-      hours: 6
-    continue_on_timeout: false
-  - domain: mobile_app
-    type: notify
-    device_id: !input notify_device
-    message: !input good_message
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: high
+          - "{{ not open }}"
+          - "{{ send_ventilate }}"
+        sequence:
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            title: !input text_ventilate
+            message: "{{ name }}: {{ states(co2) | int(0) }} ppm"
+      - conditions:
+          - condition: trigger
+            id: fresh
+          - "{{ open }}"
+          - "{{ send_fresh }}"
+        sequence:
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: !input text_fresh
+      - conditions:
+          - condition: trigger
+            id: cold
+          - "{{ open }}"
+          - "{{ send_cold }}"
+        sequence:
+          - domain: mobile_app
+            type: notify
+            device_id: !input notify_device
+            message: !input text_cold

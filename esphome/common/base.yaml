@@ -20,7 +20,7 @@ substitutions:
   co2_red_default: "1400"
   temperature_offset: "2.0"     # self-heating compensation, fine-tune it in Home Assistant (temperature correction)
   altitude: "300"               # altitude above sea level in m (start value, set it in Home Assistant)
-  trend_rising: "100"           # ppm per hour: from here the display shows a rising arrow
+  trend_rising: "100"           # ppm per hour: start value of the rising arrow (set it in Home Assistant)
   day_brightness: "80"          # percent
   # outdoor values: a real sensor (rename its entity ID in Home Assistant) wins over the weather forecast
   outdoor_temperature_entity: sensor.outdoor_temperature
@@ -37,11 +37,18 @@ esphome:
     name: "tobi136b.co2-wall-sensor"
     version: "2.2.0"  # x-release-please-version
   on_boot:
-    priority: 600
+  - priority: 600
     then:
       - light.turn_on:
           id: backlight
           brightness: ${day_brightness}%
+  - priority: -100
+    then:
+      # measuring interval from Home Assistant (restored value)
+      - lambda: |-
+          id(scd41).set_update_interval(id(measure_interval).state * 1000);
+          id(scd41).stop_poller();
+          id(scd41).start_poller();
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -113,9 +120,12 @@ sensor:
       id: co2
       name: "CO2"
       filters:
-        - sliding_window_moving_average:
-            window_size: 2
-            send_every: 1
+        # smoothing (switch in Home Assistant): mean of this and the previous reading
+        - lambda: |-
+            static float prev = NAN;
+            const float out = (id(smoothing).state && !std::isnan(prev)) ? (x + prev) / 2.0f : x;
+            prev = x;
+            return out;
     temperature:
       id: temperature
       name: "${txt_temperature}"
@@ -238,7 +248,7 @@ sensor:
       if (!id(co2).has_state() || !id(co2_trend).has_state()) return NAN;
       const float c = id(co2).state, red = id(threshold_red).state, trend = id(co2_trend).state;
       if (c >= red) return 0;
-      if (trend < ${trend_rising}) return NAN;
+      if (trend < id(trend_threshold).state) return NAN;
       const float minutes = (red - c) / trend * 60.0f;
       return minutes > 240 ? NAN : minutes;
 
@@ -267,10 +277,13 @@ text_sensor:
       const float ti = id(temperature).state, hi = id(humidity).state;
       if (id(window_open).has_state() && id(window_open).state) {
         if (opened == 0) opened = millis() | 1;
-        // fresh: clearly below the yellow threshold (300 ppm, at least 600 ppm), 30 ppm hysteresis
-        const float fresh = std::max(600.0f, id(threshold_yellow).state - 300.0f);
+        // the room cools down too much (0.3 K hysteresis), or the air is fresh again (30 ppm hysteresis)
+        if (!std::isnan(ti) && ti < id(cool_temp).state + (last == "${txt_hint_cold}" ? 0.3f : 0.0f)) {
+          last = "${txt_hint_cold}";
+          return last;
+        }
         const bool was = last == "${txt_hint_close}";
-        if (id(co2).has_state() && id(co2).state <= fresh + (was ? 30.0f : 0.0f)) {
+        if (id(co2).has_state() && id(co2).state <= id(fresh_level).state + (was ? 30.0f : 0.0f)) {
           last = "${txt_hint_close}";
           return last;
         }
@@ -397,6 +410,60 @@ number:
     optimistic: true
     entity_category: config
 
+  - platform: template
+    id: fresh_level
+    name: "${txt_fresh_level}"
+    icon: mdi:window-closed-variant
+    unit_of_measurement: ppm
+    min_value: 450
+    max_value: 1200
+    step: 25
+    initial_value: 700
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: cool_temp
+    name: "${txt_cool_temp}"
+    icon: mdi:snowflake-thermometer
+    unit_of_measurement: "°C"
+    min_value: 14
+    max_value: 23
+    step: 0.5
+    initial_value: 19
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: trend_threshold
+    name: "${txt_trend_threshold}"
+    icon: mdi:trending-up
+    unit_of_measurement: "ppm/h"
+    min_value: 20
+    max_value: 500
+    step: 10
+    initial_value: ${trend_rising}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    id: measure_interval
+    name: "${txt_interval}"
+    icon: mdi:timer-outline
+    unit_of_measurement: s
+    min_value: 5
+    max_value: 60
+    step: 5
+    initial_value: 30
+    restore_value: true
+    optimistic: true
+    entity_category: config
+    on_value:
+      - lambda: |-
+          id(scd41).set_update_interval(x * 1000);
+          id(scd41).stop_poller();
+          id(scd41).start_poller();
+
 datetime:
   - platform: template
     id: night_start
@@ -447,6 +514,20 @@ switch:
     id: show_hint
     name: "${txt_show_hint}"
     icon: mdi:window-open-variant
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: show_window
+    name: "${txt_show_window}"
+    icon: mdi:window-closed-variant
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    entity_category: config
+  - platform: template
+    id: smoothing
+    name: "${txt_smoothing}"
+    icon: mdi:chart-bell-curve-cumulative
     optimistic: true
     restore_mode: RESTORE_DEFAULT_ON
     entity_category: config
@@ -555,6 +636,7 @@ font:
       - "\U000F05A9" # mdi-wifi
       - "\U000F05AA" # mdi-wifi-off
       - "\U000F11DC" # mdi-window-open-variant
+      - "\U000F11DB" # mdi-window-closed-variant
   - file:
       type: web
       url: "https://raw.githubusercontent.com/Templarian/MaterialDesign-Webfont/master/fonts/materialdesignicons-webfont.ttf"
@@ -615,9 +697,18 @@ display:
       const bool online = wifi::global_wifi_component->is_connected();
       it.print(W - 12, 10, id(icons), online ? id(col_muted) : id(col_red), TextAlign::TOP_RIGHT,
                online ? "\U000F05A9" : "\U000F05AA");
-      // open window (contact in Home Assistant) left of the WiFi symbol
-      if (id(window_open).has_state() && id(window_open).state)
-        it.print(W - 42, 10, id(icons), id(col_cool), TextAlign::TOP_RIGHT, "\U000F11DC");
+      // window (contact or group in Home Assistant) left of the WiFi symbol: grey when shut, coloured when open.
+      // Only shown once Home Assistant delivers the contact, and the switch in Home Assistant can hide it.
+      if (id(show_window).state && id(window_open).has_state()) {
+        Color wc = id(col_muted);
+        const char *wi = "\U000F11DB";
+        if (id(window_open).state) {
+          wi = "\U000F11DC";
+          const std::string wh = id(window_hint).has_state() ? id(window_hint).state : "";
+          wc = wh == "${txt_hint_cold}" ? id(col_warm) : wh == "${txt_hint_close}" ? id(col_green) : id(col_cool);
+        }
+        it.print(W - 42, 10, id(icons), wc, TextAlign::TOP_RIGHT, wi);
+      }
 
       // status pill
       const int pw = 140, ph = 26, px = (W - pw) / 2, py = 9;
@@ -640,8 +731,9 @@ display:
         const float tr = id(co2_trend).state;
         const char *arrow = "\U000F0054";
         Color col = id(col_muted);
-        if (tr >= ${trend_rising})       { arrow = "\U000F005C"; col = level; }
-        else if (tr <= -${trend_rising}) { arrow = "\U000F0043"; col = id(col_green); }
+        const float th = id(trend_threshold).state;
+        if (tr >= th)       { arrow = "\U000F005C"; col = level; }
+        else if (tr <= -th) { arrow = "\U000F0043"; col = id(col_green); }
         it.print(W - 14, 100, id(icons_trend), col, TextAlign::TOP_RIGHT, arrow);
       }
 
@@ -654,7 +746,7 @@ display:
       if (id(show_hint).state && id(window_hint).has_state()) {
         const std::string h = id(window_hint).state;
         Color hc = id(col_cool);
-        if (h == "${txt_hint_warm}" || h == "${txt_hint_short}") hc = id(col_warm);
+        if (h == "${txt_hint_warm}" || h == "${txt_hint_short}" || h == "${txt_hint_cold}") hc = id(col_warm);
         if (h == "${txt_hint_close}") hc = id(col_green);
         if (h != "${txt_hint_none}") {
           int bx, by, bw, bh;
