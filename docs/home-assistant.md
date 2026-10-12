@@ -27,7 +27,7 @@ Under **Configuration** on the device page:
 | Smoothing (*Glättung*) | on | Mean of the current and the previous reading, calms small jumps. |
 | Trend arrow from (*Trendpfeil ab*) | 100 ppm/h | From this change per hour the arrow points up or down. |
 | Night mode, Night from, Night until | on, 22:00 to 06:00 | Display dimmed (default 8 %) or off at night. |
-| Red warning at night (*Rote Warnung auch nachts*) | on | The display wakes up while the level is red. |
+| Red warning at night (*Rote Warnung auch nachts*) | on | The display wakes up while the level is red, but not while a window is open. |
 | Display upside down (*Display auf dem Kopf*) | off | Turns the picture by 180°. |
 
 ## 3. Outdoor values
@@ -61,6 +61,8 @@ A second window later? Add it to the group. Several devices in different rooms? 
 | blue, open | *Window open: airing*, then *Airing for 6 min* | a window is open |
 | green, open | *Fresh air: close the window* | CO2 below **Fresh air below** (*Luft frisch unter*, default 700 ppm) |
 | orange, open | *Close the window: room cools down* | indoor temperature below **Window warning below** (*Fensterwarnung unter*, default 19 °C) |
+
+While a window is open the device knows you are airing: the red pill says **Airing** (*Lüftet*) instead of *Ventilate!*, the red warning does not wake the display at night, *ventilate in ~x min* is hidden and the outdoor hints (*Open the window: cooler outside* and so on) only come back once all windows are shut. The *Air quality* entity in Home Assistant keeps reporting the measurement (*Ventilate!* above red), so your own automations should check the window group too, like the examples in `homeassistant/`.
 
 The symbol appears as soon as Home Assistant delivers the group. **Window symbol on the display** (*Fenstersymbol auf dem Display*) hides it, **Window hint on the display** hides the hint line. The cooling warning wins over the fresh air message, because a cold room matters more.
 

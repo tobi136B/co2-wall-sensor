@@ -16,6 +16,12 @@
     - condition: time
       after: "07:00:00"
       before: "22:00:00"
+    # nicht, wenn schon ein Fenster offen ist (Gruppe der Fensterkontakte, siehe docs/de/home-assistant.md)
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.co2_wandsensor_fenster
+          state: "on"
   actions:
     - action: notify.notify
       data:

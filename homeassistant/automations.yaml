@@ -15,6 +15,12 @@
     - condition: time
       after: "07:00:00"
       before: "22:00:00"
+    # not while a window is open (group of the window contacts, see docs/home-assistant.md)
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: binary_sensor.co2_wall_sensor_window
+          state: "on"
   actions:
     - action: notify.notify
       data:

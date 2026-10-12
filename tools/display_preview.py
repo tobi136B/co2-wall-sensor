@@ -35,6 +35,7 @@ TEXT = {
         "good": "Good",
         "moderate": "Moderate",
         "ventilate": "Ventilate!",
+        "airing_pill": "Airing",
         "sep": ".",
         "fc": "ventilate in ~{m} min",
         "hum": "HUMIDITY",
@@ -50,6 +51,7 @@ TEXT = {
         "good": "Gut",
         "moderate": "Mäßig",
         "ventilate": "Lüften!",
+        "airing_pill": "Lüftet",
         "sep": ",",
         "fc": "lüften in ca. {m} min",
         "hum": "FEUCHTE",
@@ -72,7 +74,7 @@ STATES = [
 # window contact from Home Assistant: shut (grey), airing (blue), fresh again (green), room cools down (orange)
 WINDOW_STATES = [
     ("good", 655, 21.6, 47, "07:40", 700, "steady", None, 8.5, None, "closed"),
-    ("moderate", 1240, 21.2, 55, "10:20", 1520, "falling", None, 8.5, "airing", "airing"),
+    ("ventilate", 1480, 21.2, 55, "10:20", 1650, "falling", None, 8.5, "airing", "airing"),
     ("good", 690, 20.4, 50, "10:31", 1450, "falling", None, 8.5, "fresh", "fresh"),
     ("good", 880, 18.6, 52, "10:36", 1400, "falling", None, 8.5, "cold", "cold"),
 ]
@@ -171,7 +173,10 @@ def screen(
     pw, ph = 140, 26
     px, py = (W - pw) / 2, 9
     d.rounded_rectangle([s(px), s(py), s(px + pw), s(py + ph)], radius=s(ph / 2), fill=level)
-    text(d, (W / 2, py + ph / 2 + 1), t[state], font(14, True), (0, 0, 0), "mm")
+    window_is_open = window not in (None, "closed")
+    # red with an open window: the pill says you are airing instead of asking for it (as in the firmware)
+    pill = t["airing_pill"] if state == "ventilate" and window_is_open else t[state]
+    text(d, (W / 2, py + ph / 2 + 1), pill, font(14, True), (0, 0, 0), "mm")
 
     text(d, (W / 2 - 18, 84), f"{co2}", font(62, True), level, "mm")
     text(d, (W - 14, 74), "ppm", font(13), COLORS["muted"], "rd")
@@ -196,7 +201,7 @@ def screen(
         d.ellipse([s(17 - r), s(188 - r), s(17 + r), s(188 + r)], fill=HINT_COLORS[hint])
         text(d, (27, 196), t[hint], font(12, True), HINT_COLORS[hint], "ld")
         hint_end = 27 + d.textlength(t[hint], font=font(12, True)) / SCALE
-    if forecast:  # gives way to the hint when both do not fit side by side (as in the firmware)
+    if forecast and not window_is_open:  # gives way to the hint when both do not fit side by side (as in the firmware)
         fc = t["fc"].format(m=forecast)
         if not hint or W - 12 - d.textlength(fc, font=font(12)) / SCALE > hint_end + 12:
             text(d, (W - 12, 196), fc, font(12), COLORS["muted"], "rd")

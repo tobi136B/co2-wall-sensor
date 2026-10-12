@@ -130,7 +130,7 @@ Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Sho
 | Display Helligkeit | Licht | von Hand dimmen oder ausschalten |
 | Nachtmodus, Nacht ab, Nacht bis | Schalter, Uhrzeit | Nachtzeit (Standard 22 bis 6 Uhr) |
 | Display in der Nacht, Nachthelligkeit | Auswahl, Zahl | dimmen (Standard 8 %) oder aus |
-| Rote Warnung auch nachts | Schalter | das Display geht an, solange der CO2-Wert rot ist |
+| Rote Warnung auch nachts | Schalter | das Display geht an, solange der CO2-Wert rot ist (nicht bei offenem Fenster) |
 | Fensterhinweis auf dem Display, Fenstersymbol auf dem Display, Außenwert auf dem Display | Schalter | ein- oder ausblenden |
 | Display auf dem Kopf | Schalter | dreht das Bild um 180°, falls es auf dem Kopf steht |
 | Fensterhinweis ab Innentemperatur, Fensterhinweis: draußen kühler um | Zahl | Standard 24 °C und 3 °C |
@@ -152,7 +152,7 @@ Das Display zeigt die Außentemperatur unter **OUT**, der Fensterhinweis verglei
 
 ### Fensterkontakte
 
-Mit einem Fensterkontakt weiß das Gerät, wann du lüftest. Das Fenstersymbol oben ist grau, solange die Fenster zu sind. Geht eins auf, wird es blau und die Hinweiszeile zählt die Minuten (*Lüftet seit 6 min*). Grün heißt, die Luft ist wieder frisch (*Luft frisch: Fenster zu*, unter 700 ppm), orange, dass der Raum zu stark auskühlt (*Fenster zu: Raum kühlt aus*, unter 19 °C). Beide Schwellen sind Einstellungen in Home Assistant, ein Schalter blendet das Symbol aus. Jeder Schritt mit Bildern: [Home Assistant Anleitung](docs/de/home-assistant.md).
+Mit einem Fensterkontakt weiß das Gerät, wann du lüftest. Das Fenstersymbol oben ist grau, solange die Fenster zu sind. Geht eins auf, wird es blau und die Hinweiszeile zählt die Minuten (*Lüftet seit 6 min*). Grün heißt, die Luft ist wieder frisch (*Luft frisch: Fenster zu*, unter 700 ppm), orange, dass der Raum zu stark auskühlt (*Fenster zu: Raum kühlt aus*, unter 19 °C). Bei offenem Fenster sagt die rote Anzeige *Lüftet* statt *Lüften!*, und die rote Warnung weckt nachts nicht das Display. Beide Schwellen sind Einstellungen in Home Assistant, ein Schalter blendet das Symbol aus. Jeder Schritt mit Bildern: [Home Assistant Anleitung](docs/de/home-assistant.md).
 
 <div align="center">
 <img src="docs/images/display_window_de.png" width="70%" alt="Fenstersymbol zu, lüftet, Luft frisch und Raum kühlt aus">

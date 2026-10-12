@@ -130,7 +130,7 @@ Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the onl
 | Display brightness | light | dim or switch off the display by hand |
 | Night mode, Night from, Night until | switch, time | night schedule (default 22:00 to 06:00) |
 | Display at night, Night brightness | select, number | dim (default 8 %) or switch off |
-| Red warning at night | switch | the display wakes up while the CO2 level is red |
+| Red warning at night | switch | the display wakes up while the CO2 level is red (not while a window is open) |
 | Window hint on the display, Window symbol on the display, Outdoor value on the display | switch | show or hide them |
 | Display upside down | switch | turns the picture by 180° if it stands on its head |
 | Window hint from indoor temperature, Window hint: cooler outside by | number | default 24 °C and 3 °C |
@@ -152,7 +152,7 @@ The display shows the outdoor temperature under **OUT**, and the window hint com
 
 ### Window contacts
 
-With a window contact the device knows when you are airing. The window symbol at the top is grey while the windows are shut. Open one and it turns blue, the hint line counts the minutes (*Airing for 6 min*), green tells you the air is fresh again (*Fresh air: close the window*, below 700 ppm) and orange that the room cools down too much (*Close the window: room cools down*, below 19 °C). Both thresholds are settings in Home Assistant, a switch hides the symbol. Every step with pictures: [Home Assistant guide](docs/home-assistant.md).
+With a window contact the device knows when you are airing. The window symbol at the top is grey while the windows are shut. Open one and it turns blue, the hint line counts the minutes (*Airing for 6 min*), green tells you the air is fresh again (*Fresh air: close the window*, below 700 ppm) and orange that the room cools down too much (*Close the window: room cools down*, below 19 °C). While a window is open the red pill says *Airing* instead of *Ventilate!* and the red warning does not wake the display at night. Both thresholds are settings in Home Assistant, a switch hides the symbol. Every step with pictures: [Home Assistant guide](docs/home-assistant.md).
 
 <div align="center">
 <img src="docs/images/display_window_en.png" width="70%" alt="Window symbol shut, airing, fresh air and room cools down">
