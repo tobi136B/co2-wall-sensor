@@ -22,6 +22,11 @@ cards:
         name: Temperature
       - entity: sensor.co2_wall_sensor_humidity
         name: Humidity
+      - entity: binary_sensor.co2_wall_sensor_window
+        name: Window
+  - type: entity
+    entity: sensor.co2_wall_sensor_window_hint
+    name: Hint
   - type: history-graph
     title: Last 24 h
     hours_to_show: 24

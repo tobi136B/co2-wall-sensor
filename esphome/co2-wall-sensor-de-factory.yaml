@@ -55,6 +55,13 @@ substitutions:
   txt_hint_open: "Fenster offen: lüftet"
   txt_hint_airing: "Lüftet seit %d min"
   txt_hint_close: "Luft frisch: Fenster zu"
+  txt_hint_cold: "Fenster zu: Raum kühlt aus"
+  txt_show_window: "Fenstersymbol auf dem Display"
+  txt_fresh_level: "Luft frisch unter"
+  txt_cool_temp: "Fensterwarnung unter"
+  txt_trend_threshold: "Trendpfeil ab"
+  txt_interval: "Messintervall"
+  txt_smoothing: "Glättung"
   # Fensterkontakt in Home Assistant (am besten eine Binärsensor-Gruppe)
   window_entity: binary_sensor.co2_wandsensor_fenster
   txt_label_hum: "FEUCHTE"
