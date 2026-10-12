@@ -27,7 +27,7 @@ Unter **Konfiguration** auf der Geräteseite:
 | Glättung (*Smoothing*) | an | Mittelwert aus aktuellem und vorherigem Messwert, beruhigt kleine Sprünge. |
 | Trendpfeil ab (*Trend arrow from*) | 100 ppm/h | Ab dieser Änderung pro Stunde zeigt der Pfeil nach oben oder unten. |
 | Nachtmodus, Nacht ab, Nacht bis | an, 22:00 bis 06:00 | Display nachts gedimmt (Standard 8 %) oder aus. |
-| Rote Warnung auch nachts (*Red warning at night*) | an | Das Display geht an, solange der Wert rot ist. |
+| Rote Warnung auch nachts (*Red warning at night*) | an | Das Display geht an, solange der Wert rot ist, aber nicht bei offenem Fenster. |
 | Display auf dem Kopf (*Display upside down*) | aus | Dreht das Bild um 180°. |
 
 ## 3. Außenwerte
@@ -61,6 +61,8 @@ Später ein zweites Fenster? Einfach zur Gruppe hinzufügen. Mehrere Geräte in 
 | blau, offen | *Fenster offen: lüftet*, dann *Lüftet seit 6 min* | ein Fenster ist offen |
 | grün, offen | *Luft frisch: Fenster zu* | CO2 unter **Luft frisch unter** (Standard 700 ppm) |
 | orange, offen | *Fenster zu: Raum kühlt aus* | Innentemperatur unter **Fensterwarnung unter** (Standard 19 °C) |
+
+Solange ein Fenster offen ist, weiß das Gerät, dass du lüftest: Die rote Anzeige oben sagt **Lüftet** statt *Lüften!*, die rote Warnung weckt nachts nicht das Display, *lüften in ca. x min* verschwindet, und die Außenhinweise (*Fenster auf: außen kühler* und so weiter) kommen erst wieder, wenn alle Fenster zu sind. Die Entität *Luftqualität* in Home Assistant meldet weiter den Messwert (*Lüften!* über Rot). Eigene Automationen sollten deshalb auch die Fenstergruppe prüfen, wie die Beispiele in `homeassistant/de`.
 
 Das Symbol erscheint, sobald Home Assistant die Gruppe liefert. **Fenstersymbol auf dem Display** blendet es aus, **Fensterhinweis auf dem Display** die Hinweiszeile. Die Auskühlwarnung geht vor der Frischluftmeldung, weil ein kalter Raum wichtiger ist.
 

@@ -76,7 +76,9 @@ interval:
           const int e = id(night_end).hour * 60 + id(night_end).minute;
           bool night = s < e ? (m >= s && m < e) : (m >= s || m < e);
           if (!id(night_mode).state || s == e) night = false;
-          const bool red = id(co2).has_state() && id(co2).state >= id(threshold_red).state;
+          // an open window means you are already airing: the red warning does not wake the display then
+          const bool airing = id(window_open).has_state() && id(window_open).state;
+          const bool red = id(co2).has_state() && id(co2).state >= id(threshold_red).state && !airing;
           int state = 0;
           if (night) {
             if (id(night_display).active_index() == 1) state = (red && id(night_warning).state) ? 3 : 2;
@@ -686,7 +688,9 @@ display:
       std::string status = "${txt_status_starting}";
       if (id(co2).has_state()) {
         const float c = id(co2).state;
-        if (c >= id(threshold_red).state)         { level = id(col_red);    status = "${txt_status_ventilate}"; }
+        // red with an open window: you are already airing, so the pill says so instead of asking for it
+        const bool airing = id(window_open).has_state() && id(window_open).state;
+        if (c >= id(threshold_red).state)         { level = id(col_red);    status = airing ? "${txt_status_airing}" : "${txt_status_ventilate}"; }
         else if (c >= id(threshold_yellow).state) { level = id(col_yellow); status = "${txt_status_moderate}"; }
         else                                      { level = id(col_green);  status = "${txt_status_good}"; }
       }
@@ -758,7 +762,10 @@ display:
       }
       // forecast: when the red threshold will be reached (bottom right: a rising curve is high on the right).
       // It gives way to the window hint if both do not fit side by side.
-      if (id(co2_forecast).has_state() && !std::isnan(id(co2_forecast).state) && id(co2_forecast).state > 0) {
+      // (not while a window is open: then you are airing already)
+      const bool window_is_open = id(window_open).has_state() && id(window_open).state;
+      if (!window_is_open && id(co2_forecast).has_state() && !std::isnan(id(co2_forecast).state) &&
+          id(co2_forecast).state > 0) {
         char fc[40];
         snprintf(fc, sizeof(fc), "${txt_forecast_display}", (int) id(co2_forecast).state);
         int fx, fy, fw, fh;
