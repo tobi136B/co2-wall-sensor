@@ -49,7 +49,7 @@ Generic M2 × 3 heat-set inserts with 3.0 or 3.2 mm outer diameter (the common "
 Both, with the same housing. To the back: a 90° USB-C adapter (plug to socket) in the ESP32-C3, the cable goes straight into the flush wall box; always use it on the desk stand. To the bottom: a straight cable through the slot in the bottom and the closed back cover. See [assembly](assembly.md#3-choose-the-cable-exit).
 
 ### My straight USB-C plug does not fit.
-The slot in the bottom takes plugs with an overmould of up to 12 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or lead the cable to the back with the 90° adapter.
+The slot in the bottom takes plugs with an overmould of up to 12.5 × 7 mm. For bulkier plugs change `PLUG_W` and `PLUG_H` (the device gets deeper if `PLUG_H` grows) or lead the cable to the back with the 90° adapter.
 
 ### The picture on the display is upside down.
 Switch on *Display upside down* in Home Assistant, the picture turns by 180° at once. The housing decides how the display sits: its connector is on the left, seen from the back, and the picture stands upright. The switch is only a fallback.

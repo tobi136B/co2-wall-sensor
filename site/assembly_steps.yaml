@@ -170,8 +170,8 @@
     en: Bottom blank
     de: Bodenblende
   text:
-    en: Slide the blank into the slot of the bottom wall from the back until it stops, its lug points inwards. Its slanted flanks keep it from falling out, the back cover keeps it in place.
-    de: Die Blende von hinten in den Schlitz im Boden schieben bis zum Anschlag, ihre Nase zeigt nach innen. Die schrägen Flanken halten sie nach außen, der Rückdeckel hält sie an ihrem Platz.
+    en: Slide the blank into the slot of the bottom wall from the back until it stops, its lug points inwards. It runs in a T-track behind the outer lip of the slot like a drawer, small ribs hold it in place, the back cover locks it.
+    de: Die Blende von hinten in den Schlitz im Boden schieben bis zum Anschlag, ihre Nase zeigt nach innen. Sie läuft in einer T-Führung hinter der äußeren Kante des Schlitzes wie eine Schublade, kleine Rippen halten sie fest, der Rückdeckel sichert sie.
 
 - new: [cover, cover_screws]
   from: [0, 0, 50]

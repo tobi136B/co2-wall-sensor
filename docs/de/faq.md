@@ -49,7 +49,7 @@ Handelsübliche Einschmelzmuttern M2 × 3 mit 3,0 oder 3,2 mm Außendurchmesser 
 Beides, mit demselben Gehäuse. Nach hinten: ein USB-C-Winkeladapter 90° (Stecker auf Buchse) im ESP32-C3, das Kabel geht gerade in die Hohlwanddose; auf dem Tischständer immer so. Nach unten: ein gerades Kabel durch den Schlitz im Boden und der geschlossene Rückdeckel. Siehe [Aufbau](aufbau.md#3-kabelaustritt-wählen).
 
 ### Mein gerader USB-C-Stecker passt nicht.
-Der Schlitz im Boden nimmt Stecker mit einem Steckerkörper bis 12 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder das Kabel mit dem Winkeladapter nach hinten führen.
+Der Schlitz im Boden nimmt Stecker mit einem Steckerkörper bis 12,5 × 7 mm. Für dickere Stecker `PLUG_W` und `PLUG_H` anpassen (wird `PLUG_H` größer, wird das Gerät tiefer) oder das Kabel mit dem Winkeladapter nach hinten führen.
 
 ### Das Bild auf dem Display steht auf dem Kopf.
 In Home Assistant *Display auf dem Kopf* einschalten, das Bild dreht sich sofort um 180°. Wie das Display sitzt, gibt das Gehäuse vor: Sein Stecker ist links, von hinten gesehen, und das Bild steht aufrecht. Der Schalter ist nur eine Reserve.
