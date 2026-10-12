@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.4.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.3.0...v2.4.0) (2026-10-12)
+
+
+### Added
+
+* window states in colour, more settings in Home Assistant and a blueprint that follows the window ([#39](https://github.com/tobi136B/co2-wall-sensor/issues/39)) ([cc1e130](https://github.com/tobi136B/co2-wall-sensor/commit/cc1e1304a75d760149531ff1353f0b3ff5b3d4ea))
+
 ## [2.3.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.2.0...v2.3.0) (2026-10-12)
 
 
