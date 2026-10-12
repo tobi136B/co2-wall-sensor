@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.3.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.2.0...v2.3.0) (2026-10-12)
+
+
+### Added
+
+* **enclosure:** version 2.3, print ready with measured adapter and blank in a T-track ([#37](https://github.com/tobi136B/co2-wall-sensor/issues/37)) ([3860494](https://github.com/tobi136B/co2-wall-sensor/commit/3860494cdd319d4ec9e7f1fde4622b88e1e6a6db))
+
 ## [2.2.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.1.0...v2.2.0) (2026-10-11)
 
 
