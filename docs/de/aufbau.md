@@ -44,13 +44,13 @@ Beide Wege nutzen dasselbe Gehäuse, nur der Rückdeckel ist ein anderer:
 | Kabel | Was du brauchst | Einsatz |
 |-------|-----------------|---------|
 | **Nach hinten** | USB-C-Winkeladapter 90° (Stecker auf Buchse) in der Buchse des ESP32-C3, darin ein beliebiges USB-C-Kabel, Rückdeckel mit Loch, Bodenblende | Hohlwanddose und **immer auf dem Tischständer** |
-| **Nach unten** | gerader USB-C-Stecker, Steckerkörper höchstens 12 × 7 mm, geschlossener Rückdeckel | Kabel auf Putz, Powerbank unter dem Gerät |
+| **Nach unten** | gerader USB-C-Stecker, Steckerkörper höchstens 12,5 × 7 mm, geschlossener Rückdeckel | Kabel auf Putz, Powerbank unter dem Gerät |
 
 <img src="../images/cable_port_back.png" width="49%" alt="Kabel nach hinten"> <img src="../images/cable_port_bottom.png" width="49%" alt="Kabel nach unten">
 
 Der Adapter zeigt zur Wand und geht durch das Loch im Rückdeckel, das Kabel läuft gerade durch den Durchlass der Wandplatte in die Dose. Den Schlitz im Boden verschließt dann die Bodenblende: Sie wird von hinten eingeschoben, ihre schrägen Flanken halten sie nach außen und der Rückdeckel hält sie an ihrem Platz. Ein gerader Stecker wird stattdessen von hinten in diesen Schlitz gelegt, und der geschlossene Rückdeckel hält die Rückseite sauber.
 
-Das Loch ist großzügig (Adapterkörper 14 × 8 mm plus 1 mm Spiel). Für einen größeren Adapter `ADAPTER_W`, `ADAPTER_T` und `ADAPTER_L` in Fusion ändern, siehe [Designnotizen](design.md#parameter-in-fusion).
+Das Loch passt zum nachgemessenen sonero-Adapter (Körper 19,9 × 12,9 × 8,4 mm) mit 1 mm Spiel rundherum. Für einen größeren Adapter `ADAPTER_W`, `ADAPTER_T` und `ADAPTER_L` in Fusion ändern, siehe [Designnotizen](design.md#parameter-in-fusion).
 
 ## 4. Schritt für Schritt
 
@@ -154,7 +154,7 @@ Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter
 
 **Du brauchst:** Bodenblende
 
-Die Blende von hinten in den Schlitz im Boden schieben bis zum Anschlag, ihre Nase zeigt nach innen. Die schrägen Flanken halten sie nach außen, der Rückdeckel hält sie an ihrem Platz. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-10))
+Die Blende von hinten in den Schlitz im Boden schieben bis zum Anschlag, ihre Nase zeigt nach innen. Sie läuft in einer T-Führung hinter der äußeren Kante des Schlitzes wie eine Schublade, kleine Rippen halten sie fest, der Rückdeckel sichert sie. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-10))
 
 > **Tipp:** Kabel lieber gerade nach unten? Dann die Blende weglassen, den Stecker von hinten in den Schlitz legen und den geschlossenen Rückdeckel nehmen.
 

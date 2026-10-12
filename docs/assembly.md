@@ -44,13 +44,13 @@ Both ways use the same housing, only the back cover differs:
 | Cable | What you need | Use |
 |-------|---------------|-----|
 | **To the back** | 90° USB-C adapter (plug to socket) in the socket of the ESP32-C3, any USB-C cable plugged into it, back cover with hole, bottom blank | flush wall box and **always on the desk stand** |
-| **To the bottom** | straight USB-C plug, overmould at most 12 × 7 mm, closed back cover | cable on the wall surface, power bank below the device |
+| **To the bottom** | straight USB-C plug, overmould at most 12.5 × 7 mm, closed back cover | cable on the wall surface, power bank below the device |
 
 <img src="images/cable_port_back.png" width="49%" alt="Cable to the back"> <img src="images/cable_port_bottom.png" width="49%" alt="Cable to the bottom">
 
 The adapter points to the wall and leaves through the hole in the back cover, the cable goes straight through the passage of the wall plate into the box. The slot in the bottom wall is then closed by the bottom blank: it slides in from the back, its slanted flanks keep it from falling out and the back cover holds it in place. A straight plug instead is laid into this slot from the back, and the closed back cover keeps the back tidy.
 
-The hole is generous (adapter body 14 × 8 mm plus 1 mm play). For a bulkier adapter change `ADAPTER_W`, `ADAPTER_T` and `ADAPTER_L` in Fusion, see [design notes](design.md#parameters-in-fusion).
+The hole fits the measured sonero adapter (body 19.9 × 12.9 × 8.4 mm) with 1 mm play all around. For a bulkier adapter change `ADAPTER_W`, `ADAPTER_T` and `ADAPTER_L` in Fusion, see [design notes](design.md#parameters-in-fusion).
 
 ## 4. Step by step
 
@@ -154,7 +154,7 @@ Display: the flat cable folds back at the left wall and runs across behind the d
 
 **You need:** Bottom blank
 
-Slide the blank into the slot of the bottom wall from the back until it stops, its lug points inwards. Its slanted flanks keep it from falling out, the back cover keeps it in place. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-10))
+Slide the blank into the slot of the bottom wall from the back until it stops, its lug points inwards. It runs in a T-track behind the outer lip of the slot like a drawer, small ribs hold it in place, the back cover locks it. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-10))
 
 > **Tip:** Cable to the bottom with a straight plug instead? Leave the blank out, lay the plug into the slot from the back and use the closed back cover.
 

@@ -375,10 +375,12 @@ def parts(p: dict) -> list[dict]:
             y = c3y + p["C3_H"] - 1.6 - j * 2.54
             esp.append(cyl((c3x + side * (p["C3_W"] / 2 - 1.3), y, c3top - 0.02), (0, 0, 1), 0.06, 1.5, GOLD, "brass"))
     # 90 degree USB-C adapter in the socket, its body points to the wall, the cable is plugged in behind it
-    ay = (p["ADAPTER_Y0"] + mouth) / 2
+    ay = (p["ADAPTER_Y0"] + p["ADAPTER_Y1"]) / 2
     a_w = p["ADAPTER_W"] / 2
     adapter = [
-        box(c3x - a_w, p["ADAPTER_Y0"], p["ADAPTER_Z0"], c3x + a_w, mouth - 0.3, p["ADAPTER_Z1"], "#2b2e33", "metal"),
+        box(
+            c3x - a_w, p["ADAPTER_Y0"], p["ADAPTER_Z0"], c3x + a_w, p["ADAPTER_Y1"], p["ADAPTER_Z1"], "#2b2e33", "metal"
+        ),
         box(
             c3x - p["PLUG_W"] / 2,
             ay - p["PLUG_H"] / 2,

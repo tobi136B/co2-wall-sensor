@@ -43,7 +43,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '2.2'          # enclosure version, engraved into every part
+VERSION = '2.3'          # enclosure version, engraved into every part
 LABEL_FONT = 'Arial Black'  # labels: heavy strokes (about a fifth of the height) print as clean lines
 
 # ===================== PARAMETERS =====================
@@ -88,7 +88,7 @@ PH2_Y0, PH2_Y1 = 5.9, 24.7      # connector from the lower PCB edge (from a phot
 # --- chin: sensor chamber in front, ESP32-C3 behind ---
 DIVIDER = 2.5           # wall between display bay and chin
 FLOOR_Z, FLOOR_T = 12.0, 2.0    # sensor carrier (removable floor of the chamber)
-RIB_H = 1.2             # ESP32-C3 sits this far above the carrier
+RIB_H = 1.5             # ESP32-C3 sits this far above the carrier (room below the 90 degree adapter)
 # ESP32-C3 SuperMini, measured: board only, without the socket
 C3_W, C3_H, C3_PCB = 18.2, 22.71, 0.74
 C3_USB_OUT = 1.5        # the USB-C socket sticks out this far over the lower board edge
@@ -102,12 +102,17 @@ C3_PCB_MAX = 1.2        # thickest board the guides take
 C3_HOOK = 0.7           # spring hook behind the upper board edge (board 0.74 thick)
 C3_TONGUE_L = 10.0      # free length of the spring tongue below the ESP32-C3
 PLUG_SPACE = 12.5       # free space below the mouth of the USB-C socket for the plug
-PLUG_W, PLUG_H = 12.0, 7.0      # overmould of a straight USB-C plug
+PLUG_W, PLUG_H = 12.5, 7.0      # overmould of a straight USB-C plug (measured cable: 12.5 x 6.51)
 PLUG_PLAY = 0.4         # play around the overmould in the slot of the bottom wall
 BLANK_FIT = 0.2         # the blank that closes this slot (cable to the back): play per side in the slot
-# 90 degree USB-C adapter (plug to socket, sonero), the cable leaves to the back. Not measured yet: generous
-ADAPTER_W, ADAPTER_T, ADAPTER_L = 14.0, 8.0, 25.0  # body across, along the board, towards the wall
-ADAPTER_FRONT = 4.5     # from the axis of its USB-C plug to the front end of the body
+BLANK_LIP = 0.8         # outer lip of the slot: the blank is narrower there than on the inside (a T-track)
+BLANK_STEP = 0.8        # how far the track widens behind the lip, on each side
+BLANK_RIB = 0.25        # crush ribs on its flanks: they hold it in the slot by friction, also without the cover
+# 90 degree USB-C adapter (plug to socket, sonero B0CVQ8LV5W), the cable leaves to the back. Measured with a caliper
+ADAPTER_W, ADAPTER_T, ADAPTER_L = 12.87, 8.37, 19.91  # body across, along the board (the plug axis), towards the wall
+ADAPTER_FRONT = 4.9     # from the axis of its USB-C plug to the front end of the body (plug 3.44 to 6.38)
+ADAPTER_PLUG = 7.77     # plug with its collar, from the body face to the tip
+USB_C_INSERT = 6.65     # a USB-C plug goes this deep into the socket, the rest of the collar stays outside
 ADAPTER_PLAY = 1.0      # play around the adapter in the back cover and the wall plate
 # SCD41 board as mounted: W across the rails, L in the slide direction. Defaults: profile '14x22'.
 # Offsets are seen from the front of the device: right and up are positive (right is -x in the model).
@@ -198,7 +203,7 @@ def derive():
     global CARRIER_SCREWS, LCD_HOLES, CABLE, SCD_Y0, SCD_ZT
     global SCD_TOP, HOOK_B, HOOK_C, HOOK_A, TONGUE_TIP, TONGUE_ROOT
     global VENT_BOTTOM, VENT_SIDE, PLATE_W, PLATE_H, LCD_BACK, LCD_PCB_X1, LCD_CABLE_X0, EXT_Z0
-    global C3_TOP, C3_HOOK_Y, C3_TIP, C3_ROOT, C3_EXT_Y1, ADAPTER_Y0, ADAPTER_Z0, ADAPTER_Z1, BRIDGE_Y0
+    global C3_TOP, C3_HOOK_Y, C3_TIP, C3_ROOT, C3_EXT_Y1, ADAPTER_Y0, ADAPTER_Y1, ADAPTER_Z0, ADAPTER_Z1, BRIDGE_Y0
     CLEARANCE = FIT
     RAIL_CLEARANCE = FIT
     COVER_Z = DEPTH - COVER_T
@@ -230,7 +235,8 @@ def derive():
     LCD_CABLE_X0 = LCD_PCB_X1 - LCD_CABLE_SPAN       # bend of the plugged display cable
     EXT_Z0 = LCD_BACK + LCD_PLUG_H + LCD_PLUG_AIR    # the ESP32-C3 sled passes over the display connector
     # 90 degree adapter in the USB-C socket, its body points to the wall
-    ADAPTER_Y0 = C3_MOUTH - ADAPTER_T
+    ADAPTER_Y1 = C3_MOUTH - (ADAPTER_PLUG - USB_C_INSERT)   # face of the body towards the board
+    ADAPTER_Y0 = ADAPTER_Y1 - ADAPTER_T
     ADAPTER_Z0 = PLUG_Z - ADAPTER_FRONT
     ADAPTER_Z1 = ADAPTER_Z0 + ADAPTER_L
     # passage in wall plate and stand for the adapter and the plug in it, plus the 15 mm the device slides
@@ -804,10 +810,20 @@ def build_housing(root, ops):
     # slot in the bottom wall, open to the back: a straight USB-C plug sits in it (cable to the bottom), or the
     # BottomBlank closes it flush (cable to the back). Its inner half widens at 45 degrees, so the blank cannot
     # fall out; it slides in from the back and the back cover keeps it there.
-    prism_z(comp, plug_slot_profile(0.0), PLUG_Z - PLUG_H / 2 - PLUG_PLAY, DEPTH + 1, CUT, 'PlugSlot', body)
+    z_slot = PLUG_Z - PLUG_H / 2 - PLUG_PLAY
+    prism_z(comp, plug_slot_profile(0.0), z_slot, DEPTH + 1, CUT, 'PlugSlot', body)
+    # behind the outer lip the slot widens on both sides into a T-track: the blank runs in it like a drawer and
+    # cannot fall out. Nothing stands above the wall, the carrier slides past freely.
+    a = PLUG_W / 2 + PLUG_PLAY
+    box(comp, C3_X - a - BLANK_STEP, -BODY_H / 2 + BLANK_LIP, z_slot, C3_X + a + BLANK_STEP, Y_CHIN_LOW + 0.01,
+        DEPTH + 1, CUT, 'BlankTrack', body)
     # lead-in on the edges of the back opening: back cover, carrier and blank find their way in
     back = planar_face_at_z(body, DEPTH)
-    try_chamfer(comp, [e for lp in back.loops if not lp.isOuter for e in lp.edges], LEAD_IN, 'BackLeadIn')
+
+    def in_slot(q):   # the narrow lips around the slot of the blank keep their sharp edges
+        return q.y < cm(Y_CHIN_LOW + 0.1) and abs(q.x - cm(C3_X)) < cm(PLUG_W / 2 + 3)
+    try_chamfer(comp, [e for lp in back.loops if not lp.isOuter for e in lp.edges
+                       if not all(in_slot(q) for q in _edge_points(e))], LEAD_IN, 'BackLeadIn')
 
     label(comp, body, COVER_Z, -17, BAY_Y1 + 0.6, 17, Y_TOP_IN - 0.6, f'CO2 v{VERSION}', name='Label')
     return comp
@@ -815,20 +831,19 @@ def build_housing(root, ops):
 
 def plug_slot_profile(inset):
     """Cross-section (x, y) of the slot in the bottom wall, made smaller by inset on every side (the blank)."""
-    a = PLUG_W / 2 + PLUG_PLAY - inset             # half width of the outer half
-    y_out, y_mid = -BODY_H / 2 - (1.0 if inset == 0 else 0.0), -BODY_H / 2 + WALL / 2
+    a = PLUG_W / 2 + PLUG_PLAY - inset
+    y_out = -BODY_H / 2 - (1.0 if inset == 0 else 0.0)
     y_in = Y_CHIN_LOW + (0.01 if inset == 0 else -0.05)
-    w = (y_in - y_mid)                             # the inner half widens at 45 degrees
-    return [(C3_X - a, y_out), (C3_X + a, y_out), (C3_X + a, y_mid), (C3_X + a + w, y_in),
-            (C3_X - a - w, y_in), (C3_X - a, y_mid)]
+    return [(C3_X - a, y_out), (C3_X + a, y_out), (C3_X + a, y_in), (C3_X - a, y_in)]
 
 
 def build_bottom_blank(root, ops):
     """Closes the slot in the bottom wall when the cable leaves to the back.
 
-    Flush with the bottom outside. It slides in from the back until it stands at the front end of the slot; a lug
-    on its inner face stands just in front of the back cover, so with the cover screwed on it cannot slide out.
-    Print it with the outer face down.
+    Flush with the bottom outside. It slides in from the back like a drawer: its flange runs in the T-track
+    behind the outer lip of the slot, so it cannot fall out, and crush ribs hold it where it is pushed to (also
+    without the cover). A lug on its inner face stands just in front of the back cover, so with the cover screwed
+    on it cannot slide out. Print it with the outer face down.
     """
     NEW, CUT, JOIN = ops
     comp = new_component(root, 'BottomBlank')
@@ -839,6 +854,15 @@ def build_bottom_blank(root, ops):
     zb = COVER_Z - 0.3                               # face towards the cover, slanted so it prints standing
     lug = [(y_in - 0.01, zb - 3.0), (y_in - 0.01, zb), (y_in + 1.5, zb - 1.5), (y_in + 1.5, zb - 3.0)]
     prism_x(comp, lug, C3_X - 4.0, C3_X + 4.0, JOIN, 'Lug', body)
+    # flange in the T-track behind the outer lip: 0.1 mm play above the lip, BLANK_FIT at the sides
+    a = PLUG_W / 2 + PLUG_PLAY + BLANK_STEP - BLANK_FIT
+    box(comp, C3_X - a, -BODY_H / 2 + BLANK_LIP + 0.1, z0, C3_X + a, y_in, DEPTH - 0.1, JOIN, 'Flange', body)
+    # crush ribs on the straight flanks: half cylinders across the wall, near the front and the back end. They
+    # press 0.05 mm into the slot walls, the blank stays where it is pushed to and comes out with a fingernail.
+    rr = 0.4
+    a = PLUG_W / 2 + PLUG_PLAY - BLANK_FIT
+    ribs = [(C3_X + sx * (a + BLANK_RIB - rr), z) for sx in (-1, 1) for z in (z0 + 2.0, DEPTH - 2.5)]
+    cylinders_y(comp, ribs, 2 * rr, -BODY_H / 2, -BODY_H / 2 + BLANK_LIP, JOIN, 'BlankRib', body)
     return comp
 
 
@@ -998,6 +1022,8 @@ def build_back_cover(root, ops, name='BackCover', hole=True):
     body.name = name
     screw_holes(comp, COVER_SCREWS, DEPTH, body)
     open_head_recesses(comp, COVER_SCREWS, DEPTH, (XL + s, Y_CHIN_LOW + s, XR - s, Y_TOP_IN - s), body)
+    # shallow relief on the inside above the ESP32-C3: room for the display wires where they cross over the cable
+    box(comp, C3_X - 9.5, C3_Y0 - 1.0, COVER_Z - 1, C3_X + 9.5, C3_TOP + 1.0, COVER_Z + 0.6, CUT, 'WireRelief', body)
     if hole:
         r = ADAPTER_PLAY
         box(comp, C3_X - ADAPTER_W / 2 - r, ADAPTER_Y0 - r, COVER_Z - 1, C3_X + ADAPTER_W / 2 + r, C3_MOUTH + r,
@@ -1104,9 +1130,9 @@ def build_dummies(root, ops):
                 C3_Z0 + C3_PCB + C3_PARTS_H, NEW, 'Parts').bodies.item(0)
     parts.isLightBulbOn = False   # only for the interference check, it would hide the board in the pictures
     adapter = new_component(root, 'Dummy_Adapter')
-    box(adapter, C3_X - ADAPTER_W / 2, ADAPTER_Y0, ADAPTER_Z0, C3_X + ADAPTER_W / 2, C3_MOUTH - 0.3, ADAPTER_Z1, NEW,
+    box(adapter, C3_X - ADAPTER_W / 2, ADAPTER_Y0, ADAPTER_Z0, C3_X + ADAPTER_W / 2, ADAPTER_Y1, ADAPTER_Z1, NEW,
         'Body')
-    ya = (ADAPTER_Y0 + C3_MOUTH) / 2
+    ya = (ADAPTER_Y0 + ADAPTER_Y1) / 2
     box(adapter, C3_X - PLUG_W / 2, ya - PLUG_H / 2, ADAPTER_Z1, C3_X + PLUG_W / 2, ya + PLUG_H / 2, ADAPTER_Z1 + 20,
         NEW, 'CablePlug')
     straight = new_component(root, 'Dummy_PlugStraight')
@@ -1198,6 +1224,8 @@ def check_interference(design, root, components):
         vol = r.interferenceBody.volume * 1000
         if pair == {'SensorCarrier', 'Dummy_SCD41'} and vol <= preload:
             continue
+        if pair == {'BottomBlank', 'Housing'} and vol <= 0.2:
+            continue   # the crush ribs of the blank press into the slot on purpose
         if pair == {'SensorCarrier', 'Dummy_ESP32_C3'} and vol <= C3_RIB_SQUEEZE:
             continue   # the crush ribs press on the board edges on purpose
         log('INTERFERENCE', *sorted(pair), round(vol, 2), 'mm3')
