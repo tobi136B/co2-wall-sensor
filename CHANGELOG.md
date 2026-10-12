@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.4.1](https://github.com/tobi136B/co2-wall-sensor/compare/v2.4.0...v2.4.1) (2026-10-12)
+
+
+### Fixed
+
+* **firmware:** an open window means airing, pill, night warning and forecast follow it ([#41](https://github.com/tobi136B/co2-wall-sensor/issues/41)) ([7ad1b51](https://github.com/tobi136B/co2-wall-sensor/commit/7ad1b51a536d0b0ccb190b1fb8898c959332bd4f))
+
 ## [2.4.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.3.0...v2.4.0) (2026-10-12)
 
 
