@@ -119,25 +119,40 @@ mode: queued
 max: 5
 max_exceeded: silent
 
+# The triggers are conditions, so they also fire when the window changes: shut the window while the
+# level is high and the reminder still comes, open it in a cold room and the warning comes.
+trigger_variables:
+  t_co2: !input co2_sensor
+  t_temp: !input temperature_sensor
+  t_red: !input red_threshold
+  t_fresh: !input fresh_level
+  t_cool: !input cool_temp
+  t_window: !input window
+
 trigger:
-  - platform: numeric_state
+  - platform: template
     id: high
-    entity_id: !input co2_sensor
-    above: !input red_threshold
+    value_template: >-
+      {{ states(t_co2) | float(0) > states(t_red) | float(100000)
+         and not (t_window != '' and is_state(t_window, 'on')) }}
     for: !input delay
-  - platform: numeric_state
+  - platform: template
     id: fresh
-    entity_id: !input co2_sensor
-    below: !input fresh_level
-  - platform: numeric_state
+    value_template: >-
+      {{ t_window != '' and is_state(t_window, 'on')
+         and states(t_co2) | float(100000) < states(t_fresh) | float(0) }}
+    for:
+      minutes: 1
+  - platform: template
     id: cold
-    entity_id: !input temperature_sensor
-    below: !input cool_temp
+    value_template: >-
+      {{ t_window != '' and is_state(t_window, 'on')
+         and states(t_temp) | float(100) < states(t_cool) | float(-100) }}
+    for:
+      minutes: 1
 
 variables:
   co2: !input co2_sensor
-  window: !input window
-  open: "{{ window != '' and is_state(window, 'on') }}"
   name: "{{ state_attr(co2, 'friendly_name') or co2 }}"
   send_ventilate: !input send_ventilate
   send_fresh: !input send_fresh
@@ -148,7 +163,6 @@ action:
       - conditions:
           - condition: trigger
             id: high
-          - "{{ not open }}"
           - "{{ send_ventilate }}"
         sequence:
           - domain: mobile_app
@@ -159,7 +173,6 @@ action:
       - conditions:
           - condition: trigger
             id: fresh
-          - "{{ open }}"
           - "{{ send_fresh }}"
         sequence:
           - domain: mobile_app
@@ -169,7 +182,6 @@ action:
       - conditions:
           - condition: trigger
             id: cold
-          - "{{ open }}"
           - "{{ send_cold }}"
         sequence:
           - domain: mobile_app

@@ -34,6 +34,7 @@ DOC_PAIRS = [
     ("docs/faq.md", "docs/de/faq.md"),
     ("docs/wiring.md", "docs/de/verdrahtung.md"),
     ("docs/measure-sensor.md", "docs/de/sensor-ausmessen.md"),
+    ("docs/home-assistant.md", "docs/de/home-assistant.md"),
 ]
 
 

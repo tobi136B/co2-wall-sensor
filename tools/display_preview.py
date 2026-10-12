@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Preview of the 320 x 240 display layout in all three air quality states.
+Preview of the 320 x 240 display layout in all three air quality states and in the four window states.
 
 This is a pixel mock-up of the lambda in esphome/common/base.yaml, intended for
 the README and for design reviews without hardware. Positions and colours are
 the same as in the firmware; fonts may differ slightly (Inter on the device).
 
 Usage:   python tools/display_preview.py
-Output:  docs/images/display_preview_en.png, docs/images/display_preview_de.png
+Output:  docs/images/display_preview_{en,de}.png (air quality), docs/images/display_window_{en,de}.png (window)
 """
 
 from __future__ import annotations
@@ -42,6 +42,9 @@ TEXT = {
         "dry": "Airing dries the air",
         "warm": "Keep it shut: warmer outside",
         "short": "Air briefly: warmer outside",
+        "airing": "Airing for 6 min",
+        "fresh": "Fresh air: close the window",
+        "cold": "Close the window: room cools down",
     },
     "de": {
         "good": "Gut",
@@ -54,13 +57,24 @@ TEXT = {
         "dry": "Lüften trocknet die Luft",
         "warm": "Fenster zu: außen wärmer",
         "short": "Kurz stoßlüften: außen wärmer",
+        "airing": "Lüftet seit 6 min",
+        "fresh": "Luft frisch: Fenster zu",
+        "cold": "Fenster zu: Raum kühlt aus",
     },
 }
-# (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red, outdoor, window hint)
+# (state, CO2, temperature, humidity, time, trend start, trend arrow, minutes until red, outdoor, window hint,
+#  window: None without a contact, "closed", or the hint that colours the open window)
 STATES = [
-    ("good", 642, 21.4, 45, "08:15", 760, "falling", None, 14.5, None),
-    ("moderate", 1180, 22.1, 63, "13:40", 780, "rising", 44, 9.0, "dry"),
-    ("ventilate", 1620, 25.6, 52, "19:05", 980, "steady", None, 17.5, "cool"),
+    ("good", 642, 21.4, 45, "08:15", 760, "falling", None, 14.5, None, "closed"),
+    ("moderate", 1180, 22.1, 63, "13:40", 780, "rising", 44, 9.0, "dry", "closed"),
+    ("ventilate", 1620, 25.6, 52, "19:05", 980, "steady", None, 17.5, "cool", "closed"),
+]
+# window contact from Home Assistant: shut (grey), airing (blue), fresh again (green), room cools down (orange)
+WINDOW_STATES = [
+    ("good", 655, 21.6, 47, "07:40", 700, "steady", None, 8.5, None, "closed"),
+    ("moderate", 1240, 21.2, 55, "10:20", 1520, "falling", None, 8.5, "airing", "airing"),
+    ("good", 690, 20.4, 50, "10:31", 1450, "falling", None, 8.5, "fresh", "fresh"),
+    ("good", 880, 18.6, 52, "10:36", 1400, "falling", None, 8.5, "cold", "cold"),
 ]
 
 
@@ -100,7 +114,32 @@ def arrow(d: ImageDraw.ImageDraw, x_right: float, y_top: float, kind: str, fill)
         d.line([s(tip[0]), s(tip[1]), s(tip[0] + 6 * math.cos(a)), s(tip[1] + 6 * math.sin(a))], fill=fill, width=s(3))
 
 
-HINT_COLORS = {"cool": (90, 190, 255), "dry": (90, 190, 255), "warm": (255, 170, 60), "short": (255, 170, 60)}
+BLUE, ORANGE = (0x5A, 0xBE, 0xFF), (0xFF, 0xAA, 0x3C)  # col_cool and col_warm of the firmware
+HINT_COLORS = {
+    "cool": BLUE,
+    "dry": BLUE,
+    "warm": ORANGE,
+    "short": ORANGE,
+    "airing": BLUE,
+    "fresh": COLORS["green"],
+    "cold": ORANGE,
+}
+
+
+def window_icon(d: ImageDraw.ImageDraw, x_right: float, y_top: float, kind: str) -> None:
+    """Window symbol like mdi-window-closed-variant / -open-variant, 22 px box, right aligned."""
+    fill = COLORS["muted"] if kind == "closed" else HINT_COLORS[kind]
+    x0, y0, x1, y1 = x_right - 19, y_top + 2, x_right - 3, y_top + 20
+    w = s(2)
+    if kind == "closed":
+        d.rectangle([s(x0), s(y0), s(x1), s(y1)], outline=fill, width=w)
+        d.line([s((x0 + x1) / 2), s(y0), s((x0 + x1) / 2), s(y1)], fill=fill, width=w)
+        d.line([s(x0), s((y0 + y1) / 2), s(x1), s((y0 + y1) / 2)], fill=fill, width=w)
+        return
+    # open: frame on the left half, the sash swung out to the right as a parallelogram
+    xm = (x0 + x1) / 2
+    d.line([s(xm), s(y0), s(x0), s(y0), s(x0), s(y1), s(xm), s(y1)], fill=fill, width=w, joint="curve")
+    d.polygon([s(xm), s(y0), s(x1 + 1), s(y0 - 2), s(x1 + 1), s(y1 + 2), s(xm), s(y1)], outline=fill, width=w)
 
 
 def screen(
@@ -115,6 +154,7 @@ def screen(
     forecast,
     outdoor: float | None = None,
     hint: str | None = None,
+    window: str | None = None,
 ) -> Image.Image:
     t = TEXT[lang]
     img = Image.new("RGB", (s(W), s(H)), (0, 0, 0))
@@ -125,6 +165,8 @@ def screen(
     # WiFi glyph as three arcs
     for r in (4, 8, 12):
         d.arc([s(W - 24 - r), s(22 - r), s(W - 24 + r), s(22 + r)], 225, 315, fill=COLORS["muted"], width=s(2))
+    if window:  # left of the WiFi symbol, only with a window contact (switch in Home Assistant)
+        window_icon(d, W - 42, 10, window)
 
     pw, ph = 140, 26
     px, py = (W - pw) / 2, 9
@@ -185,21 +227,24 @@ def bezel(img: Image.Image) -> Image.Image:
     return out
 
 
+def sheet_of(lang: str, states: list, columns: int) -> Image.Image:
+    tiles = [bezel(screen(lang, *st)) for st in states]
+    gap = s(10)
+    rows = math.ceil(len(tiles) / columns)
+    tw, th = tiles[0].width, tiles[0].height
+    sheet = Image.new("RGB", (columns * tw + gap * (columns + 1), rows * th + gap * (rows + 1)), (255, 255, 255))
+    for i, tile in enumerate(tiles):
+        sheet.paste(tile, (gap + (i % columns) * (tw + gap), gap + (i // columns) * (th + gap)))
+    return sheet
+
+
 def main():
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     for lang in TEXT:
-        tiles = [bezel(screen(lang, *st)) for st in STATES]
-        gap = s(10)
-        sheet = Image.new(
-            "RGB", (sum(t.width for t in tiles) + gap * (len(tiles) + 1), tiles[0].height + 2 * gap), (255, 255, 255)
-        )
-        x = gap
-        for tile in tiles:
-            sheet.paste(tile, (x, gap))
-            x += tile.width + gap
-        out = OUT_DIR / f"display_preview_{lang}.png"
-        sheet.save(out, optimize=True)
-        print(f"written: {out.relative_to(ROOT)}")
+        for name, states, columns in (("display_preview", STATES, 3), ("display_window", WINDOW_STATES, 2)):
+            out = OUT_DIR / f"{name}_{lang}.png"
+            sheet_of(lang, states, columns).save(out, optimize=True)
+            print(f"written: {out.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

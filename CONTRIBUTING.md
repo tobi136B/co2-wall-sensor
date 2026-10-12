@@ -21,6 +21,7 @@ Thanks for your interest in improving the CO2 Wall Sensor!
   python tools/drawing.py && python tools/wiring.py && python tools/display_preview.py && python tools/build_3mf.py
   python tools/check_repo.py
   ```
+  The [dependency map](docs/dependencies.md) lists for every source file what has to be regenerated.
 * **Shop links and prices** live only in `hardware/bom.yaml` (format explained at the top of the file). `python tools/bom.py` updates the README tables; on `main` the *Shop links* workflow does that and redeploys the project page.
 * **Both languages.** User-facing text exists in English and German. Update both, or mention in the pull request that a translation is missing.
 * **Firmware texts** go into the substitutions of the four device files (`co2-wall-sensor*.yaml`), logic into `common/base.yaml`, network settings into `common/network_secrets.yaml` (own build) or `common/network_factory.yaml` (browser installer).
@@ -45,4 +46,4 @@ Danke, dass du den CO2-Wandsensor verbessern möchtest!
 * **Fehler melden** und **Ideen vorschlagen** über die Vorlagen unter [Issues](https://github.com/tobi136B/co2-wall-sensor/issues/new/choose).
 * **Pull Requests** für Firmware, CAD, Tools oder Doku sind willkommen.
 
-Die Regeln oben gelten genauso: Geometrie nur über die Parameter ändern, generierte Dateien neu erzeugen, beide Sprachen pflegen, keine Zugangsdaten einchecken, Commit-Nachrichten nach Conventional Commits. Issues und Pull Requests dürfen gerne auf Deutsch geschrieben werden.
+Die Regeln oben gelten genauso: Geometrie nur über die Parameter ändern, generierte Dateien neu erzeugen (was wovon abhängt, steht in der [Abhängigkeitskarte](docs/dependencies.md)), beide Sprachen pflegen, keine Zugangsdaten einchecken, Commit-Nachrichten nach Conventional Commits. Issues und Pull Requests dürfen gerne auf Deutsch geschrieben werden.
