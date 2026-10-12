@@ -74,7 +74,8 @@ TEXT = {
         "t_s4_text": "New releases appear as a firmware update in Home Assistant. One click installs them.",
         "t_display_title": "Everything on one screen",
         "t_display_text": "Air quality, CO2 with a three hour trend, indoor and outdoor temperature, humidity, the time "
-        "and a hint when an open window cools or dries the room. At night it dims or switches off, as set in Home Assistant.",
+        "and a hint when an open window cools or dries the room. With window contacts it shows when you are airing, "
+        "when the air is fresh again and when the room cools down. At night it dims or switches off, as set in Home Assistant.",
         "t_display_alt": "The display in the three air quality levels",
         "t_print_title": "Print the enclosure",
         "t_print_text": "The plates contain every part in its print orientation. Open them in PrusaSlicer, OrcaSlicer, "
@@ -99,9 +100,10 @@ TEXT = {
         "t_part": "Part",
         "t_prices": "Prices as checked in October 2026, they change often. Two sensor carriers fit the 13.5 × 21.75 mm and the 15 × 20 mm SCD41 board.",
         "t_docs_title": "Documentation",
-        "t_docs_text": "Step by step assembly, wiring, the reasons behind the design and answers to common questions.",
+        "t_docs_text": "Step by step assembly, wiring, Home Assistant setup, the reasons behind the design and answers to common questions.",
         "t_doc_assembly": "Printing and assembly",
         "t_doc_wiring": "Wiring",
+        "t_doc_ha": "Home Assistant guide",
         "t_doc_design": "Design notes",
         "t_doc_faq": "FAQ",
         "t_doc_drawing": "Technical drawing (PDF)",
@@ -110,6 +112,7 @@ TEXT = {
         f'<a href="{REPO}">Source on GitHub</a>.',
         "doc_assembly": f"{REPO}/blob/main/docs/assembly.md",
         "doc_wiring": f"{REPO}/blob/main/docs/wiring.md",
+        "doc_ha": f"{REPO}/blob/main/docs/home-assistant.md",
         "doc_design": f"{REPO}/blob/main/docs/design.md",
         "doc_faq": f"{REPO}/blob/main/docs/faq.md",
     },
@@ -147,7 +150,8 @@ TEXT = {
         "t_s4_text": "Neue Versionen erscheinen in Home Assistant als Firmware-Update. Ein Klick installiert sie.",
         "t_display_title": "Alles auf einem Bildschirm",
         "t_display_text": "Luftqualität, CO2 mit Drei-Stunden-Verlauf, Innen- und Außentemperatur, Luftfeuchte, Uhrzeit "
-        "und ein Hinweis, wann ein offenes Fenster kühlt oder die Luft trocknet. Nachts dimmt es oder geht aus, "
+        "und ein Hinweis, wann ein offenes Fenster kühlt oder die Luft trocknet. Mit Fensterkontakten zeigt es, "
+        "wann du lüftest, wann die Luft wieder frisch ist und wann der Raum auskühlt. Nachts dimmt es oder geht aus, "
         "wie in Home Assistant eingestellt.",
         "t_display_alt": "Das Display in den drei Luftqualitätsstufen",
         "t_print_title": "Gehäuse drucken",
@@ -173,9 +177,10 @@ TEXT = {
         "t_part": "Teil",
         "t_prices": "Preise Stand Oktober 2026, sie ändern sich oft. Zwei Sensorträger passen für die 13,5 × 21,75 mm und die 15 × 20 mm SCD41-Platine.",
         "t_docs_title": "Dokumentation",
-        "t_docs_text": "Aufbau Schritt für Schritt, Verdrahtung, die Gründe hinter dem Design und Antworten auf häufige Fragen.",
+        "t_docs_text": "Aufbau Schritt für Schritt, Verdrahtung, Einrichtung in Home Assistant, die Gründe hinter dem Design und Antworten auf häufige Fragen.",
         "t_doc_assembly": "Druck und Aufbau",
         "t_doc_wiring": "Verdrahtung",
+        "t_doc_ha": "Home Assistant Anleitung",
         "t_doc_design": "Designnotizen",
         "t_doc_faq": "FAQ",
         "t_doc_drawing": "Technische Zeichnung (PDF)",
@@ -184,6 +189,7 @@ TEXT = {
         f'<a href="{REPO}">Quellcode auf GitHub</a>.',
         "doc_assembly": f"{REPO}/blob/main/docs/de/aufbau.md",
         "doc_wiring": f"{REPO}/blob/main/docs/de/verdrahtung.md",
+        "doc_ha": f"{REPO}/blob/main/docs/de/home-assistant.md",
         "doc_design": f"{REPO}/blob/main/docs/de/design.md",
         "doc_faq": f"{REPO}/blob/main/docs/de/faq.md",
     },

@@ -28,7 +28,8 @@ It covers a flush wall box or stands on your desk.**
 * **Real CO2 measurement** with the Sensirion SCD41 (photoacoustic NDIR), plus temperature and humidity.
 * **2" IPS colour display** with everything at a glance: traffic light status, large CO2 value, 3 hour trend, clock, indoor and outdoor temperature and humidity.
 * **Window hint.** The display tells you when opening the window cools the room or dries the air, using an outdoor sensor or simply your Home Assistant weather forecast.
-* **Everything adjustable in Home Assistant.** Night schedule (dim or off), night brightness, warnings at night, temperature correction, altitude and hint thresholds, no reflashing needed.
+* **Window contacts.** With your contacts from Home Assistant the window symbol shows grey (shut), blue (airing), green (fresh air, close it) or orange (the room cools down), and the blueprint only reminds you to ventilate while the windows are shut.
+* **Everything adjustable in Home Assistant.** Measuring interval, smoothing, trend arrow, night schedule (dim or off), night brightness, warnings at night, temperature correction, altitude and every hint threshold, no reflashing needed. Step by step: [Home Assistant guide](docs/home-assistant.md).
 * **One device, two mounts.** A dovetail rail slides onto the **wall plate** (two M4 screws with wall plugs, or the screws of a 68 mm flush wall box) or the **desk stand**.
 * **Cable from the back or from below** with the same housing: a 90° USB-C adapter leads the cable straight into the wall, or a straight cable leaves through the slot in the bottom. The opening you do not use is closed by a clean printed part.
 * **One screw type, nothing glued.** 10 heat-set inserts M2 × 3 and 10 button head screws M2 × 4. The SCD41 and the ESP32-C3 slide into rails and click behind spring hooks, the display cable stays plugged in and runs under a printed bridge.
@@ -52,7 +53,7 @@ flowchart LR
     GH["GitHub releases"] -. "firmware update" .-> HA
 ```
 
-Every 30 seconds the SCD41 delivers a new reading. The ESP32-C3 updates the display, classifies the air quality against two thresholds (default 1000 and 1400 ppm) and reports everything to Home Assistant.
+Every 30 seconds (adjustable from 5 to 60 s) the SCD41 delivers a new reading. The ESP32-C3 updates the display, classifies the air quality against two thresholds (default 1000 and 1400 ppm) and reports everything to Home Assistant.
 
 ## Specifications
 
@@ -119,18 +120,21 @@ Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the onl
 | Entity | Type | Purpose |
 |--------|------|---------|
 | CO2, Temperature, Humidity | sensor | measurements every 30 s |
+| Measuring interval, Smoothing | number, switch | 5 to 60 s (default 30 s), mean of two readings (default on) |
+| Trend arrow from | number | change per hour that turns the arrow up or down (default 100 ppm/h) |
 | CO2 trend, Ventilate in | sensor | ppm per hour, minutes until the red level |
 | Air quality | text | Good, Moderate, Ventilate! |
 | Outdoor temperature, Outdoor humidity | sensor | from Home Assistant, see [outdoor values](#outdoor-values) |
-| Window hint | text | Open the window, Airing dries the air, Keep it shut, None |
+| Window hint | text | Open the window, Airing dries the air, Keep it shut, None; with a window contact: Airing for x min, Fresh air: close the window, Close the window: room cools down |
 | CO2 threshold yellow / red | number | traffic light limits (default 1000 / 1400 ppm) |
 | Display brightness | light | dim or switch off the display by hand |
 | Night mode, Night from, Night until | switch, time | night schedule (default 22:00 to 06:00) |
 | Display at night, Night brightness | select, number | dim (default 8 %) or switch off |
 | Red warning at night | switch | the display wakes up while the CO2 level is red |
-| Window hint on the display, Outdoor value on the display | switch | show or hide them |
+| Window hint on the display, Window symbol on the display, Outdoor value on the display | switch | show or hide them |
 | Display upside down | switch | turns the picture by 180° if it stands on its head |
 | Window hint from indoor temperature, Window hint: cooler outside by | number | default 24 °C and 3 °C |
+| Fresh air below, Window warning below | number | with an open window: fresh air (default 700 ppm), room cools down (default 19 °C) |
 | Temperature correction | number | self-heating at your wall: compare with a reference thermometer |
 | Altitude above sea level | number | pressure compensation of the CO2 value (default 300 m) |
 | Calibrate SCD41 (fresh air 420 ppm) | button | forced recalibration in fresh air |
@@ -148,13 +152,17 @@ The display shows the outdoor temperature under **OUT**, and the window hint com
 
 ### Window contacts
 
-With a window contact the device knows when you are airing. A window symbol appears at the top, the hint line counts the minutes (*Airing for 6 min*) and turns green when the air is fresh again (*Fresh air: close the window*, at 300 ppm below the yellow threshold, at least 600 ppm).
+With a window contact the device knows when you are airing. The window symbol at the top is grey while the windows are shut. Open one and it turns blue, the hint line counts the minutes (*Airing for 6 min*), green tells you the air is fresh again (*Fresh air: close the window*, below 700 ppm) and orange that the room cools down too much (*Close the window: room cools down*, below 19 °C). Both thresholds are settings in Home Assistant, a switch hides the symbol. Every step with pictures: [Home Assistant guide](docs/home-assistant.md).
+
+<div align="center">
+<img src="docs/images/display_window_en.png" width="70%" alt="Window symbol shut, airing, fresh air and room cools down">
+</div>
 
 * In Home Assistant open *Settings > Devices & services > Helpers > Create helper > Group > Binary sensor group*, name it **CO2 Wall Sensor Window** (German firmware: **CO2 Wandsensor Fenster**) and add the window contacts of the room. The entity ID becomes `binary_sensor.co2_wall_sensor_window` (`binary_sensor.co2_wandsensor_fenster`), exactly what the firmware listens to.
 * The group is on as soon as one window is open. A second window later? Just add it to the group, no new firmware needed.
 * Several devices in different rooms: give each device its own group and set `window_entity` in its device file.
 
-**Ventilation reminder:** a ready blueprint notifies your phone when the CO2 level stays high and again when the air is good.
+**Ventilation reminder:** a ready blueprint notifies your phone when the CO2 level stays high and the windows are shut, when the air is fresh again with the window open and when the room cools down. It takes the thresholds straight from the device.
 
 [![Open your Home Assistant instance and show the blueprint import dialog](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ftobi136B%2Fco2-wall-sensor%2Fblob%2Fmain%2Fhomeassistant%2Fblueprints%2Fco2_ventilation_reminder.yaml)
 
@@ -171,7 +179,7 @@ co2-wall-sensor/
 │   ├── step/                        STEP of the full assembly
 │   ├── stl/                         single print files
 │   └── build_info.json              fingerprint of the parameters the print files were made from
-├── docs/                            assembly, wiring, design notes, FAQ (German in docs/de)
+├── docs/                            assembly, wiring, Home Assistant guide, design notes, FAQ (German in docs/de)
 │   ├── drawing/                     technical drawing, PDF + PNG, EN and DE
 │   └── images/                      renders, animation, wiring diagram, display preview
 ├── esphome/
@@ -220,6 +228,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * [x] Enclosure 2.0 after the first print: display cable stays plugged, ESP32-C3 on a sled with a spring hook, 90° adapter instead of the loose port module, wall plate for M4 screws (v2.0)
 * [x] Enclosure 2.1: more play in every fit (0.4 mm), clean bottom blank or closed back cover for the unused cable opening, lead-ins, pull tab on the carrier, 2 mm air for the display cable (v2.1)
 * [x] Window contacts from Home Assistant: window symbol, airing time and a hint to close the window (v2.2)
+* [x] Window states in colour, more settings in Home Assistant (measuring interval, smoothing, trend arrow, fresh air and cooling thresholds), blueprint that follows the window, [Home Assistant guide](docs/home-assistant.md) (v2.4)
 * [ ] Verify display layout and thermals on real hardware, add photos
 
 ## Contributing

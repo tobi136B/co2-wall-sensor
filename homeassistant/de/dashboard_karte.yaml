@@ -22,6 +22,11 @@ cards:
         name: Temperatur
       - entity: sensor.co2_wandsensor_luftfeuchtigkeit
         name: Feuchte
+      - entity: binary_sensor.co2_wandsensor_fenster
+        name: Fenster
+  - type: entity
+    entity: sensor.co2_wandsensor_fensterhinweis
+    name: Hinweis
   - type: history-graph
     title: Verlauf 24 h
     hours_to_show: 24

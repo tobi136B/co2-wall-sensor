@@ -28,7 +28,8 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 * **Echte CO2-Messung** mit dem Sensirion SCD41 (photoakustisch, NDIR), dazu Temperatur und Luftfeuchte.
 * **2" IPS-Farbdisplay** mit allem auf einen Blick: Ampelstatus, große CO2-Zahl, 3-Stunden-Verlauf, Uhrzeit, Innen- und Außentemperatur sowie Luftfeuchte.
 * **Fensterhinweis.** Das Display zeigt, wann Lüften den Raum kühlt oder die Luft trocknet. Dafür reicht ein Außensensor oder einfach die Wettervorhersage aus Home Assistant.
-* **Alles in Home Assistant einstellbar.** Nachtzeiten (dimmen oder aus), Nachthelligkeit, Warnung in der Nacht, Temperaturkorrektur, Höhe und Schwellen für den Hinweis, ganz ohne neu zu flashen.
+* **Fensterkontakte.** Mit deinen Kontakten aus Home Assistant zeigt das Fenstersymbol grau (zu), blau (lüftet), grün (Luft frisch, Fenster zu) oder orange (Raum kühlt aus), und der Blueprint erinnert nur ans Lüften, solange die Fenster zu sind.
+* **Alles in Home Assistant einstellbar.** Messintervall, Glättung, Trendpfeil, Nachtzeiten (dimmen oder aus), Nachthelligkeit, Warnung in der Nacht, Temperaturkorrektur, Höhe und alle Schwellen für die Hinweise, ganz ohne neu zu flashen. Schritt für Schritt: [Home Assistant Anleitung](docs/de/home-assistant.md).
 * **Ein Gerät, zwei Montagearten.** Eine Schwalbenschwanzschiene gleitet auf die **Wandplatte** (zwei Schrauben M4 mit Dübeln oder die Schrauben einer Hohlwanddose Ø 68 mm) oder den **Tischständer**.
 * **Kabel von hinten oder unten** mit demselben Gehäuse: Ein USB-C-Winkeladapter führt das Kabel gerade in die Wand, oder ein gerades Kabel geht durch den Schlitz im Boden. Die Öffnung, die du nicht brauchst, verschließt ein sauberes gedrucktes Teil.
 * **Eine Schraubensorte, nichts geklebt.** 10 Einschmelzmuttern M2 × 3 und 10 Linsenkopfschrauben M2 × 4. SCD41 und ESP32-C3 gleiten in Schienen und rasten hinter Federhaken ein, das Displaykabel bleibt gesteckt und läuft unter einer mitgedruckten Brücke.
@@ -52,7 +53,7 @@ flowchart LR
     GH["GitHub Releases"] -. "Firmware-Update" .-> HA
 ```
 
-Alle 30 Sekunden liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisiert das Display, bewertet die Luftqualität anhand zweier Schwellen (Standard 1000 und 1400 ppm) und meldet alles an Home Assistant.
+Alle 30 Sekunden (einstellbar von 5 bis 60 s) liefert der SCD41 einen neuen Messwert. Der ESP32-C3 aktualisiert das Display, bewertet die Luftqualität anhand zweier Schwellen (Standard 1000 und 1400 ppm) und meldet alles an Home Assistant.
 
 ## Technische Daten
 
@@ -119,18 +120,21 @@ Maschinenlesbar: [`hardware/bom.yaml`](hardware/bom.yaml). Teile, Preise und Sho
 | Entität | Typ | Zweck |
 |---------|-----|-------|
 | CO2, Temperatur, Luftfeuchtigkeit | Sensor | Messwerte alle 30 s |
+| Messintervall, Glättung | Zahl, Schalter | 5 bis 60 s (Standard 30 s), Mittelwert aus zwei Messungen (Standard an) |
+| Trendpfeil ab | Zahl | Änderung pro Stunde, ab der der Pfeil nach oben oder unten zeigt (Standard 100 ppm/h) |
 | CO2 Trend, Lüften in | Sensor | ppm pro Stunde, Minuten bis Rot |
 | Luftqualität | Text | Gut, Mäßig, Lüften! |
 | Außentemperatur, Außenfeuchte | Sensor | aus Home Assistant, siehe [Außenwerte](#außenwerte) |
-| Fensterhinweis | Text | Fenster auf, Lüften trocknet, Fenster zu, Keiner |
+| Fensterhinweis | Text | Fenster auf, Lüften trocknet, Fenster zu, Keiner; mit Fensterkontakt: Lüftet seit x min, Luft frisch: Fenster zu, Fenster zu: Raum kühlt aus |
 | CO2 Schwelle Gelb / Rot | Zahl | Ampelgrenzen (Standard 1000 / 1400 ppm) |
 | Display Helligkeit | Licht | von Hand dimmen oder ausschalten |
 | Nachtmodus, Nacht ab, Nacht bis | Schalter, Uhrzeit | Nachtzeit (Standard 22 bis 6 Uhr) |
 | Display in der Nacht, Nachthelligkeit | Auswahl, Zahl | dimmen (Standard 8 %) oder aus |
 | Rote Warnung auch nachts | Schalter | das Display geht an, solange der CO2-Wert rot ist |
-| Fensterhinweis auf dem Display, Außenwert auf dem Display | Schalter | ein- oder ausblenden |
+| Fensterhinweis auf dem Display, Fenstersymbol auf dem Display, Außenwert auf dem Display | Schalter | ein- oder ausblenden |
 | Display auf dem Kopf | Schalter | dreht das Bild um 180°, falls es auf dem Kopf steht |
 | Fensterhinweis ab Innentemperatur, Fensterhinweis: draußen kühler um | Zahl | Standard 24 °C und 3 °C |
+| Luft frisch unter, Fensterwarnung unter | Zahl | bei offenem Fenster: Luft frisch (Standard 700 ppm), Raum kühlt aus (Standard 19 °C) |
 | Temperaturkorrektur | Zahl | Eigenerwärmung an deiner Wand: mit einem Referenzthermometer vergleichen |
 | Höhe über dem Meer | Zahl | Druckausgleich für den CO2-Wert (Standard 300 m) |
 | SCD41 kalibrieren (Frischluft 420 ppm) | Taste | Zwangskalibrierung an der frischen Luft |
@@ -148,13 +152,17 @@ Das Display zeigt die Außentemperatur unter **OUT**, der Fensterhinweis verglei
 
 ### Fensterkontakte
 
-Mit einem Fensterkontakt weiß das Gerät, wann du lüftest. Oben erscheint ein Fenstersymbol, die Hinweiszeile zählt die Minuten (*Lüftet seit 6 min*) und wird grün, sobald die Luft wieder frisch ist (*Luft frisch: Fenster zu*, bei 300 ppm unter der gelben Schwelle, mindestens 600 ppm).
+Mit einem Fensterkontakt weiß das Gerät, wann du lüftest. Das Fenstersymbol oben ist grau, solange die Fenster zu sind. Geht eins auf, wird es blau und die Hinweiszeile zählt die Minuten (*Lüftet seit 6 min*). Grün heißt, die Luft ist wieder frisch (*Luft frisch: Fenster zu*, unter 700 ppm), orange, dass der Raum zu stark auskühlt (*Fenster zu: Raum kühlt aus*, unter 19 °C). Beide Schwellen sind Einstellungen in Home Assistant, ein Schalter blendet das Symbol aus. Jeder Schritt mit Bildern: [Home Assistant Anleitung](docs/de/home-assistant.md).
+
+<div align="center">
+<img src="docs/images/display_window_de.png" width="70%" alt="Fenstersymbol zu, lüftet, Luft frisch und Raum kühlt aus">
+</div>
 
 * In Home Assistant *Einstellungen > Geräte & Dienste > Helfer > Helfer erstellen > Gruppe > Binärsensor-Gruppe* öffnen, **CO2 Wandsensor Fenster** nennen (englische Firmware: **CO2 Wall Sensor Window**) und die Fensterkontakte des Raums hinzufügen. Die Entitäts-ID wird `binary_sensor.co2_wandsensor_fenster` (`binary_sensor.co2_wall_sensor_window`), genau darauf hört die Firmware.
 * Die Gruppe ist an, sobald ein Fenster offen ist. Später ein zweites Fenster? Einfach zur Gruppe hinzufügen, keine neue Firmware nötig.
 * Mehrere Geräte in verschiedenen Räumen: Jedes Gerät bekommt seine eigene Gruppe, `window_entity` in seiner Gerätedatei setzen.
 
-**Lüftungserinnerung:** Ein fertiger Blueprint schickt eine Nachricht aufs Handy, wenn der CO2-Wert hoch bleibt, und noch einmal, wenn die Luft wieder gut ist.
+**Lüftungserinnerung:** Ein fertiger Blueprint schickt eine Nachricht aufs Handy, wenn der CO2-Wert hoch bleibt und die Fenster zu sind, wenn die Luft bei offenem Fenster wieder frisch ist und wenn der Raum auskühlt. Die Grenzwerte holt er direkt vom Gerät.
 
 [![Blueprint in Home Assistant importieren](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Ftobi136B%2Fco2-wall-sensor%2Fblob%2Fmain%2Fhomeassistant%2Fblueprints%2Fco2_ventilation_reminder.yaml)
 
@@ -171,7 +179,7 @@ co2-wall-sensor/
 │   ├── step/                        STEP der kompletten Baugruppe
 │   ├── stl/                         einzelne Druckdateien
 │   └── build_info.json              Fingerabdruck der Parameter, aus denen die Druckdateien stammen
-├── docs/                            Aufbau, Verdrahtung, Designnotizen, FAQ (Deutsch in docs/de)
+├── docs/                            Aufbau, Verdrahtung, Home Assistant Anleitung, Designnotizen, FAQ (Deutsch in docs/de)
 │   ├── drawing/                     technische Zeichnung, PDF + PNG, EN und DE
 │   └── images/                      Renderings, Animation, Verdrahtungsplan, Displayvorschau
 ├── esphome/
@@ -220,6 +228,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * [x] Gehäuse 2.0 nach dem ersten Druck: Displaykabel bleibt gesteckt, ESP32-C3 auf einem Schlitten mit Federhaken, Winkeladapter statt losem Port-Modul, Wandplatte für M4-Schrauben (v2.0)
 * [x] Gehäuse 2.1: mehr Spiel in jeder Passung (0,4 mm), saubere Bodenblende oder geschlossener Rückdeckel für die ungenutzte Kabelöffnung, Einführschrägen, Zuglasche am Träger, 2 mm Luft für das Displaykabel (v2.1)
 * [x] Fensterkontakte aus Home Assistant: Fenstersymbol, Lüftungsdauer und Hinweis zum Schließen (v2.2)
+* [x] Fensterzustände in Farbe, mehr Einstellungen in Home Assistant (Messintervall, Glättung, Trendpfeil, Schwellen für frische Luft und Auskühlen), Blueprint, der dem Fenster folgt, [Home Assistant Anleitung](docs/de/home-assistant.md) (v2.4)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 
 ## Mitmachen

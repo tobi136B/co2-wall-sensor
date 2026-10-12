@@ -52,6 +52,13 @@ substitutions:
   txt_hint_open: "Window open: airing"
   txt_hint_airing: "Airing for %d min"
   txt_hint_close: "Fresh air: close the window"
+  txt_hint_cold: "Close the window: room cools down"
+  txt_show_window: "Window symbol on the display"
+  txt_fresh_level: "Fresh air below"
+  txt_cool_temp: "Window warning below"
+  txt_trend_threshold: "Trend arrow from"
+  txt_interval: "Measuring interval"
+  txt_smoothing: "Smoothing"
   txt_label_hum: "HUMIDITY"
   # Optional overrides (defaults in common/base.yaml)
   # co2_yellow_default: "1000"
