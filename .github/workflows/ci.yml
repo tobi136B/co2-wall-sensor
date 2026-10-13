@@ -50,7 +50,7 @@ jobs:
         run: python tools/print_check.py
       - name: Collision check (every assembly path, the take-apart slider and the README animation)
         run: python tools/assembly_check.py
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - name: Configurator check (the browser builds the same sensor carrier as Fusion)
