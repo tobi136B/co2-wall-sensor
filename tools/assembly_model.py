@@ -103,13 +103,13 @@ PITCH_PLUG = 2.0  # contact pitch of the PH2.0 connector
 
 
 def esp_pad(p: dict, signal: str) -> np.ndarray:
-    """Pad of a signal on the top face of the ESP32-C3 (the side towards the back)."""
+    """Pad of a signal on the underside of the ESP32-C3 (the side on the sled): the wires are soldered from below."""
     gpio = PINS.get(signal, signal)
     for side, row in ESP_PINS.items():
         if gpio in row:
             j = row.index(gpio)
             x = p["C3_X"] + side * (p["C3_W"] / 2 - 1.3)
-            return np.array([x, p["C3_Y0"] + p["C3_H"] - 1.6 - j * 2.54, p["C3_Z0"] + p["C3_PCB"]])
+            return np.array([x, p["C3_Y0"] + p["C3_H"] - 1.6 - j * 2.54, p["C3_Z0"]])
     raise KeyError(signal)
 
 
@@ -190,24 +190,14 @@ def _line(a, b, step: float = 0.8) -> list[np.ndarray]:
     return [a + (b - a) * k / n for k in range(1, n + 1)]
 
 
-def _drop(start, pad, z_cross: float, y_cross: float) -> list[np.ndarray]:
-    """From a point of the cable up over the other wires, across to the pad row and down onto the pad."""
-    x0, y0, _ = start
-    pts = _line(start, [x0, y_cross, z_cross], 0.5)
-    pts += _line(pts[-1], [pad[0], y_cross, z_cross])
-    pts += _line(pts[-1], [pad[0], pad[1], pad[2] + 1.6], 0.5)
-    pts += _line(pts[-1], pad, 0.4)
-    return pts
-
-
 def wires_display(p: dict) -> list[dict]:
     """The 8 wires of the cable that stays plugged into the display.
 
     From the plug the flat cable runs along the back of the display to the left side wall (seen from the back)
     and bends up, then over the back of the display towards the ESP32-C3. In its own plane it turns up and
     right again, passes above the left post of the bridge, turns down and runs under the bridge of the sled,
-    over the middle of the board. Every wire leaves the cable at the height of its pad: up over the other
-    wires, across to its pad row and down onto the pad. Every turn in the plane of the cable has a radius larger
+    over the board. Below the bridge the wires leave the cable one after the other and run in the free space
+    under the board to their pads, soldered from below. Every turn in the plane of the cable has a radius larger
     than half the cable width, so no wire crosses another one.
     """
     lcd_back = p["LIP"] + p["GLASS_T"] + p["LCD_PCB"]
@@ -216,9 +206,6 @@ def wires_display(p: dict) -> list[dict]:
     zc = lcd_back + 2.9
     z_bar = p["C3_Z0"] + p["BRIDGE_H"] - p["BRIDGE_BAR"]  # underside of the bar of the bridge
     z_run = z_bar - WIRE_R - 0.1
-    z_socket = p["C3_Z0"] + p["C3_PCB"] + p["C3_USB_H"]  # top of the USB-C socket
-    z_low = z_socket + WIRE_R + 0.05  # the cable over the board, below the bridge
-    z_cross = z_low + 2 * WIRE_R + 0.1  # wires that leave the cable cross over it here
     x_plug = p["LCD_X"] - p["LCD_W"] / 2 - 0.5
     xr = p["LCD_CABLE_X0"] + 1.2  # the riser stays inside the measured 67 mm
     r_up, r = 1.5, 5.0  # bends out of the plane, turns in the plane (half the cable is 3.5 + 0.42 mm)
@@ -242,21 +229,35 @@ def wires_display(p: dict) -> list[dict]:
     rib.turn(False, 90, r)  # down, s becomes +x
     offsets = [(i - 3.5) * PITCH for i in range(8)]
     lines = rib.wires(offsets, pitch_start=PITCH_PLUG / PITCH, taper=6.0)
-    y_free = p["BRIDGE_Y0"] - 1.0  # below the bridge the cable drops onto its lower level
+    # Below the bridge the wires leave the cable one after the other: straight down into the free space above
+    # the spring tongue, across to their lane beside the middle rail (above the lanes) and down into it, then
+    # along the lane under the board to the pad, across under the pad row and up onto the pad from below.
     pads = {n: esp_pad(p, n) for n in DISPLAY_ORDER}
+    z_floor = p["C3_Z0"] - p["C3_WIRE_D"]
+    z_lane = z_floor + WIRE_R + 0.05
+    z_side = z_lane + 2 * WIRE_R + 0.05  # across above the lanes
+    y_top = p["C3_TIP"] + 0.6 + p["MIN_WALL"] + WIRE_R + 0.2  # free over the whole width from here up
+    # lanes beside the pad rows: the wire to the highest pad runs nearest to its row, so no wire crosses another
+    lanes = {}
+    for side in (-1, 1):
+        row = sorted((n for n in DISPLAY_ORDER if (pads[n][0] < p["C3_X"]) == (side < 0)), key=lambda n: -pads[n][1])
+        for k, n in enumerate(row):
+            lanes[n] = pads[n][0] - side * ((0.85 if side < 0 else 0.75) + k * 0.88)
     out = []
     for i, n in enumerate(DISPLAY_ORDER):
-        pts = lines[i]
-        x = pts[-1][0]
         pad = pads[n]
-        left = pad[0] < p["C3_X"]
-        y_cross = pad[1] + (0.75 if left else -0.75)
-        pts = pts + _line(pts[-1], [x, y_free, z_run])
-        pts += _line(pts[-1], [x, y_free - 2.0, z_low])
-        pts += _line(pts[-1], [x, y_cross + 0.5, z_low])
-        pts += _line(pts[-1], [x, y_cross, z_cross], 0.4)
-        pts += _line(pts[-1], [pad[0], y_cross, z_cross])
-        pts += _line(pts[-1], [pad[0], y_cross, pad[2] + 1.0], 0.5)
+        lane = lanes[n]
+        y_t = y_top + i * (2 * WIRE_R + 0.02)
+        line = list(lines[i])
+        line += _line(line[-1], [line[-1][0], y_top - 0.1, line[-1][2]])  # on down below the bridge
+        k = max(j for j, q in enumerate(line) if q[1] >= y_t)  # leaves the cable at y_t
+        pts = line[: k + 1]
+        x_d = pts[-1][0]
+        pts += _line(pts[-1], [x_d, y_t, z_side], 0.5)
+        pts += _line(pts[-1], [lane, y_t, z_side])
+        pts += _line(pts[-1], [lane, y_t - 0.5, z_lane], 0.4)
+        pts += _line(pts[-1], [lane, pad[1], z_lane])
+        pts += _line(pts[-1], [pad[0], pad[1], z_lane])
         pts += _line(pts[-1], pad, 0.4)
         out.append({"color": WIRE[n], "points": _r(pts), "label": n})
     return out
@@ -283,8 +284,9 @@ def wires_scd(p: dict) -> list[dict]:
     top = p["FLOOR_Z"] + p["FLOOR_T"]
     yw = p["Y_DIV_LOW"] - p["SCD_CHANNEL_W"]  # inner face of the clip
     x_ch = p["SPRING_X"] - p["SPRING_W"] / 2 - 1.6  # end of the clip
-    gx = p["C3_X"] - p["C3_W"] / 2 - p["C3_PLAY"] - 0.575  # middle of the left guide
-    z_guide = p["C3_Z0"] + p["C3_PCB_MAX"] + 0.5
+    x_notch = p["C3_X"] - p["C3_W"] / 2 - p["C3_PLAY"] - 1.15  # outer face of the left guide, notched below the board
+    x_strip = p["C3_X"] - p["C3_W"] / 2 - p["C3_PLAY"] + 0.4  # strip between the guide and the pad row
+    z_hi = top + 0.45 + 2 * r + 0.02  # second level in the wire space under the board
     z_relief = p["SCD_ZT"] + 0.33
     y_edge = p["SCD_TOP"] + r + 0.05  # just past the upper board edge
     out = []
@@ -295,7 +297,6 @@ def wires_scd(p: dict) -> list[dict]:
         z_front = z_lip - r - 0.2 - k * (2 * r + 0.05)  # each wire on its own level in front of the rail
         cy = yw + r + k * 2 * r  # side by side in the slot and in the clip channel
         cz = top + 0.45
-        z_up = z_guide + r + 0.15 + k * (2 * r + 0.1)
         pad = esp_pad(p, n)
         pts = [np.array([pad_x, y0, p["SCD_ZT"]])]
         pts += _line(pts[-1], [lane, y0 + 0.8, z_relief], 0.4)
@@ -306,11 +307,18 @@ def wires_scd(p: dict) -> list[dict]:
         pts += _line(pts[-1], [slot_x, cy, z_front])
         pts += _line(pts[-1], [slot_x, cy, cz])
         pts += _line(pts[-1], [x_ch, cy, cz])
-        pts += _line(pts[-1], [x_ch + 3.0, cy, z_up])
-        pts += _line(pts[-1], [gx, cy, z_up])
-        pts += _line(pts[-1], [gx, pad[1] - 0.75, z_up])
-        pts += _line(pts[-1], [pad[0], pad[1] - 0.75, z_up])
-        pts += _line(pts[-1], [pad[0], pad[1] - 0.75, pad[2] + 1.0], 0.5)
+        # through the notch of the left guide into the wire space under the ESP32-C3, up onto the pad from below
+        if n in ("GND", "3V3"):  # short: straight to the pad row, along it to the pad
+            pts += _line(pts[-1], [pad[0], cy, cz])
+        elif n == "SCL":  # along the strip between guide and pad row, on the lower level
+            pts += _line(pts[-1], [x_strip, cy, cz])
+            pts += _line(pts[-1], [x_strip, pad[1], cz])
+        else:  # SDA: the same strip on the upper level
+            pts += _line(pts[-1], [x_notch - 0.8, cy, cz])
+            pts += _line(pts[-1], [x_notch, cy, z_hi], 0.4)
+            pts += _line(pts[-1], [x_strip, cy, z_hi])
+            pts += _line(pts[-1], [x_strip, pad[1], z_hi])
+        pts += _line(pts[-1], [pad[0], pad[1], pts[-1][2]])
         pts += _line(pts[-1], pad, 0.4)
         out.append({"color": WIRE[n], "points": _r(pts), "label": n, "r": r})
     return out

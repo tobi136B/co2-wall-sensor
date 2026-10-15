@@ -92,7 +92,13 @@ export function buildCarrier(wasm, base, board) {
     const padX = -p.SCD_PAD_X, sx = padX > 0 ? 1 : -1;
     const xa = sx * (p.SCD_W / 2 - p.SCD_LIP - 0.1), xb = sx * (p.SCD_W / 2 + g);
     cut(box(Math.min(xa, xb), yc - 4.8, zLip - 0.1, Math.max(xa, xb), yc + 4.8, zb - g + 0.01));
-    cut(box(padX - 1.2, yLo - 0.1, p.FLOOR_Z - 0.01, padX + 1.2, p.SCD_TOP + 1.0, p.FLOOR_Z + 0.6));
+    // wire channel behind the pads, open at the top, deep where the solder joints pass, pad on the back
+    const ea = sx * (p.SCD_W / 2 - 0.6), eb = sx * (p.SCD_W / 2 - 0.6 - p.SCD_RELIEF_W);
+    const ca = Math.min(ea, eb), cb = Math.max(ea, eb);
+    const yDeep = p.Y_DIV_LOW - p.SCD_CHANNEL_W, back = p.FLOOR_Z + p.FLOOR_T;
+    add(box(ca - p.MIN_WALL, yLo, back - 0.01, cb + p.MIN_WALL, yDeep - 1.0, back + p.SCD_RELIEF_D + p.MIN_WALL - p.FLOOR_T));
+    cut(box(ca, yLo - 0.1, p.FLOOR_Z - 0.01, cb, yDeep, p.FLOOR_Z + p.SCD_RELIEF_D));
+    cut(box(ca, yDeep - 0.01, p.FLOOR_Z - 0.01, cb, yHi + 0.1, p.FLOOR_Z + 1.0));
   }
   // spring tongue
   const hw = p.SPRING_W / 2;
@@ -119,7 +125,7 @@ export function buildCarrier(wasm, base, board) {
   // ESP32-C3: ribs, sled above the divider, guides over the whole length, end stops, grooves
   top = p.FLOOR_Z + p.FLOOR_T;
   const gx = p.C3_W / 2 + p.C3_PLAY, wall = 1.15;
-  for (const x of [p.C3_X - 6, p.C3_X + 6]) add(box(x - 0.75, p.C3_Y0, top, x + 0.75, yHi, p.C3_Z0));
+  for (const x of [p.C3_X - 6, p.C3_X + 6]) add(box(x - 0.75, p.C3_Y0, p.C3_Z0 - p.C3_WIRE_D, x + 0.75, p.C3_Y0 + 2.0, p.C3_Z0));
   add(box(p.C3_X - gx - wall, yHi - 0.01, p.EXT_Z0, p.C3_X + gx + wall, p.C3_EXT_Y1, p.C3_Z0));
   const zGuide = p.C3_Z0 + p.C3_PCB_MAX + 0.5;
   for (const [x0, x1] of [[p.C3_X - gx - wall, p.C3_X - gx], [p.C3_X + gx, p.C3_X + gx + wall]])
@@ -161,6 +167,14 @@ export function buildCarrier(wasm, base, board) {
     add(prismX(post, Math.min(xa, xb), Math.max(xa, xb)));
   }
   add(box(p.C3_X - xp - 0.01, p.BRIDGE_Y0 + p.BRIDGE_H, zc - p.BRIDGE_BAR, p.C3_X + xp + 0.01, p.C3_EXT_Y1, zc));
+  // wire space under the board, open at the top end, beside the middle rail of the spring tongue
+  const zf = p.C3_Z0 - p.C3_WIRE_D, xm = h3 + 0.6 + p.MIN_WALL;
+  for (const [x0, x1] of [[p.C3_X - gx, p.C3_X - xm], [p.C3_X + xm, p.C3_X + gx]])
+    cut(box(x0, yHi - 0.01, zf, x1, p.C3_EXT_Y1 + 0.1, p.C3_Z0 + 0.01));
+  cut(box(p.C3_X - xm - 0.01, yHi - 0.01, zf, p.C3_X + xm + 0.01, p.C3_ROOT - p.MIN_WALL, p.C3_Z0 + 0.01));
+  cut(box(p.C3_X - xm - 0.01, p.C3_TIP + 0.6 + p.MIN_WALL, zf, p.C3_X + xm + 0.01, p.C3_EXT_Y1 + 0.1, p.C3_Z0 + 0.01));
+  // notch in the left guide below the board for the SCD41 wires
+  cut(box(p.C3_X - gx - wall - 0.1, p.Y_DIV_LOW - p.SCD_CHANNEL_W - 0.5, zf - 0.01, p.C3_X - gx + 0.01, yHi + 0.6, p.C3_Z0));
   // pull tab with a hole for a finger nail or a screwdriver
   const tx = p.XL + p.B + p.BOSS_D / 2 + 0.3 + p.BOSS_FILLET + 1.5, ty = yLo + 1.5;
   add(box(tx, ty, top - 0.01, tx + p.TAB_T, ty + p.TAB_L, top + p.TAB_H));

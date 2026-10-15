@@ -43,7 +43,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '2.3'          # enclosure version, engraved into every part
+VERSION = '2.4'          # enclosure version, engraved into every part
 LABEL_FONT = 'Arial Black'  # labels: heavy strokes (about a fifth of the height) print as clean lines
 
 # ===================== PARAMETERS =====================
@@ -131,6 +131,9 @@ SPRING_PRELOAD = 0.4    # the hook is pushed back this far by a board of nominal
 # --- cable management: nothing glued ---
 SCD_SLOT_W = 1.3        # narrow wire slot through the sensor carrier: 4 wires in a row, no glue needed
 SCD_CHANNEL_W = 2.4     # wire channel on the back of the carrier, between clip edge and divider wall
+SCD_RELIEF_W = 4.3      # wire channel behind the SCD41 solder pads: 4 wires side by side, open at the top
+SCD_RELIEF_D = 1.6      # its depth where the solder joints pass while the board slides in (wires: 1.0 mm)
+C3_WIRE_D = 1.5         # wire space under the ESP32-C3: the wires are soldered to its underside
 CLIP_LIP = 0.8          # snap lip over the wire channel
 BRIDGE_H = 5.6          # bridge for the display cable over the ESP32-C3 sled: height of its upper face
 BRIDGE_BAR = 1.0        # thickness of its bar, the cable runs below it
@@ -907,8 +910,16 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
         sx = 1 if pad_x > 0 else -1
         x0, x1 = sorted((sx * (SCD_W / 2 - SCD_LIP - 0.1), sx * (SCD_W / 2 + g)))
         box(comp, x0, yc - 4.8, z_lip - 0.1, x1, yc + 4.8, zb - g + 0.01, CUT, 'ScdPadWindow', body)
-        box(comp, pad_x - 1.2, y_lo - 0.1, FLOOR_Z - 0.01, pad_x + 1.2, SCD_TOP + 1.0, FLOOR_Z + 0.6, CUT,
-            'ScdPadRelief', body)
+        # wire channel behind the pads, open at the top: the wires soldered to the back of the board lie in it
+        # side by side and slide in with the board. Deep where the solder joints pass, a pad on the back keeps
+        # the wall behind it at MIN_WALL; above the joints (behind the wire clip) it only takes the wires.
+        xa, xb = sorted((sx * (SCD_W / 2 - 0.6), sx * (SCD_W / 2 - 0.6 - SCD_RELIEF_W)))
+        y_deep = Y_DIV_LOW - SCD_CHANNEL_W
+        top = FLOOR_Z + FLOOR_T
+        box(comp, xa - MIN_WALL, y_lo, top - 0.01, xb + MIN_WALL, y_deep - 1.0, top + SCD_RELIEF_D + MIN_WALL - FLOOR_T,
+            JOIN, 'ScdReliefBack', body)
+        box(comp, xa, y_lo - 0.1, FLOOR_Z - 0.01, xb, y_deep, FLOOR_Z + SCD_RELIEF_D, CUT, 'ScdPadRelief', body)
+        box(comp, xa, y_deep - 0.01, FLOOR_Z - 0.01, xb, y_hi + 0.1, FLOOR_Z + 1.0, CUT, 'ScdWireRelief', body)
     # spring tongue: U-shaped slot, thinned from the back so it bends back into its own pocket
     hw = SPRING_W / 2
     for x0, x1 in ((SPRING_X - hw - 0.6, SPRING_X - hw), (SPRING_X + hw, SPRING_X + hw + 0.6)):
@@ -944,8 +955,10 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
     # board in guides with play, the lips take boards up to C3_PCB_MAX thick.
     top = FLOOR_Z + FLOOR_T
     gx, wall = C3_W / 2 + C3_PLAY, 1.15             # inner face of the side guides, their thickness
+    # the board rests on two short posts at its lower end and on the middle rail of the spring tongue,
+    # the wires soldered to its underside run in the free space beside them (C3_WIRE_D deep)
     for x in (C3_X - 6, C3_X + 6):
-        box(comp, x - 0.75, C3_Y0, top, x + 0.75, y_hi, C3_Z0, JOIN, 'C3Rib', body)
+        box(comp, x - 0.75, C3_Y0, C3_Z0 - C3_WIRE_D, x + 0.75, C3_Y0 + 2.0, C3_Z0, JOIN, 'C3Post', body)
     box(comp, C3_X - gx - wall, y_hi - 0.01, EXT_Z0, C3_X + gx + wall, C3_EXT_Y1, C3_Z0, JOIN, 'C3Sled', body)
     z_guide = C3_Z0 + C3_PCB_MAX + 0.5
     for x0, x1 in ((C3_X - gx - wall, C3_X - gx), (C3_X + gx, C3_X + gx + wall)):
@@ -994,6 +1007,19 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
         prism_x(comp, post, x0, x1, JOIN, 'BridgePost', body)
     box(comp, C3_X - xp - 0.01, BRIDGE_Y0 + BRIDGE_H, zc - BRIDGE_BAR, C3_X + xp + 0.01, C3_EXT_Y1, zc, JOIN,
         'BridgeBar', body)
+    # wire space under the board in the sled, open at the top end: the board slides in with its wires soldered
+    # to the underside. The middle rail keeps the spring tongue and carries the board, the wires pass beside it.
+    zf = C3_Z0 - C3_WIRE_D
+    xm = hw3 + 0.6 + MIN_WALL                       # half width of the middle rail
+    for x0, x1 in ((C3_X - gx, C3_X - xm), (C3_X + xm, C3_X + gx)):
+        box(comp, x0, y_hi - 0.01, zf, x1, C3_EXT_Y1 + 0.1, C3_Z0 + 0.01, CUT, 'C3WireSpace', body)
+    box(comp, C3_X - xm - 0.01, y_hi - 0.01, zf, C3_X + xm + 0.01, C3_ROOT - MIN_WALL, C3_Z0 + 0.01, CUT,
+        'C3WireSpace', body)
+    box(comp, C3_X - xm - 0.01, C3_TIP + 0.6 + MIN_WALL, zf, C3_X + xm + 0.01, C3_EXT_Y1 + 0.1, C3_Z0 + 0.01, CUT,
+        'C3WireSpace', body)                        # above the tongue: open over the whole width
+    # notch in the left guide below the board: the SCD41 wires come in from the wire clip
+    box(comp, C3_X - gx - wall - 0.1, Y_DIV_LOW - SCD_CHANNEL_W - 0.5, zf - 0.01, C3_X - gx + 0.01, y_hi + 0.6,
+        C3_Z0, CUT, 'C3WireNotch', body)
 
     # pull tab: grip it (or hook a screwdriver into its hole) to lift the carrier out of the housing
     tx = XL + B + BOSS_D / 2 + 0.3 + BOSS_FILLET + 1.5
@@ -1004,7 +1030,7 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
 
     x1 = SPRING_X - hw - 2.0
     if abs(SCD_PAD_X) > 1e-6 and -SCD_PAD_X < x1:
-        x1 = min(x1, -SCD_PAD_X - 1.2 - 1.3)      # keep the letters off the relief behind the solder pads
+        x1 = min(x1, -(SCD_W / 2 - 0.6) - MIN_WALL - 0.5)   # keep the letters off the pad behind the wire channel
     label(comp, body, top, tx + TAB_T + 1.5, Y_CHIN_LOW + 4, x1, y_hi - 6.5,
           f'v{VERSION}\n{profile or "custom"}', name='Label')
     return comp

@@ -85,16 +85,16 @@
     en: SCD41 into the rails
     de: SCD41 in die Schienen
   text:
-    en: Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire slot, until the spring tongue clicks over the upper edge.
-    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz, bis die Federzunge über die Oberkante schnappt.
+    en: Solder four wires of about 8 cm to the pads first, on the back of the board (the side without the sensor), and lay them flat towards the upper edge. Then slide the board in from the top, sensor towards you, pads towards the wire slot, until the spring tongue clicks over the upper edge. The wires slide along in the channel behind the pads.
+    de: Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten, auf der Rückseite der Platine (ohne Sensor), und flach zur Oberkante legen. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz, bis die Federzunge über die Oberkante schnappt. Die Litzen gleiten im Kanal hinter den Lötpunkten mit.
 
 - new: [esp32]
   from: [0, 35, 0]
   stage: carrier_out
   camera: {eye: [-125, 50, 245], target: [10, -30, 42]}
   need:
-    en: "ESP32-C3 SuperMini"
-    de: "ESP32-C3 SuperMini"
+    en: "ESP32-C3 SuperMini, soldering iron, the [wiring diagram](wiring.md)"
+    de: "ESP32-C3 SuperMini, Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
   tip:
     en: "To take it out again, press the hook down with a small screwdriver and slide the board up."
     de: "Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben."
@@ -102,8 +102,8 @@
     en: ESP32-C3 onto the sled
     de: ESP32-C3 auf den Schlitten
   text:
-    en: Chip side up, USB-C socket down. Put it on the top of the sled and slide it down between the guides until it stands on the end stops. The hook clicks behind its upper edge.
-    de: Bauteile nach oben, USB-C-Buchse nach unten. Oben auf den Schlitten legen und zwischen den Führungen nach unten schieben, bis er auf den Anschlägen steht. Der Haken schnappt hinter seine Oberkante.
+    en: "First solder the 4 SCD41 wires to the underside of the ESP32-C3 (the side with the pin labels): GND, 3V3, GPIO0 (SDA), GPIO1 (SCL). Lead them through the notch in the left guide. Chip side up, USB-C socket down: put it on the top of the sled and slide it down between the guides until it stands on the end stops. The wires lie in the free space under the board, the hook clicks behind its upper edge."
+    de: "Zuerst die 4 SCD41-Litzen von unten an den ESP32-C3 löten (die Seite mit der Pinbeschriftung): GND, 3V3, GPIO0 (SDA), GPIO1 (SCL). Sie laufen durch die Kerbe in der linken Führung. Bauteile nach oben, USB-C-Buchse nach unten: oben auf den Schlitten legen und zwischen den Führungen nach unten schieben, bis er auf den Anschlägen steht. Die Litzen liegen im Freiraum unter der Platine, der Haken schnappt hinter seine Oberkante."
 
 - new: [adapter]
   from: [0, -25, 0]
@@ -147,14 +147,14 @@
     en: "The cable of the display (shortened), soldering iron, the [wiring diagram](wiring.md)"
     de: "Das Kabel des Displays (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
   tip:
-    en: "Push the cable under the bridge first and mark the length of every wire at its pad, then shorten and solder. The cable stays plugged into the display: to take the display out, just pull the plug."
-    de: "Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen, dann kürzen und löten. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen."
+    en: "Push the cable under the bridge first and mark the length of every wire at its pad. Then press the hook down, slide the ESP32-C3 up and out, shorten the wires, solder them to its underside and slide it back in. The cable stays plugged into the display: to take the display out, just pull the plug."
+    de: "Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen. Dann den Haken nach unten drücken, den ESP32-C3 nach oben herausschieben, die Adern kürzen, von unten anlöten und ihn wieder einschieben. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen."
   title:
     en: Wiring
     de: Verdrahtung
   text:
-    en: "Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram."
-    de: "Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan."
+    en: "Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, then every wire goes down into the free space under the board and along it to its pad, soldered from below. SCD41: the 4 wires along the clip channel of the carrier and through the notch of the left guide. Colours as in the wiring diagram."
+    de: "Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch. Dann geht jede Ader hinunter in den Freiraum unter der Platine und darin zu ihrem Lötpunkt, von unten angelötet. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und durch die Kerbe der linken Führung. Farben wie im Verdrahtungsplan."
 
 - new: [blank]
   from: [0, 0, 40]

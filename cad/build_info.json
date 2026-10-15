@@ -1,6 +1,6 @@
 {
-  "enclosure_version": "2.3",
-  "parameters_sha256": "8507159a18d76dd5c2e81968a1e16caa0e0ee218eec1d98b689e1eb8091d81e3",
+  "enclosure_version": "2.4",
+  "parameters_sha256": "3fdbac695eefc2b71b1c9536283f52de25a1baa471b17269ad5630aeac79ec59",
   "parts": [
     "back_cover",
     "back_cover_closed",

@@ -104,7 +104,7 @@ Der Träger ist der herausnehmbare Boden der Sensorkammer und hält auf seiner R
 
 **Du brauchst:** SCD41, 4 Litzen von ca. 8 cm, Lötkolben
 
-Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz, bis die Federzunge über die Oberkante schnappt. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-5))
+Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten, auf der Rückseite der Platine (ohne Sensor), und flach zur Oberkante legen. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz, bis die Federzunge über die Oberkante schnappt. Die Litzen gleiten im Kanal hinter den Lötpunkten mit. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-5))
 
 > **Tipp:** Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken.
 
@@ -112,9 +112,9 @@ Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten. Dann die Platine von o
 
 <img src="../images/steps/step_06.png" width="60%" alt="ESP32-C3 auf den Schlitten">
 
-**Du brauchst:** ESP32-C3 SuperMini
+**Du brauchst:** ESP32-C3 SuperMini, Lötkolben, den [Verdrahtungsplan](verdrahtung.md)
 
-Bauteile nach oben, USB-C-Buchse nach unten. Oben auf den Schlitten legen und zwischen den Führungen nach unten schieben, bis er auf den Anschlägen steht. Der Haken schnappt hinter seine Oberkante. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-6))
+Zuerst die 4 SCD41-Litzen von unten an den ESP32-C3 löten (die Seite mit der Pinbeschriftung): GND, 3V3, GPIO0 (SDA), GPIO1 (SCL). Sie laufen durch die Kerbe in der linken Führung. Bauteile nach oben, USB-C-Buchse nach unten: oben auf den Schlitten legen und zwischen den Führungen nach unten schieben, bis er auf den Anschlägen steht. Die Litzen liegen im Freiraum unter der Platine, der Haken schnappt hinter seine Oberkante. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-6))
 
 > **Tipp:** Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben.
 
@@ -144,9 +144,9 @@ Den Träger auf die Leisten im Kinn legen, der Schlitten gleitet über den Displ
 
 **Du brauchst:** Das Kabel des Displays (gekürzt), Lötkolben, den [Verdrahtungsplan](verdrahtung.md)
 
-Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch, jede Ader geht zu ihrem Lötpunkt. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und über die linke Führung. Farben wie im Verdrahtungsplan. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-9))
+Display: Das Flachkabel faltet sich an der linken Wand zurück und läuft hinter dem Display hinüber zum Schlitten und unter seiner Brücke durch. Dann geht jede Ader hinunter in den Freiraum unter der Platine und darin zu ihrem Lötpunkt, von unten angelötet. SCD41: die 4 Litzen am Kabelkanal des Trägers entlang und durch die Kerbe der linken Führung. Farben wie im Verdrahtungsplan. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-9))
 
-> **Tipp:** Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen, dann kürzen und löten. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen.
+> **Tipp:** Das Kabel zuerst unter der Brücke durchschieben und die Länge jeder Ader an ihrem Lötpunkt anzeichnen. Dann den Haken nach unten drücken, den ESP32-C3 nach oben herausschieben, die Adern kürzen, von unten anlöten und ihn wieder einschieben. Das Kabel bleibt im Display stecken: Zum Ausbauen des Displays nur den Stecker ziehen.
 
 ### Schritt 10 von 13: Bodenblende
 

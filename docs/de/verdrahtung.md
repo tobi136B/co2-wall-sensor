@@ -21,12 +21,14 @@ Alle Module laufen mit 3,3 V direkt aus dem ESP32-C3 SuperMini. Strom kommt übe
 
 ## ESP32-C3 SuperMini zu SCD41 (I2C)
 
-| SCD41 | ESP32-C3 | Funktion |
-|-------|----------|----------|
-| VDD   | 3V3      | Versorgung 3,3 V |
-| GND   | GND      | Masse |
-| SDA   | GPIO0    | I2C Daten |
-| SCL   | GPIO1    | I2C Takt |
+| SCD41 | Litze | ESP32-C3 | Funktion |
+|-------|-------|----------|----------|
+| VDD   | rot     | 3V3      | Versorgung 3,3 V |
+| GND   | schwarz | GND      | Masse |
+| SDA   | blau    | GPIO0    | I2C Daten |
+| SCL   | gelb    | GPIO1    | I2C Takt |
+
+Die Farben stammen aus dem Silikonlitzen-Set der Stückliste. Beim Display gelten die Farben seines Kabels: nach der Beschriftung an der Displaybuchse löten, nicht nach Farbe.
 
 ## Warum genau diese Pins?
 
@@ -36,9 +38,20 @@ Alle Module laufen mit 3,3 V direkt aus dem ESP32-C3 SuperMini. Strom kommt übe
 
 Der Plan wird mit `python tools/wiring.py` direkt aus `esphome/common/base.yaml` erzeugt. Wer Pins in der YAML ändert, erzeugt den Plan einfach neu.
 
+## Löten
+
+Alle Adern werden **von unten** angelötet, also auf der Seite, die zum Träger zeigt. Dahinter ist genug Platz für Lötstellen und Adern, sie liegen sauber in eigenen Kanälen.
+
+* **SCD41:** Litzen auf der Rückseite anlöten (die Seite ohne Sensor) und flach zur Oberkante legen. Im Träger läuft hinter den Lötpunkten ein 4,3 mm breiter Kanal bis oben durch, 1,6 mm tief, wo die Lötstellen beim Einschieben vorbeikommen. Die Litzen gleiten darin mit.
+* **ESP32-C3:** Adern auf der Unterseite anlöten (die Seite mit der Pinbeschriftung, ohne Bauteile). Unter der Platine ist ein 1,5 mm tiefer Freiraum, oben offen. Die Platine liegt auf der Mittelschiene der Federzunge und auf zwei kurzen Stützen. Die SCD41-Litzen kommen durch die Kerbe in der linken Führung, die Display-Adern von oben unter der Brücke durch.
+* **Reihenfolge:** SCD41-Litzen an den ESP löten, bevor er auf den Schlitten kommt. Für die Display-Adern das Kabel unter der Brücke durchschieben, Längen anzeichnen, den ESP herausschieben, löten und wieder einschieben.
+* **Sauber löten:** Nur 1 bis 1,5 mm abisolieren, Litze verdrillen und verzinnen, Pads vorverzinnen. No-Clean-Flussmittel hilft, aber nicht in die Nähe der Sensoröffnung des SCD41. Lötstellen flach halten, Drahtenden bündig abschneiden.
+* **Prüfen:** Vor dem ersten Einstecken jede Ader auf Durchgang messen, vor allem 3V3 gegen GND auf Kurzschluss.
+
 ## Tipps
 
 * **Display:** Das beiliegende PH2.0-Kabel bleibt im Display stecken. Es faltet sich an der linken Wand zurück (von hinten gesehen) und läuft hinter dem Display hinüber zum Schlitten und unter der Brücke durch, dann geht jede Ader zu ihrem Lötpunkt am ESP32-C3. Zuerst einlegen, die Längen an den Lötpunkten anzeichnen, dann kürzen und löten. Zum Ausbauen des Displays nur den Stecker ziehen.
 * **SCD41:** 4 Litzen AWG 30 von ca. 8 cm. Sie liegen nebeneinander im schmalen Kabelschlitz des Sensorträgers und auf der Rückseite unter der Lippe des Kabelclips. Kleber ist nicht nötig.
+* **Strom:** Durch die Litzen fließen nur Sensor und Display (im Mittel ca. 15 mA und 30 bis 60 mA). Die AWG-30-Litzen reichen dafür locker, der ESP selbst hängt direkt am USB.
 * Der SCD41 zieht für wenige Millisekunden bis ca. 200 mA. Der 3,3-V-Regler des SuperMini schafft das, die Versorgungsleitungen trotzdem kurz halten.
 * Alles zuerst auf dem Tisch testen, dann einbauen.
