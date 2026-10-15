@@ -160,6 +160,7 @@ async function buildPart(spec) {
 // The same rules as tools/assembly_check.py, which replays every motion and proves that no part passes
 // through another one. Change both together.
 let data, parts = {}, current = -1, explode = 0, xray = false, playing = 0;
+const hidden = new Set();   // parts hidden by the viewer (parts list or double-click)
 let anim = { t0: 0, camT0: 0, camFrom: null, camTo: null, draw: [], end: 0 };
 const clock = new THREE.Clock();
 
@@ -331,7 +332,7 @@ function tick() {
         if (u >= 1) part.path = null;
       }
     }
-    part.group.visible = part.shown;
+    part.group.visible = part.shown && !hidden.has(part.spec.id);
     part.group.position.copy(part.base);
     if (exploded.has(part.spec.id)) part.group.position.add(exploded.get(part.spec.id));
     // the parts of the current step light up while they arrive, then fade so the true colours stay visible
@@ -440,12 +441,30 @@ function bindUi() {
   $('view').addEventListener('click', () => flyCamera(data.steps[current].camera, false));
   $('explode').addEventListener('input', (e) => { explode = +e.target.value; hideHint(); });
   $('xray').addEventListener('change', (e) => setXray(e.target.checked));
+  // show and hide single parts, e.g. everything around the wires of the SCD41
+  $('parts').replaceChildren(...data.parts.map((spec) => {
+    const li = document.createElement('li');
+    const label = document.createElement('label');
+    const box = Object.assign(document.createElement('input'), { type: 'checkbox', checked: true });
+    box.dataset.part = spec.id;
+    box.addEventListener('change', () => setHidden(spec.id, !box.checked));
+    label.append(box, spec.name[LANG]);
+    li.append(label);
+    return li;
+  }));
+  $('show-all').addEventListener('click', () => { for (const id of [...hidden]) setHidden(id, false); });
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); setPlaying(false); next(); }
     if (e.key === 'ArrowLeft') { setPlaying(false); goTo(current - 1); }
   });
   setTimeout(hideHint, 9000);
+}
+
+function setHidden(id, off) {
+  if (off) hidden.add(id); else hidden.delete(id);
+  const box = document.querySelector(`#parts input[data-part="${id}"]`);
+  if (box) { box.checked = !off; box.parentElement.classList.toggle('off', off); }
 }
 
 function setXray(on) {
@@ -489,6 +508,20 @@ renderer.domElement.addEventListener('pointermove', (e) => {
   });
 });
 renderer.domElement.addEventListener('pointerleave', () => { tip.style.opacity = 0; });
+renderer.domElement.addEventListener('dblclick', (e) => {   // double-click hides the part under the pointer
+  if (!data) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(pointer, camera);
+  const targets = Object.values(parts).filter((p) => p.group.visible).map((p) => p.group);
+  const hit = raycaster.intersectObjects(targets, true).find((h) => !h.object.userData.edges && h.object.visible
+    && !(xray && ['housing', 'cover', 'wall_plate'].includes(h.object.userData.part)));
+  if (hit) {
+    setHidden(hit.object.userData.part, true);
+    $('parts-box').open = true;
+    tip.style.opacity = 0;
+  }
+});
 
 // ----------------------------------------------------------------------------- start
 async function main() {
@@ -506,7 +539,7 @@ async function main() {
     goTo(start, { instant: true });
   }
   $('loading').classList.add('done');
-  window.assemblyGuide = { goTo, setExplode: (v) => { explode = v; $('explode').value = v; }, setXray, parts, data, camera, controls };
+  window.assemblyGuide = { goTo, setExplode: (v) => { explode = v; $('explode').value = v; }, setXray, setHidden, parts, data, camera, controls };
 }
 
 main().catch((err) => {

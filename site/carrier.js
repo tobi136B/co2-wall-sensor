@@ -100,6 +100,24 @@ export function buildCarrier(wasm, base, board) {
     cut(box(ca, yLo - 0.1, p.FLOOR_Z - 0.01, cb, yDeep, p.FLOOR_Z + p.SCD_RELIEF_D));
     cut(box(ca, yDeep - 0.01, p.FLOOR_Z - 0.01, cb, yHi + 0.1, p.FLOOR_Z + 1.0));
   }
+  // free space behind the whole board over its whole way in, the tongue and the floor behind the adapter stay
+  {
+    const xe = p.SCD_W / 2 - 0.6;
+    const xt0 = p.SPRING_X - p.SPRING_W / 2 - 0.6 - p.MIN_WALL, xt1 = p.SPRING_X + p.SPRING_W / 2 + 0.6 + p.MIN_WALL;
+    const yt0 = p.TONGUE_ROOT - p.MIN_WALL, yt1 = p.TONGUE_TIP + 0.6 + p.MIN_WALL;
+    const xa = p.C3_X - (p.ADAPTER_W / 2 + 0.5) - p.MIN_WALL, ya = p.C3_Y0 - 1.3 + p.MIN_WALL;
+    for (const [x0, x1, y0, y1] of [[-xe, xt0, p.SCD_Y0, yHi + 0.1], [xt1, Math.min(xe, xa), p.SCD_Y0, yHi + 0.1],
+      [xt0, xt1, p.SCD_Y0, yt0], [xt0, xt1, yt1, yHi + 0.1], [xa, xe, ya, yHi + 0.1]])
+      if (x1 - x0 > 0.1 && y1 - y0 > 0.1) cut(box(x0, y0, p.FLOOR_Z - 0.01, x1, y1, p.FLOOR_Z + p.SCD_AIR));
+    // 45 degree lead-ins at the top of both rails
+    const li = 0.6;
+    for (const sx of [-1, 1]) {
+      const xIn = p.SCD_W / 2 - p.SCD_LIP, xEdge = p.SCD_W / 2 + g, xOut = p.SCD_W / 2 + g + 1.2;
+      const a = sx * (xIn - 0.01), b = sx * (xOut + 0.01);
+      cut(prismX([[yHi + 0.01, zb - g + 0.01], [yHi + 0.01, zb - g - li], [yHi - li, zb - g + 0.01]], Math.min(a, b), Math.max(a, b)));
+      cut(prismZ([[sx * xEdge, yHi + 0.01], [sx * (xEdge + li), yHi + 0.01], [sx * xEdge, yHi - li]], zLip - 0.01, p.FLOOR_Z + 0.01));
+    }
+  }
   // spring tongue
   const hw = p.SPRING_W / 2;
   for (const [x0, x1] of [[p.SPRING_X - hw - 0.6, p.SPRING_X - hw], [p.SPRING_X + hw, p.SPRING_X + hw + 0.6]])
