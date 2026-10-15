@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.6.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.5.0...v2.6.0) (2026-10-15)
+
+
+### Added
+
+* **enclosure:** version 2.5, air behind the whole SCD41, rail lead-ins, hide parts in the 3D guide ([#48](https://github.com/tobi136B/co2-wall-sensor/issues/48)) ([e23c3df](https://github.com/tobi136B/co2-wall-sensor/commit/e23c3dfd5f85233a9aad68a83c07093b3db1deae))
+
 ## [2.5.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.4.2...v2.5.0) (2026-10-15)
 
 
