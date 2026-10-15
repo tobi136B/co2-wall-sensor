@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.4.2](https://github.com/tobi136B/co2-wall-sensor/compare/v2.4.1...v2.4.2) (2026-10-15)
+
+
+### Fixed
+
+* **docs:** SCD41 wires only in colours of the wire set, SCL yellow ([#44](https://github.com/tobi136B/co2-wall-sensor/issues/44)) ([56e9387](https://github.com/tobi136B/co2-wall-sensor/commit/56e93875dedbc226b37d96d240115bb3d199edc4))
+
 ## [2.4.1](https://github.com/tobi136B/co2-wall-sensor/compare/v2.4.0...v2.4.1) (2026-10-12)
 
 
