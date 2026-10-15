@@ -43,7 +43,7 @@ import re
 import adsk.core
 import adsk.fusion
 
-VERSION = '2.4'          # enclosure version, engraved into every part
+VERSION = '2.5'          # enclosure version, engraved into every part
 LABEL_FONT = 'Arial Black'  # labels: heavy strokes (about a fifth of the height) print as clean lines
 
 # ===================== PARAMETERS =====================
@@ -134,6 +134,7 @@ SCD_CHANNEL_W = 2.4     # wire channel on the back of the carrier, between clip 
 SCD_RELIEF_W = 4.3      # wire channel behind the SCD41 solder pads: 4 wires side by side, open at the top
 SCD_RELIEF_D = 1.6      # its depth where the solder joints pass while the board slides in (wires: 1.0 mm)
 C3_WIRE_D = 1.5         # wire space under the ESP32-C3: the wires are soldered to its underside
+SCD_AIR = 1.0           # free space behind the whole SCD41 board, over the whole way it slides in
 CLIP_LIP = 0.8          # snap lip over the wire channel
 BRIDGE_H = 5.6          # bridge for the display cable over the ESP32-C3 sled: height of its upper face
 BRIDGE_BAR = 1.0        # thickness of its bar, the cable runs below it
@@ -920,6 +921,27 @@ def build_sensor_carrier(root, ops, name='SensorCarrier', profile=None):
             JOIN, 'ScdReliefBack', body)
         box(comp, xa, y_lo - 0.1, FLOOR_Z - 0.01, xb, y_deep, FLOOR_Z + SCD_RELIEF_D, CUT, 'ScdPadRelief', body)
         box(comp, xa, y_deep - 0.01, FLOOR_Z - 0.01, xb, y_hi + 0.1, FLOOR_Z + 1.0, CUT, 'ScdWireRelief', body)
+    # free space behind the whole board, from its lower edge up to the top of the carrier: it rests on 0.6 mm
+    # strips along its edges in the rails. The spring tongue keeps its full thickness, the floor behind the
+    # pocket of the adapter keeps MIN_WALL.
+    xe = SCD_W / 2 - 0.6
+    xt0, xt1 = SPRING_X - SPRING_W / 2 - 0.6 - MIN_WALL, SPRING_X + SPRING_W / 2 + 0.6 + MIN_WALL
+    yt0, yt1 = TONGUE_ROOT - MIN_WALL, TONGUE_TIP + 0.6 + MIN_WALL
+    xa_ = C3_X - (ADAPTER_W / 2 + 0.5) - MIN_WALL      # pocket of the adapter behind the floor
+    ya_ = C3_Y0 - 1.3 + MIN_WALL
+    for x0, x1, y0, y1 in ((-xe, xt0, SCD_Y0, y_hi + 0.1), (xt1, min(xe, xa_), SCD_Y0, y_hi + 0.1),
+                           (xt0, xt1, SCD_Y0, yt0), (xt0, xt1, yt1, y_hi + 0.1), (xa_, xe, ya_, y_hi + 0.1)):
+        if x1 - x0 > 0.1 and y1 - y0 > 0.1:
+            box(comp, x0, y0, FLOOR_Z - 0.01, x1, y1, FLOOR_Z + SCD_AIR, CUT, 'ScdAir', body)
+    # 45 degree lead-ins at the top of both rails: the board with its wires finds the grooves
+    li = 0.6
+    for sx in (-1, 1):
+        x_in, x_edge, x_out = SCD_W / 2 - SCD_LIP, SCD_W / 2 + g, SCD_W / 2 + g + 1.2
+        xa2, xb2 = sorted((sx * (x_in - 0.01), sx * (x_out + 0.01)))
+        prism_x(comp, [(y_hi + 0.01, zb - g + 0.01), (y_hi + 0.01, zb - g - li), (y_hi - li, zb - g + 0.01)],
+                xa2, xb2, CUT, 'ScdLeadIn', body)
+        prism_z(comp, [(sx * x_edge, y_hi + 0.01), (sx * (x_edge + li), y_hi + 0.01), (sx * x_edge, y_hi - li)],
+                z_lip - 0.01, FLOOR_Z + 0.01, CUT, 'ScdLeadIn', body)
     # spring tongue: U-shaped slot, thinned from the back so it bends back into its own pocket
     hw = SPRING_W / 2
     for x0, x1 in ((SPRING_X - hw - 0.6, SPRING_X - hw), (SPRING_X + hw, SPRING_X + hw + 0.6)):

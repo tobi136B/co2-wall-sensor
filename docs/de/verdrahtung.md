@@ -42,9 +42,10 @@ Der Plan wird mit `python tools/wiring.py` direkt aus `esphome/common/base.yaml`
 
 Alle Adern werden **von unten** angelötet, also auf der Seite, die zum Träger zeigt. Dahinter ist genug Platz für Lötstellen und Adern, sie liegen sauber in eigenen Kanälen.
 
-* **SCD41:** Litzen auf der Rückseite anlöten (die Seite ohne Sensor) und flach zur Oberkante legen. Im Träger läuft hinter den Lötpunkten ein 4,3 mm breiter Kanal bis oben durch, 1,6 mm tief, wo die Lötstellen beim Einschieben vorbeikommen. Die Litzen gleiten darin mit.
+* **SCD41:** Litzen auf der Rückseite anlöten (die Seite ohne Sensor). Hinter der ganzen Platine ist 1 mm Luft über den ganzen Schiebeweg, sie liegt nur an den Rändern in den Schienen auf. Hinter den Lötpunkten ist ein 4,3 mm breiter Kanal 1,6 mm tief, dort kommen die Lötstellen beim Einschieben vorbei. Oben an den Schienen helfen Einführschrägen.
 * **ESP32-C3:** Adern auf der Unterseite anlöten (die Seite mit der Pinbeschriftung, ohne Bauteile). Unter der Platine ist ein 1,5 mm tiefer Freiraum, oben offen. Die Platine liegt auf der Mittelschiene der Federzunge und auf zwei kurzen Stützen. Die SCD41-Litzen kommen durch die Kerbe in der linken Führung, die Display-Adern von oben unter der Brücke durch.
 * **Reihenfolge:** SCD41-Litzen an den ESP löten, bevor er auf den Schlitten kommt. Für die Display-Adern das Kabel unter der Brücke durchschieben, Längen anzeichnen, den ESP herausschieben, löten und wieder einschieben.
+* **Ausbauen:** Den Stecker am Display abziehen. Der PH2.0-Stecker passt durch die Brücke (Öffnung 18,8 × 6,1 mm), der ESP kommt mit allen Adern komplett heraus. Oder den Träger losschrauben und alles zusammen herausnehmen.
 * **Sauber löten:** Nur 1 bis 1,5 mm abisolieren, Litze verdrillen und verzinnen, Pads vorverzinnen. No-Clean-Flussmittel hilft, aber nicht in die Nähe der Sensoröffnung des SCD41. Lötstellen flach halten, Drahtenden bündig abschneiden.
 * **Prüfen:** Vor dem ersten Einstecken jede Ader auf Durchgang messen, vor allem 3V3 gegen GND auf Kurzschluss.
 

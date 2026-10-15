@@ -7,7 +7,7 @@ It covers a flush wall box or stands on your desk.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Enclosure](https://img.shields.io/badge/enclosure-v2.4-6E7B8B)
+![Enclosure](https://img.shields.io/badge/enclosure-v2.5-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -101,7 +101,7 @@ Machine-readable: [`hardware/bom.yaml`](hardware/bom.yaml). This file is the onl
 ## Quick start
 
 1. **Print** the two ready plates [`co2_wall_sensor_device.3mf`](cad/3mf/co2_wall_sensor_device.3mf) and [`co2_wall_sensor_mounts.3mf`](cad/3mf/co2_wall_sensor_mounts.3mf) (every part already in its print orientation, the device plate includes the desk stand: delete it for a wall mount) or the single files from [`cad/stl`](cad/stl). Settings: [docs/assembly.md](docs/assembly.md).
-2. **Wire** the modules according to [docs/wiring.md](docs/wiring.md) and **assemble** them as described in [docs/assembly.md](docs/assembly.md). The [3D assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html) shows every step: turn the device, take it apart and see which part comes next.
+2. **Wire** the modules according to [docs/wiring.md](docs/wiring.md) and **assemble** them as described in [docs/assembly.md](docs/assembly.md). The [3D assembly guide](https://tobi136b.github.io/co2-wall-sensor/assembly.html) shows every step: turn the device, take it apart, hide single parts (double-click) and see which part comes next.
 
    <img src="docs/images/wiring_en.png" width="80%" alt="Wiring diagram">
 
@@ -214,7 +214,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * **Versions:** the release number (e.g. 1.9.0) counts every change, firmware and docs included. The **enclosure version** (badge at the top, engraved on every printed part) only changes when the printed parts change. Parts with the same enclosure version fit together, whatever release they came from.
 * **SCD41 board:** measure it and print the matching sensor carrier, see [measure your sensor](docs/measure-sensor.md). Other boards: [online configurator](https://tobi136b.github.io/co2-wall-sensor/configurator.html).
 * **Display:** all dimensions of the Waveshare 2inch LCD Module are measured with a caliper (PCB 58.2 × 35.3 × 1.62 mm, glass 47.7 × 34.6 mm, PCB and glass 4.43 mm thick). Other batches may differ slightly: check `LCD_*` and `GLASS_*`.
-* **Hardware status:** enclosure 2.4 contains the lessons of the first printed device and is verified in CAD and CI. Compared with 2.3 only the sensor carrier changed (every wire is soldered from below, with room behind the boards), all other parts of 2.3 fit. The 90° USB-C adapter is measured, pocket and hole fit it with 1 mm play. Photos and measurements of a printed device are welcome.
+* **Hardware status:** enclosure 2.5 contains the lessons of the first printed device and is verified in CAD and CI. Compared with 2.3 only the sensor carrier changed (every wire is soldered from below, with room behind the boards, 1 mm of air behind the whole SCD41), all other parts of 2.3 fit. The 90° USB-C adapter is measured, pocket and hole fit it with 1 mm play. Photos and measurements of a printed device are welcome.
 
 ## Roadmap
 
@@ -230,6 +230,7 @@ The CI repeats all of this, compiles four firmware variants and checks that the 
 * [x] Window contacts from Home Assistant: window symbol, airing time and a hint to close the window (v2.2)
 * [x] Window states in colour, more settings in Home Assistant (measuring interval, smoothing, trend arrow, fresh air and cooling thresholds), blueprint that follows the window, [Home Assistant guide](docs/home-assistant.md) (v2.4)
 * [x] Enclosure 2.4: every wire soldered from below, a channel behind the SCD41 pads and a free space under the ESP32-C3, only the sensor carrier changed (v2.5)
+* [x] Enclosure 2.5: 1 mm of air behind the whole SCD41 and lead-ins on its rails, show and hide parts in the 3D guide (v2.6)
 * [ ] Verify display layout and thermals on real hardware, add photos
 
 ## Contributing

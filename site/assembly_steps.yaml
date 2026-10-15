@@ -79,8 +79,8 @@
     en: "SCD41, 4 wires of about 8 cm, soldering iron"
     de: "SCD41, 4 Litzen von ca. 8 cm, Lötkolben"
   tip:
-    en: "To take the board out again, push the spring tongue back with a small screwdriver."
-    de: "Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken."
+    en: "Behind the board there is 1 mm of air, so the wires on its back slide along. To take the board out again, push the spring tongue back with a small screwdriver."
+    de: "Hinter der Platine ist 1 mm Luft, die Litzen auf ihrer Rückseite gleiten mit. Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken."
   title:
     en: SCD41 into the rails
     de: SCD41 in die Schienen
@@ -96,8 +96,8 @@
     en: "ESP32-C3 SuperMini, soldering iron, the [wiring diagram](wiring.md)"
     de: "ESP32-C3 SuperMini, Lötkolben, den [Verdrahtungsplan](verdrahtung.md)"
   tip:
-    en: "To take it out again, press the hook down with a small screwdriver and slide the board up."
-    de: "Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben."
+    en: "To take it out again, press the hook down with a small screwdriver and slide the board up. Wired up, pull the plug off the display first: it fits through the bridge, so the ESP comes out with all its wires."
+    de: "Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben. Ist alles verlötet, vorher den Stecker am Display abziehen: Er passt durch die Brücke, der ESP kommt mit allen Adern heraus."
   title:
     en: ESP32-C3 onto the sled
     de: ESP32-C3 auf den Schlitten

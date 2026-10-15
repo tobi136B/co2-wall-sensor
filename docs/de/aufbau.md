@@ -106,7 +106,7 @@ Der Träger ist der herausnehmbare Boden der Sensorkammer und hält auf seiner R
 
 Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten, auf der Rückseite der Platine (ohne Sensor), und flach zur Oberkante legen. Dann die Platine von oben einschieben, Sensor zeigt zu dir, Lötpunkte zum Kabelschlitz, bis die Federzunge über die Oberkante schnappt. Die Litzen gleiten im Kanal hinter den Lötpunkten mit. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-5))
 
-> **Tipp:** Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken.
+> **Tipp:** Hinter der Platine ist 1 mm Luft, die Litzen auf ihrer Rückseite gleiten mit. Zum Herausnehmen die Federzunge mit einem kleinen Schraubendreher zurückdrücken.
 
 ### Schritt 6 von 13: ESP32-C3 auf den Schlitten
 
@@ -116,7 +116,7 @@ Zuerst vier Litzen von ca. 8 cm an die Lötpunkte löten, auf der Rückseite der
 
 Zuerst die 4 SCD41-Litzen von unten an den ESP32-C3 löten (die Seite mit der Pinbeschriftung): GND, 3V3, GPIO0 (SDA), GPIO1 (SCL). Sie laufen durch die Kerbe in der linken Führung. Bauteile nach oben, USB-C-Buchse nach unten: oben auf den Schlitten legen und zwischen den Führungen nach unten schieben, bis er auf den Anschlägen steht. Die Litzen liegen im Freiraum unter der Platine, der Haken schnappt hinter seine Oberkante. ([in 3D ansehen](https://tobi136b.github.io/co2-wall-sensor/de/assembly.html#step-6))
 
-> **Tipp:** Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben.
+> **Tipp:** Zum Herausnehmen den Haken mit einem kleinen Schraubendreher nach unten drücken und die Platine nach oben schieben. Ist alles verlötet, vorher den Stecker am Display abziehen: Er passt durch die Brücke, der ESP kommt mit allen Adern heraus.
 
 ### Schritt 7 von 13: USB-C-Adapter
 
