@@ -104,7 +104,7 @@ The carrier is the removable floor of the sensor chamber and holds the ESP32-C3 
 
 **You need:** SCD41, 4 wires of about 8 cm, soldering iron
 
-Solder four wires of about 8 cm to the pads first. Then slide the board in from the top, sensor towards you, pads towards the wire slot, until the spring tongue clicks over the upper edge. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-5))
+Solder four wires of about 8 cm to the pads first, on the back of the board (the side without the sensor), and lay them flat towards the upper edge. Then slide the board in from the top, sensor towards you, pads towards the wire slot, until the spring tongue clicks over the upper edge. The wires slide along in the channel behind the pads. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-5))
 
 > **Tip:** To take the board out again, push the spring tongue back with a small screwdriver.
 
@@ -112,9 +112,9 @@ Solder four wires of about 8 cm to the pads first. Then slide the board in from 
 
 <img src="images/steps/step_06.png" width="60%" alt="ESP32-C3 onto the sled">
 
-**You need:** ESP32-C3 SuperMini
+**You need:** ESP32-C3 SuperMini, soldering iron, the [wiring diagram](wiring.md)
 
-Chip side up, USB-C socket down. Put it on the top of the sled and slide it down between the guides until it stands on the end stops. The hook clicks behind its upper edge. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-6))
+First solder the 4 SCD41 wires to the underside of the ESP32-C3 (the side with the pin labels): GND, 3V3, GPIO0 (SDA), GPIO1 (SCL). Lead them through the notch in the left guide. Chip side up, USB-C socket down: put it on the top of the sled and slide it down between the guides until it stands on the end stops. The wires lie in the free space under the board, the hook clicks behind its upper edge. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-6))
 
 > **Tip:** To take it out again, press the hook down with a small screwdriver and slide the board up.
 
@@ -144,9 +144,9 @@ Put the carrier onto the ledges in the chin, the sled slides over the display co
 
 **You need:** The cable of the display (shortened), soldering iron, the [wiring diagram](wiring.md)
 
-Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, every wire goes to its pad. SCD41: the 4 wires along the clip channel of the carrier and over the left guide. Colours as in the wiring diagram. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-9))
+Display: the flat cable folds back at the left wall and runs across behind the display to the sled and under its bridge, then every wire goes down into the free space under the board and along it to its pad, soldered from below. SCD41: the 4 wires along the clip channel of the carrier and through the notch of the left guide. Colours as in the wiring diagram. ([see it in 3D](https://tobi136b.github.io/co2-wall-sensor/assembly.html#step-9))
 
-> **Tip:** Push the cable under the bridge first and mark the length of every wire at its pad, then shorten and solder. The cable stays plugged into the display: to take the display out, just pull the plug.
+> **Tip:** Push the cable under the bridge first and mark the length of every wire at its pad. Then press the hook down, slide the ESP32-C3 up and out, shorten the wires, solder them to its underside and slide it back in. The cable stays plugged into the display: to take the display out, just pull the plug.
 
 ### Step 10 of 13: Bottom blank
 

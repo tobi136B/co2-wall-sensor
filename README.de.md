@@ -7,7 +7,7 @@ Er verdeckt eine Hohlwanddose oder steht auf dem Schreibtisch.**
 
 [![CI](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml/badge.svg)](https://github.com/tobi136B/co2-wall-sensor/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/tobi136B/co2-wall-sensor?label=release)](https://github.com/tobi136B/co2-wall-sensor/releases/latest)
-![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.3-6E7B8B)
+![Gehäuse](https://img.shields.io/badge/Geh%C3%A4use-v2.4-6E7B8B)
 ![ESPHome](https://img.shields.io/badge/ESPHome-2026.9-000?logo=esphome)
 ![Home Assistant](https://img.shields.io/badge/Home%20Assistant-ready-41BDF5?logo=homeassistant&logoColor=white)
 ![CAD](https://img.shields.io/badge/CAD-Autodesk%20Fusion-F39C12?logo=autodesk)
@@ -214,7 +214,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * **Versionen:** Die Releasenummer (z. B. 1.9.0) zählt jede Änderung, auch an Firmware und Doku. Die **Gehäuseversion** (Badge oben, auf jedem gedruckten Teil eingeprägt) ändert sich nur, wenn sich die Druckteile ändern. Teile mit derselben Gehäuseversion passen zusammen, egal aus welchem Release sie stammen.
 * **SCD41-Platine:** ausmessen und den passenden Sensorträger drucken, siehe [Sensor ausmessen](docs/de/sensor-ausmessen.md). Andere Platinen: [Online-Konfigurator](https://tobi136b.github.io/co2-wall-sensor/de/configurator.html).
 * **Display:** Alle Maße des Waveshare 2inch LCD Module sind mit dem Messschieber nachgemessen (Platine 58,2 × 35,3 × 1,62 mm, Glas 47,7 × 34,6 mm, Platine und Glas zusammen 4,43 mm). Andere Chargen können leicht abweichen: `LCD_*` und `GLASS_*` prüfen.
-* **Stand der Hardware:** Gehäuse 2.3 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Der USB-C-Winkeladapter ist nachgemessen, Tasche und Loch passen mit 1 mm Spiel. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
+* **Stand der Hardware:** Gehäuse 2.4 enthält die Erfahrungen aus dem ersten gedruckten Gerät und ist im CAD und in der CI geprüft. Gegenüber 2.3 ist nur der Sensorträger neu (alle Adern von unten gelötet, mit Platz hinter den Platinen), alle anderen Teile von 2.3 passen. Der USB-C-Winkeladapter ist nachgemessen, Tasche und Loch passen mit 1 mm Spiel. Fotos und Messwerte eines gedruckten Geräts sind willkommen.
 
 ## Ausblick
 
@@ -229,6 +229,7 @@ Die CI wiederholt all das, kompiliert vier Firmware-Varianten und prüft, ob die
 * [x] Gehäuse 2.1: mehr Spiel in jeder Passung (0,4 mm), saubere Bodenblende oder geschlossener Rückdeckel für die ungenutzte Kabelöffnung, Einführschrägen, Zuglasche am Träger, 2 mm Luft für das Displaykabel (v2.1)
 * [x] Fensterkontakte aus Home Assistant: Fenstersymbol, Lüftungsdauer und Hinweis zum Schließen (v2.2)
 * [x] Fensterzustände in Farbe, mehr Einstellungen in Home Assistant (Messintervall, Glättung, Trendpfeil, Schwellen für frische Luft und Auskühlen), Blueprint, der dem Fenster folgt, [Home Assistant Anleitung](docs/de/home-assistant.md) (v2.4)
+* [x] Gehäuse 2.4: alle Adern von unten gelötet, Kanal hinter den Lötpunkten des SCD41 und Freiraum unter dem ESP32-C3, nur der Sensorträger ist neu (v2.5)
 * [ ] Displaylayout und Thermik auf echter Hardware prüfen, Fotos ergänzen
 
 ## Mitmachen
