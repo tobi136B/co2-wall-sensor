@@ -103,6 +103,12 @@
   .row label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
   .row input[type=range] { flex: 1; accent-color: var(--accent); }
   .row input[type=checkbox] { accent-color: var(--accent); width: 18px; height: 18px; }
+  .parts { font-size: .92rem; color: var(--muted); }
+  .parts summary { cursor: pointer; }
+  .parts ul { list-style: none; margin: 8px 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .parts label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .parts label.off { opacity: .45; }
+  .parts input { accent-color: var(--accent); width: 16px; height: 16px; }
 
   .list { position: relative; overflow-y: auto; margin: 0; padding: 10px 12px 24px; list-style: none; counter-reset: s; }
   .list li { counter-increment: s; }
@@ -176,6 +182,11 @@
         <span style="flex:1"></span>
         <button class="btn quiet" id="view" style="padding:6px 14px">{{a_view}}</button>
       </div>
+      <details class="parts" id="parts-box">
+        <summary>{{a_parts}}</summary>
+        <ul id="parts"></ul>
+        <button class="btn quiet" id="show-all" style="padding:6px 14px">{{a_show_all}}</button>
+      </details>
     </div>
     <ol class="list" id="list"></ol>
   </aside>

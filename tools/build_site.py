@@ -201,7 +201,7 @@ ASSEMBLY = {
         "a_title": "Assembly guide · CO2 Wall Sensor",
         "a_description": "Interactive 3D assembly guide of the CO2 Wall Sensor: every step, every screw, every wire.",
         "a_back": "Project page",
-        "a_hint": "Drag to turn, scroll to zoom, point at a part to see its name",
+        "a_hint": "Drag to turn, scroll to zoom, point at a part to see its name, double-click hides it",
         "a_loading": "Loading the 3D model …",
         "a_noscript": "The 3D guide needs JavaScript. The written guide is in docs/assembly.md.",
         "a_new_parts": "New in this step",
@@ -211,12 +211,14 @@ ASSEMBLY = {
         "a_explode": "Take apart",
         "a_xray": "See through the housing",
         "a_view": "Reset view",
+        "a_parts": "Show and hide parts",
+        "a_show_all": "Show all",
     },
     "de": {
         "a_title": "Aufbauanleitung · CO2-Wandsensor",
         "a_description": "Interaktive 3D-Aufbauanleitung des CO2-Wandsensors: jeder Schritt, jede Schraube, jede Litze.",
         "a_back": "Projektseite",
-        "a_hint": "Ziehen zum Drehen, Scrollen zum Zoomen, auf ein Teil zeigen für seinen Namen",
+        "a_hint": "Ziehen zum Drehen, Scrollen zum Zoomen, auf ein Teil zeigen für seinen Namen, Doppelklick blendet es aus",
         "a_loading": "3D-Modell wird geladen …",
         "a_noscript": "Die 3D-Anleitung braucht JavaScript. Die schriftliche Anleitung steht in docs/de/aufbau.md.",
         "a_new_parts": "Neu in diesem Schritt",
@@ -226,6 +228,8 @@ ASSEMBLY = {
         "a_explode": "Zerlegen",
         "a_xray": "Gehäuse durchsichtig",
         "a_view": "Ansicht zurücksetzen",
+        "a_parts": "Teile ein- und ausblenden",
+        "a_show_all": "Alle zeigen",
     },
 }
 
