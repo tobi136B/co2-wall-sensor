@@ -29,14 +29,16 @@ TEXT = {
         "esp_sub": "USB-C = power + flashing",
         "lcd_sub": "ST7789V, 240x320, SPI",
         "scd_sub": "CO2 / temp / humidity, I2C",
-        "footer": "All modules run on 3.3 V from the ESP32-C3. About 6 cm of wire is enough. "
+        "footer": "All modules run on 3.3 V from the ESP32-C3. SCD41: about 8 cm of silicone wire in these colours. "
+        "Display: its own cable stays plugged in, solder by the labels on the display, not by colour.\n"
         "Pins are read from esphome/common/base.yaml.",
     },
     "de": {
         "esp_sub": "USB-C = Strom + Flashen",
         "lcd_sub": "ST7789V, 240x320, SPI",
         "scd_sub": "CO2 / Temp / Feuchte, I2C",
-        "footer": "Alle Module mit 3,3 V aus dem ESP32-C3. Ca. 6 cm Kabel reichen. "
+        "footer": "Alle Module mit 3,3 V aus dem ESP32-C3. SCD41: ca. 8 cm Silikonlitze in diesen Farben. "
+        "Display: sein Kabel bleibt gesteckt, nach der Beschriftung am Display löten, nicht nach Farbe.\n"
         "Pinbelegung automatisch aus esphome/common/base.yaml.",
     },
 }
@@ -75,7 +77,7 @@ def render(lang: str, p: dict[str, str]):
         "3V3": "#d62728",
         "GND": "#222222",
         "SDA": "#1f77b4",
-        "SCL": "#17becf",
+        "SCL": "#f2c500",
         "CLK": "#ff7f0e",
         "DIN": "#9467bd",
         "CS": "#2ca02c",
