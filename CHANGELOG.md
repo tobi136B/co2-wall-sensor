@@ -2,6 +2,13 @@
 
 All notable changes to this project. Format based on [Keep a Changelog](https://keepachangelog.com), versioning follows [SemVer](https://semver.org).
 
+## [2.5.0](https://github.com/tobi136B/co2-wall-sensor/compare/v2.4.2...v2.5.0) (2026-10-15)
+
+
+### Added
+
+* **enclosure:** version 2.4, every wire soldered from below with room behind the boards ([#46](https://github.com/tobi136B/co2-wall-sensor/issues/46)) ([316bcfa](https://github.com/tobi136B/co2-wall-sensor/commit/316bcfa51a835a50d9868ca1b902a76514675c21))
+
 ## [2.4.2](https://github.com/tobi136B/co2-wall-sensor/compare/v2.4.1...v2.4.2) (2026-10-15)
 
 
