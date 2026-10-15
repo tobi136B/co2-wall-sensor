@@ -50,7 +50,7 @@ WIRE = {
     "3V3": "#d62728",
     "GND": "#2b2b2b",
     "SDA": "#1f77b4",
-    "SCL": "#17becf",
+    "SCL": "#f2c500",
     "CLK": "#ff7f0e",
     "DIN": "#9467bd",
     "CS": "#2ca02c",
