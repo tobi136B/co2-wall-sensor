@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import yaml  # noqa: E402
+from matplotlib import patheffects as pe  # noqa: E402
 from matplotlib.patches import FancyBboxPatch  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,16 +31,38 @@ TEXT = {
         "lcd_sub": "ST7789V, 240x320, SPI",
         "scd_sub": "CO2 / temp / humidity, I2C",
         "footer": "All modules run on 3.3 V from the ESP32-C3. SCD41: about 8 cm of silicone wire in these colours. "
-        "Display: its own cable stays plugged in, solder by the labels on the display, not by colour.\n"
+        "Display: the colours of the supplied Waveshare cable, check VCC and BL at the labels of the socket.\n"
         "Pins are read from esphome/common/base.yaml.",
+        "colour": {
+            "3V3": "purple",
+            "GND": "white",
+            "DIN": "green",
+            "CLK": "orange",
+            "CS": "yellow",
+            "DC": "blue",
+            "RST": "brown",
+            "BL": "grey",
+        },
+        "colour_scd": {"3V3": "red", "GND": "black", "SDA": "blue", "SCL": "yellow"},
     },
     "de": {
         "esp_sub": "USB-C = Strom + Flashen",
         "lcd_sub": "ST7789V, 240x320, SPI",
         "scd_sub": "CO2 / Temp / Feuchte, I2C",
         "footer": "Alle Module mit 3,3 V aus dem ESP32-C3. SCD41: ca. 8 cm Silikonlitze in diesen Farben. "
-        "Display: sein Kabel bleibt gesteckt, nach der Beschriftung am Display löten, nicht nach Farbe.\n"
+        "Display: Farben des mitgelieferten Waveshare-Kabels, VCC und BL an der Beschriftung der Buchse prüfen.\n"
         "Pinbelegung automatisch aus esphome/common/base.yaml.",
+        "colour": {
+            "3V3": "lila",
+            "GND": "weiß",
+            "DIN": "grün",
+            "CLK": "orange",
+            "CS": "gelb",
+            "DC": "blau",
+            "RST": "braun",
+            "BL": "grau",
+        },
+        "colour_scd": {"3V3": "rot", "GND": "schwarz", "SDA": "blau", "SCL": "gelb"},
     },
 }
 
@@ -73,18 +96,19 @@ def render(lang: str, p: dict[str, str]):
     ax.set_xlim(0, 110)
     ax.set_ylim(0, 66)
     ax.axis("off")
-    farben = {
-        "3V3": "#d62728",
-        "GND": "#222222",
-        "SDA": "#1f77b4",
-        "SCL": "#f2c500",
-        "CLK": "#ff7f0e",
-        "DIN": "#9467bd",
-        "CS": "#2ca02c",
-        "DC": "#8c564b",
-        "RST": "#e377c2",
-        "BL": "#bcbd22",
+    # display: the colours of the supplied Waveshare cable, SCD41: the silicone wire set of the bill of materials
+    lcd_farben = {
+        "3V3": "#8e44ad",  # lila
+        "GND": "#ffffff",  # weiß
+        "DIN": "#2ca02c",  # grün
+        "CLK": "#ff7f0e",  # orange
+        "CS": "#f2c500",  # gelb
+        "DC": "#1f77b4",  # blau
+        "RST": "#8c564b",  # braun
+        "BL": "#9a9a9a",  # grau
     }
+    scd_farben = {"3V3": "#d62728", "GND": "#222222", "SDA": "#1f77b4", "SCL": "#f2c500"}
+    outline = [pe.Stroke(linewidth=3.6, foreground="#555"), pe.Normal()]  # keeps the white wire visible
 
     def module_box(x, y, b, h, titel, sub, fc):
         ax.add_patch(FancyBboxPatch((x, y), b, h, boxstyle="round,pad=0.6,rounding_size=1.8", fc=fc, ec="#333", lw=1.2))
@@ -113,23 +137,24 @@ def render(lang: str, p: dict[str, str]):
     for i, (sig, pin) in enumerate(lcd):
         y = dy + dh - 4 - i * 4.4
         gpio = "3V3" if sig == "3V3" else "GND" if sig == "GND" else p[sig].replace("GPIO", "GPIO ")
-        ax.plot([ex + eb, dx], [y, y], color=farben[sig], lw=2.4, solid_capstyle="round")
+        ax.plot([ex + eb, dx], [y, y], color=lcd_farben[sig], lw=2.4, solid_capstyle="round", path_effects=outline)
         ax.text(ex + eb - 1, y, gpio, ha="right", va="center", fontsize=8.5, family="monospace")
         ax.text(dx + 1, y, pin, ha="left", va="center", fontsize=8.5, family="monospace")
         ax.text(
             (ex + eb + dx) / 2,
             y + 0.9,
-            sig if sig not in ("3V3", "GND") else "",
+            t["colour"][sig],
             ha="center",
             fontsize=7,
-            color=farben[sig],
+            color="#666",
         )
 
     scd = [("3V3", "VDD"), ("GND", "GND"), ("SDA", "SDA"), ("SCL", "SCL")]
     for i, (sig, pin) in enumerate(scd):
         y = sy + sh - 4 - i * 4.4
         gpio = "3V3" if sig == "3V3" else "GND" if sig == "GND" else p[sig].replace("GPIO", "GPIO ")
-        ax.plot([sx + sb, ex], [y, y], color=farben[sig], lw=2.4, solid_capstyle="round")
+        ax.plot([sx + sb, ex], [y, y], color=scd_farben[sig], lw=2.4, solid_capstyle="round")
+        ax.text((sx + sb + ex) / 2, y + 0.9, t["colour_scd"][sig], ha="center", fontsize=7, color="#666")
         ax.text(sx + sb - 1, y, pin, ha="right", va="center", fontsize=8.5, family="monospace")
         ax.text(ex + 1, y, gpio, ha="left", va="center", fontsize=8.5, family="monospace")
 

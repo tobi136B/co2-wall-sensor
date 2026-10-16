@@ -45,19 +45,18 @@ STEEL = "#a7adb4"
 GOLD = "#d9b23a"
 RUBBER = "#202226"
 
-# wire colours of docs/wiring.md (tools/wiring.py)
-WIRE = {
-    "3V3": "#d62728",
-    "GND": "#2b2b2b",
-    "SDA": "#1f77b4",
-    "SCL": "#f2c500",
+# wire colours of docs/wiring.md (tools/wiring.py): the supplied Waveshare cable and the silicone wire set
+WIRE_LCD = {
+    "3V3": "#8e44ad",
+    "GND": "#f2f2f2",
+    "DIN": "#2ca02c",
     "CLK": "#ff7f0e",
-    "DIN": "#9467bd",
-    "CS": "#2ca02c",
-    "DC": "#8c564b",
-    "RST": "#e377c2",
-    "BL": "#bcbd22",
+    "CS": "#f2c500",
+    "DC": "#1f77b4",
+    "RST": "#8c564b",
+    "BL": "#9a9a9a",
 }
+WIRE_SCD = {"3V3": "#d62728", "GND": "#2b2b2b", "SDA": "#1f77b4", "SCL": "#f2c500"}
 
 INSERT_D, INSERT_L = 3.2, 3.0
 SCREW_HEAD_D, SCREW_HEAD_H, SCREW_D, SCREW_L = 3.5, 1.1, 2.0, 4.0  # ISO 7380 M2 x 4
@@ -259,7 +258,7 @@ def wires_display(p: dict) -> list[dict]:
         pts += _line(pts[-1], [lane, pad[1], z_lane])
         pts += _line(pts[-1], [pad[0], pad[1], z_lane])
         pts += _line(pts[-1], pad, 0.4)
-        out.append({"color": WIRE[n], "points": _r(pts), "label": n})
+        out.append({"color": WIRE_LCD[n], "points": _r(pts), "label": n})
     return out
 
 
@@ -320,7 +319,7 @@ def wires_scd(p: dict) -> list[dict]:
             pts += _line(pts[-1], [x_strip, pad[1], z_hi])
         pts += _line(pts[-1], [pad[0], pad[1], pts[-1][2]])
         pts += _line(pts[-1], pad, 0.4)
-        out.append({"color": WIRE[n], "points": _r(pts), "label": n, "r": r})
+        out.append({"color": WIRE_SCD[n], "points": _r(pts), "label": n, "r": r})
     return out
 
 
