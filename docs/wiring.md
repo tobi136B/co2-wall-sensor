@@ -8,16 +8,18 @@ All modules run on 3.3 V directly from the ESP32-C3 SuperMini. Power comes in th
 
 ## ESP32-C3 SuperMini to Waveshare 2inch LCD (SPI)
 
-| LCD | ESP32-C3 | Function |
-|-----|----------|----------|
-| VCC | 3V3      | 3.3 V supply |
-| GND | GND      | ground |
-| DIN | GPIO6    | SPI MOSI |
-| CLK | GPIO4    | SPI clock |
-| CS  | GPIO7    | chip select |
-| DC  | GPIO5    | data / command |
-| RST | GPIO3    | reset |
-| BL  | GPIO10   | backlight (PWM, dimmable) |
+| LCD | Wire | ESP32-C3 | Function |
+|-----|------|----------|----------|
+| VCC | purple | 3V3      | 3.3 V supply |
+| GND | white  | GND      | ground |
+| DIN | green  | GPIO6    | SPI MOSI |
+| CLK | orange | GPIO4    | SPI clock |
+| CS  | yellow | GPIO7    | chip select |
+| DC  | blue   | GPIO5    | data / command |
+| RST | brown  | GPIO3    | reset |
+| BL  | grey   | GPIO10   | backlight (PWM, dimmable) |
+
+These are the colours of the supplied Waveshare cable. Check them at the labels of the display socket: purple at VCC, grey at BL.
 
 ## ESP32-C3 SuperMini to SCD41 (I2C)
 
@@ -28,7 +30,7 @@ All modules run on 3.3 V directly from the ESP32-C3 SuperMini. Power comes in th
 | SDA   | blue   | GPIO0    | I2C data |
 | SCL   | yellow | GPIO1    | I2C clock |
 
-The colours are from the silicone wire set in the bill of materials. The display keeps the colours of its own cable: solder by the labels at the display socket, not by colour.
+The colours are from the silicone wire set in the bill of materials. Blue and yellow also exist on the display cable (DC and CS): do not mix up the two cables while soldering.
 
 ## Why these pins?
 

@@ -8,16 +8,18 @@ Alle Module laufen mit 3,3 V direkt aus dem ESP32-C3 SuperMini. Strom kommt übe
 
 ## ESP32-C3 SuperMini zu Waveshare 2inch LCD (SPI)
 
-| LCD | ESP32-C3 | Funktion |
-|-----|----------|----------|
-| VCC | 3V3      | Versorgung 3,3 V |
-| GND | GND      | Masse |
-| DIN | GPIO6    | SPI MOSI |
-| CLK | GPIO4    | SPI Takt |
-| CS  | GPIO7    | Chip Select |
-| DC  | GPIO5    | Daten / Kommando |
-| RST | GPIO3    | Reset |
-| BL  | GPIO10   | Hintergrundlicht (PWM, dimmbar) |
+| LCD | Ader | ESP32-C3 | Funktion |
+|-----|------|----------|----------|
+| VCC | lila   | 3V3      | Versorgung 3,3 V |
+| GND | weiß   | GND      | Masse |
+| DIN | grün   | GPIO6    | SPI MOSI |
+| CLK | orange | GPIO4    | SPI Takt |
+| CS  | gelb   | GPIO7    | Chip Select |
+| DC  | blau   | GPIO5    | Daten / Kommando |
+| RST | braun  | GPIO3    | Reset |
+| BL  | grau   | GPIO10   | Hintergrundlicht (PWM, dimmbar) |
+
+Die Farben sind die des mitgelieferten Waveshare-Kabels. Zur Sicherheit an der Beschriftung der Displaybuchse prüfen: lila an VCC, grau an BL.
 
 ## ESP32-C3 SuperMini zu SCD41 (I2C)
 
@@ -28,7 +30,7 @@ Alle Module laufen mit 3,3 V direkt aus dem ESP32-C3 SuperMini. Strom kommt übe
 | SDA   | blau    | GPIO0    | I2C Daten |
 | SCL   | gelb    | GPIO1    | I2C Takt |
 
-Die Farben stammen aus dem Silikonlitzen-Set der Stückliste. Beim Display gelten die Farben seines Kabels: nach der Beschriftung an der Displaybuchse löten, nicht nach Farbe.
+Die Farben stammen aus dem Silikonlitzen-Set der Stückliste. Blau und Gelb gibt es auch am Displaykabel (DC und CS): beim Löten die beiden Kabel nicht verwechseln.
 
 ## Warum genau diese Pins?
 
